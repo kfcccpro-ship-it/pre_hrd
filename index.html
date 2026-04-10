@@ -470,73 +470,100 @@ a{text-decoration:none;color:inherit}
 
 /* ── 홈 추가버튼 ── */
 .home-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:16px}
-.home-extra-btn{background:rgba(255,255,255,.88);border:1.5px solid rgba(229,232,235,.95);border-radius:18px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow);font-family:inherit;color:var(--text)}
-.home-extra-btn span:first-child{font-size:26px}
-.home-extra-btn span:last-child{font-size:13px;font-weight:900;text-align:center;line-height:1.4;color:var(--text-2)}
-.home-extra-btn:hover{border-color:#b6d0ff;box-shadow:var(--shadow-strong)}
+.home-extra-btn{background:rgba(255,255,255,.9);border:1.5px solid rgba(229,232,235,.95);border-radius:18px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow);font-family:inherit;color:var(--text)}
+.home-extra-btn>span:first-child{font-size:26px}
+.home-extra-btn>span:last-child{font-size:13px;font-weight:900;text-align:center;line-height:1.4;color:var(--text-2)}
 .home-extra-btn:active{transform:scale(.97)}
 /* ── 경고박스 ── */
-.warn-box{background:#FFFBDB;border:2.5px solid #F5C400;border-radius:16px;padding:16px 18px;margin-bottom:20px;font-size:16px;font-weight:900;color:#7A5C00;line-height:1.6;text-align:center}
+.warn-box{background:#FFFBDB;border:2.5px solid #F5C400;border-radius:16px;padding:16px 18px;margin-bottom:20px;font-size:15px;font-weight:900;color:#7A5C00;line-height:1.65;text-align:center}
 /* ── 유형카드 ── */
-.type-cards{display:grid;gap:10px;margin-bottom:20px}
-.type-card{background:#fff;border:2px solid var(--line);border-radius:20px;padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow)}
-.type-card:hover{border-color:#b6d0ff}
+.type-cards{display:grid;gap:10px;margin-bottom:16px}
+.type-card{background:#fff;border:2px solid var(--line);border-radius:20px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow)}
 .type-card:active{transform:scale(.985)}
-.tc-icon{font-size:28px;flex-shrink:0}
-.tc-text h3{font-size:15px;font-weight:900;color:var(--text);margin-bottom:3px}
+.tc-icon{font-size:26px;flex-shrink:0}
+.tc-text h3{font-size:15px;font-weight:900;color:var(--text);margin-bottom:2px}
 .tc-text p{font-size:12px;color:var(--text-3);line-height:1.5}
-/* ── 복귀시간 ── */
-.ret-toggle{display:flex;gap:8px;margin-bottom:12px}
-.ret-btn{flex:1;padding:12px;border:2px solid var(--line);border-radius:14px;background:#fff;font-size:14px;font-weight:800;cursor:pointer;transition:all .18s;color:var(--text-2);font-family:inherit}
-.ret-btn.on{border-color:var(--primary);background:var(--primary-weak);color:var(--primary)}
-.ret-notice{background:#FFF4EC;border:1px solid #FFD9BF;border-radius:12px;padding:11px 14px;font-size:13px;color:#C2410C;font-weight:700;margin-bottom:12px;line-height:1.5}
 /* ── 폼 공통 ── */
-.fgroup{margin-bottom:15px}
+.fgroup{margin-bottom:14px}
 .flabel{font-size:14px;font-weight:800;color:var(--text-2);margin-bottom:6px;display:block}
 .freq{color:var(--danger)}
 .finput{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;background:#fff;color:var(--text);font-family:inherit;box-sizing:border-box}
 .finput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,130,246,.1)}
-.finput-hint{font-size:12px;color:var(--text-3);margin-top:5px}
-textarea.finput{resize:vertical;min-height:78px}
+.finput-hint{font-size:12px;color:var(--text-3);margin-top:5px;line-height:1.5}
+textarea.finput{resize:vertical;min-height:72px}
+/* ── 이동수단 버튼 ── */
+.transport-opts{display:flex;gap:8px;flex-wrap:wrap}
+.transport-opt{padding:10px 18px;border:2px solid var(--line);border-radius:12px;background:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--text-2);transition:all .15s}
+.transport-opt.on{border-color:var(--primary);background:var(--primary-weak);color:var(--primary)}
+/* ── 시간 선택 ── */
+.time-selects{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+/* ── 전화번호 강조 ── */
+.phone-emph{background:#FFF0F0;border:2px solid var(--danger);border-radius:14px;padding:12px 14px;margin-bottom:4px;font-size:15px;font-weight:900;color:var(--text);width:100%;box-sizing:border-box;font-family:inherit}
+.phone-emph:focus{outline:none;border-color:#c0001a;box-shadow:0 0 0 3px rgba(240,68,82,.12)}
+.phone-label-emph{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:900;color:var(--danger);margin-bottom:6px}
+.phone-notice{background:#FEECEF;border:1px solid #F04452;border-radius:10px;padding:10px 12px;font-size:13px;color:#c0001a;font-weight:800;margin-top:6px;line-height:1.5}
 /* ── 완료박스 ── */
-.cbox{background:linear-gradient(135deg,#E8F3FF,#F0F7FF);border:2px solid #b6d0ff;border-radius:24px;padding:30px 20px;text-align:center;margin-bottom:20px}
-.cbox .ce{font-size:48px;margin-bottom:12px}
-.cbox h2{font-size:21px;font-weight:900;margin-bottom:10px;color:var(--text)}
-.cbox-code{font-size:22px;font-weight:900;color:var(--primary);letter-spacing:0.05em;margin:12px 0;padding:14px;background:#fff;border-radius:14px;border:1.5px solid #b6d0ff;word-break:break-all}
+.cbox{background:linear-gradient(135deg,#E8F3FF,#F0F7FF);border:2px solid #b6d0ff;border-radius:24px;padding:28px 20px;text-align:center;margin-bottom:16px}
+.cbox .ce{font-size:44px;margin-bottom:10px}
+.cbox h2{font-size:20px;font-weight:900;margin-bottom:8px;color:var(--text)}
+.cbox-code{font-size:20px;font-weight:900;color:var(--primary);letter-spacing:0.04em;margin:10px 0;padding:12px;background:#fff;border-radius:12px;border:1.5px solid #b6d0ff;word-break:break-all}
 .cbox p{font-size:13px;color:var(--text-2);line-height:1.7}
-.cbox-red{color:var(--danger)!important;font-weight:900!important;font-size:14px}
+.cbox-red{color:var(--danger)!important;font-weight:900!important}
 /* ── 관리자탭 ── */
-.adm-tabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.adm-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .adm-tab{padding:10px 14px;border:1.5px solid var(--line);border-radius:20px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;background:#fff;color:var(--text-2);transition:all .18s;font-family:inherit;flex-shrink:0}
 .adm-tab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
 .adm-panel{display:none}
 .adm-panel.on{display:block}
-/* ── 신청목록 ── */
+/* ── 신청목록 카드 ── */
 .req-item{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
-.req-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
+.req-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap}
 .req-name{font-size:15px;font-weight:900;color:var(--text)}
 .rbadge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
 .rbadge.ing{background:var(--warning-weak);color:var(--warning)}
 .rbadge.done{background:var(--success-weak);color:var(--success)}
-.req-info{font-size:13px;color:var(--text-3);line-height:1.8}
+.req-info{font-size:13px;color:var(--text-3);line-height:1.9}
 .req-info b{color:var(--text-2)}
 .req-retbtn{width:100%;margin-top:10px;background:var(--success);color:#fff;border:none;border-radius:12px;padding:11px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
 .rfilt{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .rfilt-btn{padding:8px 14px;border:1.5px solid var(--line);border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;background:#fff;color:var(--text-2);font-family:inherit;transition:all .15s}
 .rfilt-btn.on{background:var(--primary);color:#fff;border-color:var(--primary)}
 /* ── 버스 ── */
-.binfo-box{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
-.binfo-row{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.binfo-box{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.binfo-row{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
 .binfo-row:last-child{border-bottom:none}
-.binfo-lbl{font-size:13px;color:var(--text-3);font-weight:700;min-width:70px;flex-shrink:0}
+.binfo-lbl{font-size:13px;color:var(--text-3);font-weight:700;min-width:68px;flex-shrink:0}
 .binfo-val{font-size:14px;color:var(--text);font-weight:800}
 .bgroup{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
-.bgroup-h{font-size:15px;font-weight:900;color:var(--text);margin-bottom:2px}
-.bgroup-s{font-size:13px;color:var(--primary);font-weight:800;margin-bottom:10px}
-.bmem{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line)}
+.bgroup-h{font-size:15px;font-weight:900;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.bgroup-sub{font-size:13px;color:var(--primary);font-weight:800;margin-top:2px}
+.bgroup-body{display:none;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.bgroup-body.on{display:block}
+.bmem{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.bmem:last-child{border-bottom:none}
 .bmem-name{font-size:14px;font-weight:800;color:var(--text)}
 .bmem-info{font-size:12px;color:var(--text-3);margin-top:2px}
+/* ── 금고명 입력 ── */
+.bank-wrap{display:flex;align-items:center;gap:0;width:100%}
+.bank-inp{flex:1;border:1.5px solid var(--line);border-radius:12px 0 0 12px;padding:12px 14px;font-size:15px;background:#fff;color:var(--text);font-family:inherit;box-sizing:border-box}
+.bank-inp:focus{outline:none;border-color:var(--primary)}
+.bank-suffix{background:#F5F7FA;border:1.5px solid var(--line);border-left:none;border-radius:0 12px 12px 0;padding:12px 14px;font-size:15px;font-weight:800;color:var(--text-2);white-space:nowrap;flex-shrink:0}
+/* ── 구분선 ── */
 .sep{height:1px;background:var(--line);margin:16px 0}
+/* ── 외출신청/복귀처리 큰 버튼 ── */
+.oe-main-btns{display:grid;gap:12px;margin-top:20px}
+.oe-big-btn{background:#fff;border:2px solid var(--line);border-radius:20px;padding:22px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow);font-family:inherit;text-align:left;width:100%}
+.oe-big-btn:active{transform:scale(.985)}
+.oe-big-icon{font-size:32px;flex-shrink:0}
+.oe-big-text h3{font-size:17px;font-weight:900;color:var(--text);margin-bottom:3px}
+.oe-big-text p{font-size:13px;color:var(--text-3);line-height:1.5}
+.oe-big-arrow{margin-left:auto;font-size:20px;color:var(--text-3)}
+/* ── 요약 통계 ── */
+.stat-row{display:flex;gap:8px;margin-bottom:14px}
+.stat-card{flex:1;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 10px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-size:26px;font-weight:900;color:var(--text)}
+.stat-lbl{font-size:11px;color:var(--text-3);margin-top:3px;font-weight:800}
+
 </style>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -595,7 +622,6 @@ textarea.finput{resize:vertical;min-height:78px}
     <div class="hd1"></div><div class="hd2"></div>
     <div class="htop">
       <div class="horg">MG인재개발원 안내</div>
-      
       <button class="btnstart off btnstart-top" id="start-btn" onclick="handleStartBtn()"><span class="main" id="start-btn-main">바로 시작하기</span><span class="sub" id="start-btn-sub">안내 준비 중</span></button>
       <div class="home-extra-grid">
         <button class="home-extra-btn" onclick="goTo('outexit')">
@@ -608,7 +634,7 @@ textarea.finput{resize:vertical;min-height:78px}
 
     </div>
     <div class="hbot">
-      <button class="btnadm" onclick="openPwOverlay()">관리자 화면 열기</button>
+      <button class="btnadm" onclick="openPwOverlay('admin')">관리자 화면 열기</button>
       <div class="hmeta">오늘의 안내 상태</div>
       <div class="dstat" id="home-stat">데이터를 불러오는 중입니다</div>
       <p class="hnote">시작일과 과정명을 선택하면 강의실과 이동 경로를 안내합니다.</p>
@@ -637,7 +663,7 @@ textarea.finput{resize:vertical;min-height:78px}
       <div style="font-size:13px;font-weight:900;color:var(--primary);margin-bottom:8px">관리자 설정 필요</div>
       <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px">아직 등록된 일정이 없습니다</div>
       <div style="font-size:13px;color:var(--text-3);line-height:1.7">관리자 메뉴에서 CSV 파일을 업로드하면<br>시작일과 과정 목록이 바로 표시됩니다.</div>
-      <button onclick="openPwOverlay()" style="margin-top:12px;background:var(--primary);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 10px 20px rgba(49,130,246,.20)">관리자 열기</button>
+      <button onclick="openPwOverlay('admin')" style="margin-top:12px;background:var(--primary);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 10px 20px rgba(49,130,246,.20)">관리자 열기</button>
     </div>
     <div id="clist-area" style="display:none"></div>
   </div>
@@ -806,20 +832,17 @@ textarea.finput{resize:vertical;min-height:78px}
       </button>
     </div>
     </div><!-- /ap-classroom -->
-
     <div class="adm-panel" id="ap-outexit">
-      <div class="rfilt" id="oe-filt">
-        <button class="rfilt-btn on" onclick="setOeFilt('all',this)">전체</button>
-        <button class="rfilt-btn" onclick="setOeFilt('pending',this)">외출중</button>
-        <button class="rfilt-btn" onclick="setOeFilt('returned',this)">복귀완료</button>
+      <div class="rfilt" id="adm-oe-filt">
+        <button class="rfilt-btn on" onclick="setAdmOeFilt('all',this)">전체</button>
+        <button class="rfilt-btn" onclick="setAdmOeFilt('pending',this)">외출중</button>
+        <button class="rfilt-btn" onclick="setAdmOeFilt('returned',this)">복귀완료</button>
       </div>
-      <div id="adm-oe-list"><div style="text-align:center;padding:30px;color:var(--text-3)">탭 전환 시 불러옵니다</div></div>
+      <div id="adm-oe-list"><div class="empty-st"><div class="ei">🚶</div><p>탭 전환 시 불러옵니다</p></div></div>
     </div>
-
     <div class="adm-panel" id="ap-bus">
-      <div id="adm-bus-list"><div style="text-align:center;padding:30px;color:var(--text-3)">탭 전환 시 불러옵니다</div></div>
+      <div id="adm-bus-list"><div class="empty-st"><div class="ei">🚌</div><p>탭 전환 시 불러옵니다</p></div></div>
     </div>
-
   </div>
 </div>
 
@@ -946,12 +969,13 @@ const ADMIN_PW = '2026';
 let pwBuf = ''; let pwFails = 0; let pwLockUntil = 0; const PW_MAX_FAILS = 5; const PW_LOCK_MS = 30 * 1000;
 function isPwLocked(){ return Date.now() < pwLockUntil; }
 function pwLockMsg(){ const remain = Math.ceil((pwLockUntil - Date.now())/1000); return remain>0 ? `잠금 중 · ${remain}초 후 다시 시도` : ''; }
-function openPwOverlay(){ pwBuf = ''; updatePwDots(); const err = document.getElementById('pw-err'); err.textContent = isPwLocked() ? pwLockMsg() : ''; document.getElementById('pw-overlay').classList.add('show'); history.pushState({pw:true},''); }
+let PW_DEST='admin';
+function openPwOverlay(dest){ PW_DEST=dest||'admin'; pwBuf = ''; updatePwDots(); const err = document.getElementById('pw-err'); err.textContent = isPwLocked() ? pwLockMsg() : ''; document.getElementById('pw-overlay').classList.add('show'); history.pushState({pw:true},''); }
 function pwInput(n){
   const err = document.getElementById('pw-err'); if(isPwLocked()){ err.textContent = pwLockMsg(); return; }
   if(pwBuf.length >= 4) return; pwBuf += n; updatePwDots();
   if(pwBuf.length === 4){ setTimeout(()=>{
-      if(pwBuf === ADMIN_PW){ pwFails = 0; document.getElementById('pw-overlay').classList.remove('show'); history.back(); setTimeout(()=>goTo('admin'),50); } 
+      if(pwBuf === ADMIN_PW){ pwFails = 0; document.getElementById('pw-overlay').classList.remove('show'); history.back(); setTimeout(()=>goTo(PW_DEST),50); } 
       else { pwFails++; if(pwFails >= PW_MAX_FAILS){ pwLockUntil = Date.now() + PW_LOCK_MS; err.textContent = `🚫 비밀번호 오류가 여러 번 발생했습니다. ${Math.ceil(PW_LOCK_MS/1000)}초 잠금`; } 
       else { err.textContent = `❌ 비밀번호가 틀렸습니다 (${pwFails}/${PW_MAX_FAILS})`; } pwBuf = ''; updatePwDots(); }
     }, 200); }
@@ -1065,7 +1089,22 @@ async function bulkDeleteCourses(){ if(COURSE_SEL.size === 0){ toast('삭제할 
 // NAV & HOME & WEEK SCREEN
 // ═══════════════════════════════
 let curScreen = 'home';
-function goTo(name,fromBack){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+name).classList.add('active'); const prev=curScreen; curScreen = name; window.scrollTo(0,0); if(!fromBack && prev!==name) history.pushState({screen:name},''); if(name==='home') renderHome(); if(name==='week') initWeek(); if(name==='admin') renderAdmin(); if(name==='guide') renderGuide(); if(name==='bus-apply') initBusApply(); if(name==='outexit') {}; if(name==='admin'){ ADM_TAB=ADM_TAB||'classroom'; } }
+function goTo(name,fromBack){
+  const el = document.getElementById('s-'+name);
+  if(!el){ console.warn('Screen not found: s-'+name); return; }
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  const prev=curScreen; curScreen=name; window.scrollTo(0,0);
+  if(!fromBack && prev!==name) history.pushState({screen:name},'');
+  if(name==='home') renderHome();
+  if(name==='week') initWeek();
+  if(name==='admin'){ ADM_TAB=ADM_TAB||'classroom'; renderAdmin(); }
+  if(name==='guide') renderGuide();
+  if(name==='bus-apply') initBusApply();
+  if(name==='oe-form') initOEForm();
+  if(name==='oe-admin') loadOEAdmin();
+  if(name==='bus-admin') loadBusAdmin();
+}
 function renderHome(){ const el=document.getElementById('home-stat'); const n=D.courses.length; if(!n){ el.className='dstat empty'; el.textContent='등록된 일정이 없습니다. 관리자에서 CSV를 업로드해 주세요.'; } else{ const ok=D.courses.filter(c=>c.room).length; el.className='dstat ok'; el.textContent=`현재 등록된 과정 ${n}개 · 강의실 배정 ${ok}/${n}`; } }
 function uniqueDates(){ const seen=new Set(),res=[]; D.courses.forEach(c=>{ if(!seen.has(c.startDate)){seen.add(c.startDate);res.push(c.startDate);} }); return res; }
 function initWeek(){
@@ -1299,21 +1338,23 @@ window.onload = async () => {
 };
 
 
-// ═══════════════════════════════════════════════════════
-// Google Apps Script 웹앱 URL (배포 후 교체)
-// ═══════════════════════════════════════════════════════
-const GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'; // ← 배포 후 교체
+// ════════════════════════════════════════════════
+// GAS URL – 배포 후 교체
+// ════════════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 
-// ═══════════════════════════════════════════════════════
-// 관리자 탭 상태
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// 공통 상태
+// ════════════════════════════════════════════════
 let ADM_TAB = 'classroom';
-let OE_FILT = 'all';
-let OE_TYPE = null; // 'hospital' | 'other' | 'overnight'
-let RET_TYPE = 'unknown'; // 'unknown' | 'scheduled'
-let BUS_SELECTED_COURSE = '';
-let BUS_FILT = 'all';
+let OE_TYPE = null;
+let TRANSPORT_SEL = null;
+let OE_ADM_FILT = 'all';
+let BUS_SEL_COURSE = '';
 
+// ════════════════════════════════════════════════
+// 관리자 탭 전환
+// ════════════════════════════════════════════════
 function admTab(tab){
   ADM_TAB = tab;
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab));
@@ -1321,236 +1362,336 @@ function admTab(tab){
   if(tab==='outexit') loadAdmOE();
   if(tab==='bus') loadAdmBus();
 }
+function setAdmOeFilt(f, btn){
+  document.querySelectorAll('#adm-oe-filt .rfilt-btn').forEach(b=>b.classList.toggle('on', b===btn));
+  OE_ADM_FILT = f;
+  loadAdmOE();
+}
 
-// ═══════════════════════════════════════════════════════
-// 외출·외박 – 신청 흐름
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// 외출·외박 신청 폼 초기화
+// ════════════════════════════════════════════════
 function startOE(type){
   OE_TYPE = type;
-  // 폼 초기화
-  ['oef-name','oef-idcode','oef-course','oef-phone','oef-dest','oef-transport','oef-reason','oef-special'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.value = '';
-  });
-  document.getElementById('oef-startdt').value = '';
-  setRetType('unknown');
-
-  const title = {hospital:'병원·약국 외출', other:'기타 외출', overnight:'외박'}[type];
-  document.getElementById('oe-form-title').textContent = title + ' 신청';
-
-  const destLbl = document.getElementById('oef-dest-lbl');
-  const destHint = document.getElementById('oef-dest-hint');
-  const specialWrap = document.getElementById('oef-special-wrap');
-  const transWrap = document.getElementById('oef-transport-wrap');
-
-  if(type==='hospital'){
-    destLbl.innerHTML = '병원·약국명 또는 방문 목적 <span class="freq">*</span>';
-    destHint.textContent = '정확한 주소를 몰라도 목적만 쓰셔도 됩니다';
-    specialWrap.style.display = 'block';
-    transWrap.style.display = 'block';
-  } else {
-    destLbl.innerHTML = '행선지 <span class="freq">*</span>';
-    destHint.textContent = '';
-    specialWrap.style.display = 'none';
-    transWrap.style.display = 'block';
-  }
-  if(type==='overnight'){
-    document.getElementById('oef-transport-wrap').style.display = 'block';
-  }
+  TRANSPORT_SEL = null;
   goTo('oe-form');
 }
 
-function setRetType(t){
-  RET_TYPE = t;
-  document.getElementById('ret-unknown').classList.toggle('on', t==='unknown');
-  document.getElementById('ret-scheduled').classList.toggle('on', t==='scheduled');
-  document.getElementById('ret-notice').style.display = t==='unknown' ? 'block' : 'none';
-  document.getElementById('ret-dt-wrap').style.display = t==='scheduled' ? 'block' : 'none';
+function initOEForm(){
+  if(!OE_TYPE) return;
+  // 제목
+  const titles = {hospital:'병원·약국 외출 신청', other:'기타 외출 신청', overnight:'외박 신청'};
+  document.getElementById('oef-title').textContent = titles[OE_TYPE] || '외출 신청';
+  // 필드 초기화
+  ['oef-name','oef-idcode','oef-phone','oef-dest','oef-special','oef-reason2'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['oef-startdt','oef-retdt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const rea=document.getElementById('oef-reason'); if(rea) rea.value='';
+  // 이동수단 초기화
+  document.querySelectorAll('.transport-opt').forEach(b=>b.classList.remove('on'));
+  // 날짜 초기화
+  const ds = document.getElementById('oef-date-sel');
+  ds.innerHTML = '<option value="">-- 시작일을 선택하세요 --</option>';
+  uniqueDates().forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent='📅 '+d; ds.appendChild(o); });
+  document.getElementById('oef-course-list').style.display='none';
+  document.getElementById('oef-course').value='';
+  // 월/일/시 셀렉트
+  initTimeSelects();
+  // 타입별 필드 표시 제어
+  document.getElementById('oef-dest-wrap').style.display = OE_TYPE==='hospital' ? 'none' : 'block';
+  document.getElementById('oef-overnight-wrap').style.display = OE_TYPE==='overnight' ? 'block' : 'none';
+  document.getElementById('oef-reason-wrap').style.display = OE_TYPE==='other' ? 'block' : 'none';
+  document.getElementById('oef-special-wrap').style.display = OE_TYPE==='hospital' ? 'block' : 'none';
+  document.getElementById('oef-time-wrap').style.display = OE_TYPE==='overnight' ? 'none' : 'block';
+}
+
+function initTimeSelects(){
+  const now = new Date();
+  // 월
+  const ms = document.getElementById('oef-month'); ms.innerHTML='<option value="">월</option>';
+  for(let i=1;i<=12;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i+'월'; if(i===now.getMonth()+1) o.selected=true; ms.appendChild(o); }
+  // 일
+  const ds = document.getElementById('oef-day'); ds.innerHTML='<option value="">일</option>';
+  for(let i=1;i<=31;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i+'일'; if(i===now.getDate()) o.selected=true; ds.appendChild(o); }
+  // 시
+  const hs = document.getElementById('oef-hour'); hs.innerHTML='<option value="">시</option>';
+  for(let i=0;i<=23;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i+'시'; if(i===now.getHours()) o.selected=true; hs.appendChild(o); }
+}
+
+function onOEDateSel(sel){
+  const cl = document.getElementById('oef-course-list');
+  document.getElementById('oef-course').value='';
+  if(!sel.value){ cl.style.display='none'; return; }
+  const list = D.courses.filter(c=>c.startDate===sel.value);
+  cl.style.display='block';
+  cl.innerHTML = list.map((c,i)=>`<div class="card" style="margin-bottom:8px" onclick="pickOECourse('${esc(c.courseName)}')">
+    <div class="crow"><div class="cicon">${i+1}</div><div class="cinfo"><h3>${esc(c.courseName)}</h3></div><span class="chev">›</span></div>
+  </div>`).join('');
+}
+
+function pickOECourse(name){
+  document.getElementById('oef-course').value = name;
+  document.getElementById('oef-course-list').style.display='none';
+  toast('✅ 과정 선택 완료');
+}
+
+function setTransport(t, btn){
+  TRANSPORT_SEL = t;
+  document.querySelectorAll('.transport-opt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
 }
 
 function submitOE(){
-  const name     = document.getElementById('oef-name').value.trim();
-  const idcode   = document.getElementById('oef-idcode').value.trim();
-  const course   = document.getElementById('oef-course').value.trim();
-  const phone    = document.getElementById('oef-phone').value.trim();
-  const dest     = document.getElementById('oef-dest').value.trim();
-  const transport= document.getElementById('oef-transport').value.trim();
-  const startdt  = document.getElementById('oef-startdt').value;
-  const reason   = document.getElementById('oef-reason').value.trim();
-  const special  = document.getElementById('oef-special').value.trim();
-  const retdt    = RET_TYPE==='scheduled' ? document.getElementById('oef-retdt').value : '';
+  const course  = document.getElementById('oef-course').value.trim();
+  const name    = document.getElementById('oef-name').value.trim();
+  const idcode  = document.getElementById('oef-idcode').value.trim();
+  const phone   = document.getElementById('oef-phone').value.trim();
+  const mon     = document.getElementById('oef-month').value;
+  const day     = document.getElementById('oef-day').value;
+  const hour    = document.getElementById('oef-hour').value;
 
-  if(!name||!idcode||!course||!phone||!dest||!startdt||!reason){
-    toast('⚠️ 필수 항목을 모두 입력해 주세요'); return;
+  if(!course){ toast('⚠️ 과정을 선택해 주세요'); return; }
+  if(!name)  { toast('⚠️ 성명을 입력해 주세요'); return; }
+  if(!idcode){ toast('⚠️ 금고코드-사번을 입력해 주세요'); return; }
+  if(!phone) { toast('⚠️ 연락처를 입력해 주세요'); return; }
+  if(!TRANSPORT_SEL){ toast('⚠️ 이동수단을 선택해 주세요'); return; }
+
+  let startStr = '';
+  let dest = '';
+  let reason = '';
+  let retdt = '';
+  let special = '';
+
+  if(OE_TYPE==='overnight'){
+    startStr = document.getElementById('oef-startdt').value;
+    retdt    = document.getElementById('oef-retdt').value;
+    reason   = document.getElementById('oef-reason').value.trim();
+    dest     = document.getElementById('oef-dest').value.trim();
+    if(!startStr||!retdt||!reason||!dest){ toast('⚠️ 외박 정보를 모두 입력해 주세요'); return; }
+  } else {
+    if(!mon||!day||!hour){ toast('⚠️ 외출 요청 시간을 선택해 주세요'); return; }
+    startStr = mon+'월 '+day+'일 '+hour+'시';
+    if(OE_TYPE==='other'){
+      dest   = document.getElementById('oef-dest').value.trim();
+      reason = document.getElementById('oef-reason2').value.trim();
+      if(!dest||!reason){ toast('⚠️ 행선지와 사유를 입력해 주세요'); return; }
+    }
+    if(OE_TYPE==='hospital'){
+      special = document.getElementById('oef-special').value.trim();
+    }
   }
-  if(OE_TYPE!=='hospital' && !transport){
-    toast('⚠️ 이동수단을 입력해 주세요'); return;
-  }
-  if(RET_TYPE==='scheduled' && !retdt){
-    toast('⚠️ 복귀 예정 시간을 입력해 주세요'); return;
-  }
-  // 복귀 확인 팝업
+
   if(!confirm('복귀 후 과정 진행 매니저에게 반드시 연락해 주세요.\n\n신청을 제출하시겠습니까?')) return;
 
   const typeLabel = {hospital:'병원·약국 외출', other:'기타 외출', overnight:'외박'}[OE_TYPE];
-  const now = new Date().toISOString();
   const payload = {
-    action:'addOE',
-    type: OE_TYPE, typeLabel,
-    name, idcode, course, phone, dest, transport,
-    startdt, retType: RET_TYPE, retdt, reason, special,
-    status:'pending', createdAt: now
+    action:'addOE', type:OE_TYPE, typeLabel,
+    name, idcode, course, phone, dest, transport:TRANSPORT_SEL,
+    startdt:startStr, retdt, reason, special,
+    status:'pending', createdAt:new Date().toISOString()
   };
-
-  toast('신청 중입니다...');
-  fetch(GAS_URL, {method:'POST', body:JSON.stringify(payload)})
-    .then(r=>r.json()).then(res=>{
-      if(res.ok){
-        showOEComplete(payload, res.id);
-        sendOEEmail(payload, res.id);
-      } else { toast('❌ 저장 실패: '+res.msg); }
-    }).catch(()=>toast('❌ 서버 연결 실패. 잠시 후 다시 시도해 주세요.'));
+  toast('신청 중...');
+  fetch(GAS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)})
+    .then(()=>{ showOEComplete(payload); sendOEEmail(payload); })
+    .catch(()=>{ showOEComplete(payload); toast('⚠️ 서버 저장 실패, 관리자에게 알려주세요'); });
 }
 
-function showOEComplete(d, id){
-  const typeLabel = d.typeLabel;
-  const retStr = d.retType==='unknown' ? '미정 (복귀 후 즉시 연락)' : (d.retdt||'');
+function showOEComplete(d){
   const html = `
     <div class="cbox">
       <div class="ce">✅</div>
-      <h2>${typeLabel} 신청이 완료되었습니다</h2>
+      <h2>${esc(d.typeLabel)} 신청 완료</h2>
       <div style="font-size:14px;color:var(--text-3);margin-bottom:6px">신청 완료 번호</div>
-      <div class="cbox-code">${d.idcode}</div>
-      <p><b>${d.name}</b>님의 신청이 접수되었습니다</p>
+      <div class="cbox-code">${esc(d.idcode)}</div>
+      <p><b>${esc(d.name)}</b>님 신청이 접수됐습니다</p>
     </div>
-    <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;font-size:14px;line-height:2;color:var(--text-2)">
-      <div><b>유형</b> ${typeLabel}</div>
-      <div><b>과정명</b> ${esc(d.course)}</div>
-      <div><b>행선지</b> ${esc(d.dest)}</div>
-      <div><b>출발시간</b> ${d.startdt.replace('T',' ')}</div>
-      <div><b>복귀예정</b> ${retStr}</div>
+    <div style="background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;font-size:13px;line-height:2;color:var(--text-2)">
+      <div><b>유형</b> ${esc(d.typeLabel)}</div>
+      <div><b>과정</b> ${esc(d.course)}</div>
+      <div><b>이동수단</b> ${esc(d.transport)}</div>
+      <div><b>출발시간</b> ${esc(d.startdt)}</div>
+      ${d.dest?`<div><b>행선지</b> ${esc(d.dest)}</div>`:''}
     </div>
-    <div class="cbox-red" style="text-align:center;margin-bottom:16px;font-size:14px">📣 담당 매니저 님께 신청 내역을 다시 알려주세요</div>
+    <div style="background:#FEECEF;border:1px solid var(--danger);border-radius:14px;padding:14px;text-align:center;margin-bottom:16px;font-size:14px;font-weight:900;color:var(--danger)">
+      📣 복귀 후 즉시 매니저에게 연락해 주세요!
+    </div>
     <button class="btnhome" onclick="goTo('home')">홈으로 돌아가기</button>`;
   document.getElementById('oe-complete-cnt').innerHTML = html;
   goTo('oe-complete');
 }
 
-// 이메일 발송 (Google Apps Script)
-function sendOEEmail(d, id){
-  const payload = { action:'sendOEEmail', ...d, id };
-  fetch(GAS_URL, {method:'POST', body:JSON.stringify(payload)}).catch(()=>{});
+function sendOEEmail(d){
+  const typeLabel = d.typeLabel||'외출';
+  const body = `<div style="font-family:sans-serif;max-width:560px;margin:0 auto">
+  <h2 style="text-align:center;border-bottom:2px solid #3182F6;padding-bottom:10px">외출 및 외박 신청서</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:14px">
+    <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd;width:110px">유형</td><td style="padding:8px 12px;border:1px solid #ddd">${typeLabel}</td></tr>
+    <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">신청인</td><td style="padding:8px 12px;border:1px solid #ddd">${d.name}</td></tr>
+    <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">완료번호</td><td style="padding:8px 12px;border:1px solid #ddd">${d.idcode}</td></tr>
+    <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">과정명</td><td style="padding:8px 12px;border:1px solid #ddd">${d.course}</td></tr>
+    <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">연락처</td><td style="padding:8px 12px;border:1px solid #ddd">${d.phone}</td></tr>
+    <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">이동수단</td><td style="padding:8px 12px;border:1px solid #ddd">${d.transport||'-'}</td></tr>
+    ${d.dest?`<tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">행선지</td><td style="padding:8px 12px;border:1px solid #ddd">${d.dest}</td></tr>`:''}
+    <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">외출시각</td><td style="padding:8px 12px;border:1px solid #ddd">${d.startdt}</td></tr>
+    ${d.retdt?`<tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">복귀예정</td><td style="padding:8px 12px;border:1px solid #ddd">${d.retdt}</td></tr>`:''}
+    ${d.reason?`<tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">사유</td><td style="padding:8px 12px;border:1px solid #ddd">${d.reason}</td></tr>`:''}
+    ${d.special?`<tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:bold;border:1px solid #ddd">현재상태</td><td style="padding:8px 12px;border:1px solid #ddd">${d.special}</td></tr>`:''}
+  </table>
+  <br>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:16px">
+    <tr>
+      <td style="border:1px solid #ddd;text-align:center;padding:20px 10px;width:33%"><b>신청인</b><br><br><br>${d.name}&nbsp;(인)</td>
+      <td style="border:1px solid #ddd;text-align:center;padding:20px 10px;width:33%"><b>담당교수</b><br><br><br>&nbsp;</td>
+      <td style="border:1px solid #ddd;text-align:center;padding:20px 10px;width:33%"><b>팀장(부장)</b><br><br><br>&nbsp;</td>
+    </tr>
+  </table>
+  <div style="background:#FFF0F0;border:1px solid #F04452;border-radius:8px;padding:12px;font-size:13px;color:#F04452;font-weight:bold;text-align:center;margin-top:16px">
+    ※ 복귀 후 과정 진행 매니저에게 반드시 연락하여 복귀 사실을 알려주세요.
+  </div></div>`;
+  fetch(GAS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({
+    action:'sendOEEmail', subject:`[외출신청] ${d.name} – ${typeLabel}`,
+    htmlBody: body
+  })}).catch(()=>{});
 }
 
-// ═══════════════════════════════════════════════════════
-// 외출·외박 – 복귀 처리
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// 복귀 처리 (전화번호 뒷 4자리 OR 사번)
+// ════════════════════════════════════════════════
 function searchReturn(){
   const q = document.getElementById('oer-query').value.trim();
-  if(!q){ toast('⚠️ 조회할 정보를 입력해 주세요'); return; }
+  if(!q){ toast('⚠️ 조회 정보를 입력해 주세요'); return; }
   toast('조회 중...');
   fetch(GAS_URL+'?action=searchOE&q='+encodeURIComponent(q))
-    .then(r=>r.json()).then(res=>{
-      const list = document.getElementById('oer-list');
-      if(!res.data||!res.data.length){
-        list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-3)">외출 중인 신청 내역이 없습니다</div>';
-        return;
-      }
-      list.innerHTML = res.data.map(item=>`
-        <div class="req-item">
-          <div class="req-head">
-            <span class="req-name">${esc(item.name)}</span>
-            <span class="rbadge ${item.status==='returned'?'done':'ing'}">${item.status==='returned'?'복귀완료':'외출중'}</span>
-          </div>
-          <div class="req-info">
-            <div><b>유형</b> ${esc(item.typeLabel)}</div>
-            <div><b>과정</b> ${esc(item.course)}</div>
-            <div><b>행선지</b> ${esc(item.dest)}</div>
-            <div><b>출발</b> ${esc(item.startdt||'').replace('T',' ')}</div>
-            <div><b>완료번호</b> ${esc(item.idcode)}</div>
-          </div>
-          ${item.status!=='returned' ? `<button class="req-retbtn" onclick="doReturn('${item.rowIdx}','${esc(item.name)}')">✅ 복귀 처리</button>` : ''}
-        </div>`).join('');
-    }).catch(()=>toast('❌ 조회 실패'));
+    .then(r=>r.json()).then(res=>renderReturnList(res.data||[]))
+    .catch(()=>{
+      toast('⚠️ GAS 연결 필요');
+      document.getElementById('oer-list').innerHTML='<div style="text-align:center;padding:20px;color:var(--text-3)">GAS URL 설정 후 사용 가능합니다</div>';
+    });
+}
+
+function renderReturnList(data){
+  const el = document.getElementById('oer-list');
+  if(!data.length){ el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">해당 정보의 외출 내역이 없습니다</div>'; return; }
+  el.innerHTML = data.map(item=>`
+    <div class="req-item">
+      <div class="req-head">
+        <span class="req-name">${esc(item.name)} <span style="font-size:13px;color:var(--text-3)">${esc(item.typeLabel||'')}</span></span>
+        <span class="rbadge ${item.status==='returned'?'done':'ing'}">${item.status==='returned'?'복귀완료':'외출중'}</span>
+      </div>
+      <div class="req-info">
+        <div><b>과정</b> ${esc(item.course)}</div>
+        <div><b>출발</b> ${esc(item.startdt||'')}</div>
+        <div><b>이동수단</b> ${esc(item.transport||'-')}</div>
+        <div><b>완료번호</b> ${esc(item.idcode)}</div>
+      </div>
+      ${item.status!=='returned'?`<button class="req-retbtn" onclick="doReturn('${item.rowIdx}','${esc(item.name)}')">✅ 복귀 처리</button>`:''}
+    </div>`).join('');
 }
 
 function doReturn(rowIdx, name){
   if(!confirm(`${name}님을 복귀 처리하시겠습니까?`)) return;
-  toast('처리 중...');
-  fetch(GAS_URL, {method:'POST', body:JSON.stringify({action:'returnOE', rowIdx, returnedAt: new Date().toISOString()})})
-    .then(r=>r.json()).then(res=>{
-      if(res.ok){ toast('✅ 복귀 처리 완료'); searchReturn(); }
-      else toast('❌ 처리 실패');
-    }).catch(()=>toast('❌ 오류 발생'));
+  fetch(GAS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({
+    action:'returnOE', rowIdx, returnedAt:new Date().toISOString()
+  })}).then(()=>{ toast('✅ 복귀 처리 완료'); searchReturn(); })
+    .catch(()=>{ toast('⚠️ GAS 연결 필요'); });
 }
 
-// ═══════════════════════════════════════════════════════
-// 외출·외박 관리자
-// ═══════════════════════════════════════════════════════
-function setOeFilt(f, btn){
-  OE_FILT = f;
-  document.querySelectorAll('#oe-filt .rfilt-btn').forEach(b=>b.classList.toggle('on', b===btn));
-  loadAdmOE();
-}
-
-function loadAdmOE(){
-  const el = document.getElementById('adm-oe-list');
-  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-3)">불러오는 중...</div>';
-  fetch(GAS_URL+'?action=listOE&filter='+OE_FILT)
+// ════════════════════════════════════════════════
+// 외출 관리자 대시보드
+// ════════════════════════════════════════════════
+function loadOEAdmin(){
+  const el = document.getElementById('oe-admin-list');
+  const st = document.getElementById('oe-admin-stats');
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-3)">불러오는 중...</div>';
+  fetch(GAS_URL+'?action=listOE&filter='+OE_ADM_FILT)
     .then(r=>r.json()).then(res=>{
-      if(!res.data||!res.data.length){
-        el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>'; return;
-      }
-      el.innerHTML = res.data.map(item=>`
+      const data = res.data||[];
+      const total = data.length;
+      const out   = data.filter(d=>d.status!=='returned').length;
+      const ret   = data.filter(d=>d.status==='returned').length;
+      st.innerHTML=`
+        <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">전체</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--warning)">${out}</div><div class="stat-lbl">외출중</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--success)">${ret}</div><div class="stat-lbl">복귀완료</div></div>`;
+      if(!data.length){ el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>'; return; }
+      el.innerHTML = data.map(item=>`
         <div class="req-item">
           <div class="req-head">
-            <span class="req-name">${esc(item.name)} <span style="font-size:13px;color:var(--text-3);font-weight:700">${esc(item.typeLabel)}</span></span>
+            <span class="req-name">${esc(item.name)} <span style="font-size:12px;color:var(--text-3)">${esc(item.typeLabel||'')}</span></span>
             <span class="rbadge ${item.status==='returned'?'done':'ing'}">${item.status==='returned'?'복귀완료':'외출중'}</span>
           </div>
           <div class="req-info">
             <div><b>과정</b> ${esc(item.course)}</div>
             <div><b>완료번호</b> ${esc(item.idcode)}</div>
             <div><b>연락처</b> ${esc(item.phone)}</div>
-            <div><b>행선지</b> ${esc(item.dest)}</div>
-            <div><b>출발</b> ${esc((item.startdt||'').replace('T',' '))}</div>
-            <div><b>복귀예정</b> ${item.retType==='unknown'?'미정':esc((item.retdt||'').replace('T',' '))}</div>
-            ${item.returnedAt?`<div><b>복귀시간</b> ${esc(item.returnedAt.replace('T',' ').slice(0,16))}</div>`:''}
+            <div><b>이동수단</b> ${esc(item.transport||'-')}</div>
+            <div><b>출발</b> ${esc(item.startdt||'')}</div>
+            ${item.dest?`<div><b>행선지</b> ${esc(item.dest)}</div>`:''}
+            ${item.returnedAt?`<div><b>복귀시간</b> ${esc(String(item.returnedAt).slice(0,16).replace('T',' '))}</div>`:''}
           </div>
           ${item.status!=='returned'?`<button class="req-retbtn" onclick="admDoReturn('${item.rowIdx}','${esc(item.name)}')">✅ 복귀 처리</button>`:''}
         </div>`).join('');
-    }).catch(()=>{ el.innerHTML='<div style="padding:20px;color:var(--danger)">불러오기 실패</div>'; });
+    }).catch(()=>{ el.innerHTML='<div style="padding:20px;text-align:center;color:var(--danger)">GAS URL 설정 후 사용 가능합니다</div>'; st.innerHTML=''; });
 }
-
-function admDoReturn(rowIdx, name){
+function setOeAdmFilt(f,btn){
+  OE_ADM_FILT=f;
+  document.querySelectorAll('#oe-adm-filt .rfilt-btn').forEach(b=>b.classList.toggle('on',b===btn));
+  loadOEAdmin();
+}
+function admDoReturn(rowIdx,name){
   if(!confirm(`${name}님을 복귀 처리하시겠습니까?`)) return;
-  fetch(GAS_URL, {method:'POST', body:JSON.stringify({action:'returnOE', rowIdx, returnedAt:new Date().toISOString()})})
+  fetch(GAS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({
+    action:'returnOE', rowIdx, returnedAt:new Date().toISOString()
+  })}).then(()=>{ toast('✅ 복귀 처리 완료'); loadOEAdmin(); })
+    .catch(()=>toast('⚠️ GAS 연결 필요'));
+}
+function loadAdmOE(){ setAdmOeFilt('all', document.querySelector('#adm-oe-filt .rfilt-btn')); }
+function setAdmOeFilt(f,btn){
+  if(btn) document.querySelectorAll('#adm-oe-filt .rfilt-btn').forEach(b=>b.classList.toggle('on',b===btn));
+  OE_ADM_FILT=f;
+  const el=document.getElementById('adm-oe-list');
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-3)">불러오는 중...</div>';
+  fetch(GAS_URL+'?action=listOE&filter='+f)
     .then(r=>r.json()).then(res=>{
-      if(res.ok){ toast('✅ 복귀 처리 완료'); loadAdmOE(); }
-      else toast('❌ 처리 실패');
-    }).catch(()=>toast('❌ 오류'));
+      const data=res.data||[];
+      if(!data.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">내역 없음</div>';return;}
+      el.innerHTML=data.map(item=>`
+        <div class="req-item">
+          <div class="req-head">
+            <span class="req-name">${esc(item.name)}</span>
+            <span class="rbadge ${item.status==='returned'?'done':'ing'}">${item.status==='returned'?'복귀완료':'외출중'}</span>
+          </div>
+          <div class="req-info">
+            <div><b>유형</b> ${esc(item.typeLabel||'')}</div>
+            <div><b>과정</b> ${esc(item.course)}</div>
+            <div><b>연락처</b> ${esc(item.phone)}</div>
+            <div><b>출발</b> ${esc(item.startdt||'')}</div>
+          </div>
+          ${item.status!=='returned'?`<button class="req-retbtn" onclick="admDoReturn('${item.rowIdx}','${esc(item.name)}')">✅ 복귀 처리</button>`:''}
+        </div>`).join('');
+    }).catch(()=>{el.innerHTML='<div style="padding:16px;text-align:center;color:var(--danger)">GAS 연결 필요</div>';});
 }
 
-// ═══════════════════════════════════════════════════════
-// 귀가버스 – 신청
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// 귀가버스 신청
+// ════════════════════════════════════════════════
 function initBusApply(){
   const sel = document.getElementById('bus-date-sel');
+  if(!sel) return;
   sel.innerHTML = '<option value="">-- 시작일을 선택하세요 --</option>';
-  uniqueDates().forEach(d=>{
-    const o = document.createElement('option'); o.value=d; o.textContent='📅 '+d; sel.appendChild(o);
-  });
+  uniqueDates().forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent='📅 '+d; sel.appendChild(o); });
   document.getElementById('bus-clist-area').style.display='none';
   document.getElementById('bus-form-area').style.display='none';
-  document.getElementById('bus-apply-main').style.display='block';
-  document.getElementById('bus-complete-area').style.display='none';
-  BUS_SELECTED_COURSE='';
+  document.getElementById('bus-apply-wrap').style.display='block';
+  document.getElementById('bus-complete-wrap').style.display='none';
+  BUS_SEL_COURSE='';
 }
 
 function onBusDateSel(sel){
   const area = document.getElementById('bus-clist-area');
-  const formArea = document.getElementById('bus-form-area');
   document.getElementById('bus-form-area').style.display='none';
-  BUS_SELECTED_COURSE='';
+  BUS_SEL_COURSE='';
   if(!sel.value){ area.style.display='none'; return; }
   const list = D.courses.filter(c=>c.startDate===sel.value);
   area.style.display='block';
@@ -1561,42 +1702,45 @@ function onBusDateSel(sel){
 }
 
 function selectBusCourse(name){
-  BUS_SELECTED_COURSE = name;
+  BUS_SEL_COURSE = name;
   document.getElementById('busf-course').value = name;
-  document.getElementById('busf-bank').value='';
-  document.getElementById('busf-name').value='';
-  document.getElementById('busf-phone').value='';
+  ['busf-bank-prefix','busf-name','busf-phone'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
   document.getElementById('bus-form-area').style.display='block';
   setTimeout(()=>document.getElementById('bus-form-area').scrollIntoView({behavior:'smooth'}),100);
 }
 
 function submitBus(){
-  const course= document.getElementById('busf-course').value.trim();
-  const bank  = document.getElementById('busf-bank').value.trim();
-  const name  = document.getElementById('busf-name').value.trim();
-  const phone = document.getElementById('busf-phone').value.trim();
-  if(!course||!bank||!name||!phone){ toast('⚠️ 모든 항목을 입력해 주세요'); return; }
+  const course = document.getElementById('busf-course').value.trim();
+  const bankPfx= document.getElementById('busf-bank-prefix').value.trim();
+  const name   = document.getElementById('busf-name').value.trim();
+  const phone  = document.getElementById('busf-phone').value.trim();
+  if(!course||!bankPfx||!name||!phone){ toast('⚠️ 모든 항목을 입력해 주세요'); return; }
   const digits = phone.replace(/\D/g,'');
   if(digits.length<8){ toast('⚠️ 연락처를 올바르게 입력해 주세요'); return; }
-  const code = 'MG'+digits.slice(-4);
+  const bank = bankPfx + '새마을금고';
+  const code = 'MG' + digits.slice(-4);
   const payload = {action:'addBus', course, bank, name, phone, code, createdAt:new Date().toISOString()};
   toast('신청 중...');
-  fetch(GAS_URL, {method:'POST', body:JSON.stringify(payload)})
-    .then(r=>r.json()).then(res=>{
-      if(res.ok){
-        document.getElementById('bus-comp-code').textContent = code;
-        document.getElementById('bus-apply-main').style.display='none';
-        document.getElementById('bus-complete-area').style.display='block';
-        toast('✅ 신청 완료');
-      } else toast('❌ '+res.msg);
-    }).catch(()=>toast('❌ 서버 연결 실패'));
+  fetch(GAS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)})
+    .then(()=>{
+      document.getElementById('bus-comp-code').textContent = code;
+      document.getElementById('bus-apply-wrap').style.display='none';
+      document.getElementById('bus-complete-wrap').style.display='block';
+    }).catch(()=>{
+      document.getElementById('bus-comp-code').textContent = code;
+      document.getElementById('bus-apply-wrap').style.display='none';
+      document.getElementById('bus-complete-wrap').style.display='block';
+      toast('⚠️ GAS 연결 필요 (로컬 완료 처리)');
+    });
 }
 
 function resetBusApply(){ initBusApply(); }
 
-// ═══════════════════════════════════════════════════════
-// 귀가버스 – 확인
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// 귀가버스 확인
+// ════════════════════════════════════════════════
 function checkBus(){
   const code = document.getElementById('bchk-code').value.trim().toUpperCase();
   if(!code){ toast('⚠️ 신청번호를 입력해 주세요'); return; }
@@ -1604,9 +1748,7 @@ function checkBus(){
   fetch(GAS_URL+'?action=checkBus&code='+encodeURIComponent(code))
     .then(r=>r.json()).then(res=>{
       const el = document.getElementById('bchk-result');
-      if(!res.data||!res.data.length){
-        el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">해당 번호의 신청 내역이 없습니다</div>'; return;
-      }
+      if(!(res.data||[]).length){ el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">해당 번호의 신청 내역이 없습니다</div>'; return; }
       el.innerHTML = res.data.map(d=>`
         <div class="binfo-box">
           <div class="binfo-row"><span class="binfo-lbl">신청번호</span><span class="binfo-val">${esc(d.code)}</span></div>
@@ -1614,38 +1756,52 @@ function checkBus(){
           <div class="binfo-row"><span class="binfo-lbl">금고명</span><span class="binfo-val">${esc(d.bank)}</span></div>
           <div class="binfo-row"><span class="binfo-lbl">성명</span><span class="binfo-val">${esc(d.name)}</span></div>
           <div class="binfo-row"><span class="binfo-lbl">연락처</span><span class="binfo-val">${esc(d.phone)}</span></div>
-          <div class="binfo-row"><span class="binfo-lbl">신청일시</span><span class="binfo-val">${esc((d.createdAt||'').slice(0,16).replace('T',' '))}</span></div>
         </div>`).join('');
-    }).catch(()=>toast('❌ 조회 실패'));
+    }).catch(()=>{ document.getElementById('bchk-result').innerHTML='<div style="text-align:center;padding:20px;color:var(--danger)">GAS URL 설정 후 사용 가능합니다</div>'; });
 }
 
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════
 // 귀가버스 관리자
-// ═══════════════════════════════════════════════════════
-function loadAdmBus(){
-  const el = document.getElementById('adm-bus-list');
+// ════════════════════════════════════════════════
+function loadBusAdmin(){
+  const el = document.getElementById('bus-admin-list');
+  const st = document.getElementById('bus-admin-stats');
   el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-3)">불러오는 중...</div>';
   fetch(GAS_URL+'?action=listBus')
     .then(r=>r.json()).then(res=>{
-      if(!res.data||!res.data.length){
-        el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>'; return;
-      }
-      // 과정별 그룹핑
-      const groups = {};
-      res.data.forEach(d=>{ if(!groups[d.course]) groups[d.course]=[]; groups[d.course].push(d); });
-      el.innerHTML = Object.entries(groups).map(([course, members])=>`
+      const data = res.data||[];
+      st.innerHTML=`<div class="stat-card"><div class="stat-num">${data.length}</div><div class="stat-lbl">총 신청</div></div>`;
+      if(!data.length){ el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역 없음</div>'; return; }
+      const groups={};
+      data.forEach(d=>{ if(!groups[d.course]) groups[d.course]=[]; groups[d.course].push(d); });
+      el.innerHTML = Object.entries(groups).map(([course,members])=>`
         <div class="bgroup">
-          <div class="bgroup-h">${esc(course)}</div>
-          <div class="bgroup-s">${members.length}명 신청</div>
-          ${members.map(m=>`
-            <div class="bmem">
-              <div>
-                <div class="bmem-name">${esc(m.name)} <span style="font-weight:700;color:var(--primary);font-size:12px">${esc(m.code)}</span></div>
-                <div class="bmem-info">${esc(m.bank)} · ${esc(m.phone)}</div>
-              </div>
-            </div>`).join('')}
+          <div class="bgroup-h" onclick="toggleBusGroup(this)">
+            <div>
+              <div>${esc(course)}</div>
+              <div class="bgroup-sub">${members.length}명 신청</div>
+            </div>
+            <span>▾</span>
+          </div>
+          <div class="bgroup-body">
+            ${members.map(m=>`
+              <div class="bmem">
+                <div>
+                  <div class="bmem-name">${esc(m.name)}</div>
+                  <div class="bmem-info">${esc(m.bank)} · ${esc(m.phone)}</div>
+                </div>
+                <div style="font-size:12px;color:var(--primary);font-weight:800">${esc(m.code)}</div>
+              </div>`).join('')}
+          </div>
         </div>`).join('');
-    }).catch(()=>{ el.innerHTML='<div style="padding:20px;color:var(--danger)">불러오기 실패</div>'; });
+    }).catch(()=>{ el.innerHTML='<div style="padding:20px;text-align:center;color:var(--danger)">GAS URL 설정 후 사용 가능합니다</div>'; st.innerHTML=''; });
+}
+function loadAdmBus(){ loadBusAdmin(); }
+function toggleBusGroup(header){
+  const body = header.nextElementSibling;
+  body.classList.toggle('on');
+  const arrow = header.querySelector('span:last-child');
+  if(arrow) arrow.textContent = body.classList.contains('on') ? '▴' : '▾';
 }
 
 /* ↓↓↓↓ 여기에 원래 파일 하단에 있던 CAMPUS_PHOTO (Base64) 코드를 그대로 붙여넣으세요 ↓↓↓↓ */
@@ -1654,76 +1810,134 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
 
 </script>
 
-<!-- ══ 외출/외박 메인 ══ -->
+<!-- ══ 외출·외박 메인 ══ -->
 <div id="s-outexit" class="screen">
-  <div class="hdr"><button class="bk" onclick="history.back()">← 홈</button><h1>외출 및 외박 신청</h1></div>
+  <div class="hdr"><button class="bk" onclick="history.back()">← 홈</button><h1>외출 및 외박</h1></div>
   <div class="cnt">
     <div class="warn-box">⚠️ 교육담당 부서의 확인 및 승인 후<br><b>외출, 외박이 가능합니다</b></div>
+    <div class="oe-main-btns">
+      <button class="oe-big-btn" onclick="goTo('outexit-type')">
+        <span class="oe-big-icon">🚶</span>
+        <div class="oe-big-text"><h3>외출 신청</h3><p>병원·기타 외출 및 외박 신청</p></div>
+        <span class="oe-big-arrow">›</span>
+      </button>
+      <button class="oe-big-btn" onclick="goTo('oe-return')">
+        <span class="oe-big-icon">✅</span>
+        <div class="oe-big-text"><h3>복귀 처리</h3><p>전화번호 뒷 4자리 또는 사번으로 처리</p></div>
+        <span class="oe-big-arrow">›</span>
+      </button>
+    </div>
+    <div class="sep"></div>
+    <button class="btnadm" style="display:block;margin:0 auto" onclick="openPwOverlay('oe-admin')">관리자 대시보드 열기</button>
+  </div>
+</div>
+
+<!-- ══ 유형 선택 ══ -->
+<div id="s-outexit-type" class="screen">
+  <div class="hdr"><button class="bk" onclick="history.back()">← 뒤로</button><h1>외출 및 외박 신청</h1></div>
+  <div class="cnt">
     <p class="stit" style="font-size:22px;margin-bottom:4px">유형 선택</p>
     <p class="ssub">해당하는 유형을 선택해 주세요</p>
     <div class="type-cards" style="margin-top:14px">
       <div class="type-card" onclick="startOE('hospital')">
         <span class="tc-icon">🏥</span>
         <div class="tc-text"><h3>병원·약국 외출</h3><p>병원·약국 방문을 위한 외출</p></div>
-        <span class="chev" style="margin-left:auto;color:var(--text-3)">›</span>
+        <span style="margin-left:auto;color:var(--text-3)">›</span>
       </div>
       <div class="type-card" onclick="startOE('other')">
         <span class="tc-icon">🚶</span>
         <div class="tc-text"><h3>기타 외출</h3><p>업무·개인 용무 등 일반 외출</p></div>
-        <span class="chev" style="margin-left:auto;color:var(--text-3)">›</span>
+        <span style="margin-left:auto;color:var(--text-3)">›</span>
       </div>
       <div class="type-card" onclick="startOE('overnight')">
         <span class="tc-icon">🌙</span>
         <div class="tc-text"><h3>외박</h3><p>당일 귀원하지 않는 외박 신청</p></div>
-        <span class="chev" style="margin-left:auto;color:var(--text-3)">›</span>
+        <span style="margin-left:auto;color:var(--text-3)">›</span>
       </div>
     </div>
-    <div class="sep"></div>
-    <button class="btn btn-sec" style="width:100%;font-size:15px;padding:15px" onclick="goTo('oe-return')">📋 복귀 처리하기</button>
   </div>
 </div>
 
-<!-- ══ 외출/외박 신청 폼 ══ -->
+<!-- ══ 외출·외박 신청 폼 ══ -->
 <div id="s-oe-form" class="screen">
-  <div class="hdr"><button class="bk" onclick="history.back()">← 뒤로</button><h1 id="oe-form-title">외출 신청</h1></div>
+  <div class="hdr"><button class="bk" onclick="history.back()">← 뒤로</button><h1 id="oef-title">외출 신청</h1></div>
   <div class="cnt">
-    <div class="fgroup"><label class="flabel">성명 <span class="freq">*</span></label><input id="oef-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
+    <!-- 과정 선택 (날짜→과정) -->
+    <div class="fgroup">
+      <label class="flabel">교육 시작일 선택 <span class="freq">*</span></label>
+      <div class="ddwrap" style="margin-bottom:10px">
+        <select class="csel" id="oef-date-sel" onchange="onOEDateSel(this)">
+          <option value="">-- 시작일을 선택하세요 --</option>
+        </select>
+        <span class="sarr">▾</span>
+      </div>
+      <div id="oef-course-list" style="display:none"></div>
+      <input id="oef-course" class="finput" type="text" readonly placeholder="위에서 과정을 선택하세요" style="background:#f5f7fa;color:var(--text-2);margin-top:6px">
+    </div>
+    <!-- 성명 -->
+    <div class="fgroup">
+      <label class="flabel">성명 <span class="freq">*</span></label>
+      <input id="oef-name" class="finput" type="text" placeholder="이름을 입력하세요">
+    </div>
+    <!-- 금고코드-사번 -->
     <div class="fgroup">
       <label class="flabel">금고코드-사번 <span class="freq">*</span></label>
       <input id="oef-idcode" class="finput" type="text" placeholder="예: 1234-A20001">
-      <div class="finput-hint">신청 완료번호로 사용됩니다 (금고코드-사번 형식)</div>
+      <div class="finput-hint">신청 완료번호로 사용 · 복귀 처리 시 이 번호로 조회 가능</div>
     </div>
-    <div class="fgroup"><label class="flabel">과정명 <span class="freq">*</span></label><input id="oef-course" class="finput" type="text" placeholder="참가 중인 과정명 입력"></div>
-    <div class="fgroup"><label class="flabel">연락처 <span class="freq">*</span></label><input id="oef-phone" class="finput" type="tel" placeholder="010-0000-0000"></div>
+    <!-- 연락처 (강조) -->
     <div class="fgroup">
+      <div class="phone-label-emph">📞 연락처 <span class="freq">*</span> <span style="font-size:12px;font-weight:700">복귀 처리 시 반드시 필요</span></div>
+      <input id="oef-phone" class="phone-emph" type="tel" placeholder="010-0000-0000">
+      <div class="phone-notice">⚠️ 전화번호 뒷자리 4자리로 복귀 처리가 됩니다.<br>반드시 정확하게 입력해 주세요!</div>
+    </div>
+    <!-- 행선지 (병원 외 타입만) -->
+    <div class="fgroup" id="oef-dest-wrap">
       <label class="flabel" id="oef-dest-lbl">행선지 <span class="freq">*</span></label>
-      <input id="oef-dest" class="finput" type="text" placeholder="">
-      <div class="finput-hint" id="oef-dest-hint"></div>
+      <input id="oef-dest" class="finput" type="text" placeholder="행선지를 입력하세요">
     </div>
-    <div class="fgroup" id="oef-transport-wrap">
-      <label class="flabel">이동수단 <span class="freq">*</span></label>
-      <input id="oef-transport" class="finput" type="text" placeholder="예: 자가용, 대중교통, 택시 등">
-    </div>
-    <div class="fgroup"><label class="flabel">외출 시작 일시 <span class="freq">*</span></label><input id="oef-startdt" class="finput" type="datetime-local"></div>
+    <!-- 이동수단 -->
     <div class="fgroup">
-      <label class="flabel">복귀 예정 <span class="freq">*</span></label>
-      <div class="ret-toggle">
-        <button class="ret-btn on" id="ret-unknown" onclick="setRetType('unknown')">⏳ 미정</button>
-        <button class="ret-btn" id="ret-scheduled" onclick="setRetType('scheduled')">🕐 시간 지정</button>
+      <label class="flabel">이동수단 <span class="freq">*</span></label>
+      <div class="transport-opts">
+        <button class="transport-opt" onclick="setTransport('개인차량',this)">🚗 개인차량</button>
+        <button class="transport-opt" onclick="setTransport('택시',this)">🚕 택시</button>
+        <button class="transport-opt" onclick="setTransport('기타',this)">🚶 기타</button>
       </div>
-      <div class="ret-notice" id="ret-notice">복귀 후 매니저에게 즉시 연락하세요</div>
-      <div id="ret-dt-wrap" style="display:none"><input id="oef-retdt" class="finput" type="datetime-local"></div>
     </div>
-    <div class="fgroup"><label class="flabel">사유 <span class="freq">*</span></label><textarea id="oef-reason" class="finput" rows="3" placeholder="외출/외박 사유를 입력해 주세요"></textarea></div>
+    <!-- 외출 요청 시간 -->
+    <div class="fgroup" id="oef-time-wrap">
+      <label class="flabel">외출 요청 시간 <span class="freq">*</span></label>
+      <div class="time-selects">
+        <select class="finput" id="oef-month"><option value="">월</option></select>
+        <select class="finput" id="oef-day"><option value="">일</option></select>
+        <select class="finput" id="oef-hour"><option value="">시</option></select>
+      </div>
+    </div>
+    <!-- 외박 기간 (외박 타입만) -->
+    <div class="fgroup" id="oef-overnight-wrap" style="display:none">
+      <label class="flabel">외박 시작 일시 <span class="freq">*</span></label>
+      <input id="oef-startdt" class="finput" type="datetime-local">
+      <div style="margin-top:8px"><label class="flabel">복귀 예정 일시 <span class="freq">*</span></label>
+      <input id="oef-retdt" class="finput" type="datetime-local"></div>
+      <div class="fgroup" style="margin-top:8px;margin-bottom:0"><label class="flabel">사유 <span class="freq">*</span></label>
+      <textarea id="oef-reason" class="finput" rows="3" placeholder="외박 사유를 입력해 주세요"></textarea></div>
+    </div>
+    <!-- 기타 외출 사유 -->
+    <div class="fgroup" id="oef-reason-wrap" style="display:none">
+      <label class="flabel">행선지·사유 <span class="freq">*</span></label>
+      <textarea id="oef-reason2" class="finput" rows="2" placeholder="외출 사유를 간략히 입력해 주세요"></textarea>
+    </div>
+    <!-- 현재 상태 (병원 타입만) -->
     <div class="fgroup" id="oef-special-wrap" style="display:none">
       <label class="flabel">현재 상태 <span style="font-size:12px;color:var(--text-3);font-weight:700">(민감정보 보호)</span></label>
-      <textarea id="oef-special" class="finput" rows="2" placeholder="아픈 곳 등 간략히 입력, 없으면 비워두세요"></textarea>
+      <input id="oef-special" class="finput" type="text" placeholder="아픈 곳 등 대략적인 내용, 없으면 비워두세요">
     </div>
-    <button class="btnsave" style="margin-top:8px" onclick="submitOE()">신청하기</button>
+    <button class="btnsave" style="margin-top:12px" onclick="submitOE()">신청하기</button>
   </div>
 </div>
 
-<!-- ══ 외출/외박 신청 완료 ══ -->
+<!-- ══ 외출 신청 완료 ══ -->
 <div id="s-oe-complete" class="screen">
   <div class="hdr"><h1>신청 완료</h1></div>
   <div class="cnt" id="oe-complete-cnt"></div>
@@ -1734,13 +1948,27 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
   <div class="hdr"><button class="bk" onclick="history.back()">← 뒤로</button><h1>복귀 처리</h1></div>
   <div class="cnt">
     <p class="stit" style="font-size:22px;margin-bottom:4px">복귀 처리</p>
-    <p class="ssub">전화번호 또는 금고코드-사번으로 조회합니다</p>
+    <p class="ssub">전화번호 뒷 4자리 또는 금고코드-사번으로 조회합니다</p>
     <div class="fgroup" style="margin-top:20px">
-      <label class="flabel">전화번호 또는 금고코드-사번</label>
-      <input id="oer-query" class="finput" type="text" placeholder="010-0000-0000 또는 1234-A20001">
+      <label class="flabel">전화번호 뒷 4자리 또는 사번</label>
+      <input id="oer-query" class="finput" type="text" placeholder="예: 5068   또는   1234-A20001">
     </div>
     <button class="btnsave" onclick="searchReturn()">조회하기</button>
     <div id="oer-list" style="margin-top:20px"></div>
+  </div>
+</div>
+
+<!-- ══ 외출 관리자 대시보드 ══ -->
+<div id="s-oe-admin" class="screen">
+  <div class="hdr"><button class="bk" onclick="history.back()">← 뒤로</button><h1>외출·외박 관리</h1></div>
+  <div class="cnt">
+    <div class="stat-row" id="oe-admin-stats"></div>
+    <div class="rfilt" id="oe-adm-filt">
+      <button class="rfilt-btn on" onclick="setOeAdmFilt('all',this)">전체</button>
+      <button class="rfilt-btn" onclick="setOeAdmFilt('pending',this)">외출중</button>
+      <button class="rfilt-btn" onclick="setOeAdmFilt('returned',this)">복귀완료</button>
+    </div>
+    <div id="oe-admin-list"><div class="empty-st"><div class="ei">🚶</div><p>불러오는 중...</p></div></div>
   </div>
 </div>
 
@@ -1754,47 +1982,54 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
       <button class="home-extra-btn" onclick="goTo('bus-apply')"><span>🚌</span><span>귀가 버스<br>신청</span></button>
       <button class="home-extra-btn" onclick="goTo('bus-check')"><span>🔍</span><span>신청 내역<br>확인</span></button>
     </div>
+    <div class="sep"></div>
+    <button class="btnadm" style="display:block;margin:0 auto" onclick="openPwOverlay('bus-admin')">관리자 모드</button>
   </div>
 </div>
 
 <!-- ══ 귀가버스 신청 ══ -->
 <div id="s-bus-apply" class="screen">
   <div class="hdr"><button class="bk" onclick="history.back()">← 뒤로</button><h1>귀가 버스 신청</h1></div>
-  <div id="bus-apply-main">
+  <div id="bus-apply-wrap">
     <div class="cnt">
-      <p class="stit" style="font-size:22px;margin-bottom:4px">교육 시작일 선택</p>
+      <p class="stit" style="font-size:20px;margin-bottom:4px">교육 시작일 선택</p>
       <p class="ssub">과정에 해당하는 시작일을 선택하세요</p>
-      <div class="ddwrap" style="margin-bottom:16px">
-        <div class="ddlabel">교육 시작일</div>
+      <div class="ddwrap" style="margin-bottom:14px">
         <select class="csel" id="bus-date-sel" onchange="onBusDateSel(this)"><option value="">-- 시작일을 선택하세요 --</option></select>
         <span class="sarr">▾</span>
       </div>
-      <div id="bus-clist-area" style="display:none;margin-bottom:16px"></div>
+      <div id="bus-clist-area" style="display:none;margin-bottom:14px"></div>
       <div id="bus-form-area" style="display:none">
         <div class="sep"></div>
-        <p class="stit" style="font-size:20px;margin-bottom:14px">신청 정보 입력</p>
+        <p class="stit" style="font-size:18px;margin-bottom:14px">신청 정보 입력</p>
         <div class="fgroup"><label class="flabel">과정명 <span class="freq">*</span></label><input id="busf-course" class="finput" type="text" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
-        <div class="fgroup"><label class="flabel">금고명 <span class="freq">*</span></label><input id="busf-bank" class="finput" type="text" placeholder="소속 금고명을 입력하세요"></div>
+        <div class="fgroup">
+          <label class="flabel">금고명 <span class="freq">*</span></label>
+          <div class="bank-wrap">
+            <input id="busf-bank-prefix" class="bank-inp" type="text" placeholder="예: 강남">
+            <div class="bank-suffix">새마을금고</div>
+          </div>
+          <div class="finput-hint">금고명 앞부분만 입력하세요 &nbsp; 예: <b>강남</b>새마을금고 → "강남" 입력</div>
+        </div>
         <div class="fgroup"><label class="flabel">성명 <span class="freq">*</span></label><input id="busf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
         <div class="fgroup">
           <label class="flabel">연락처 <span class="freq">*</span></label>
           <input id="busf-phone" class="finput" type="tel" placeholder="010-0000-0000">
-          <div class="finput-hint">신청번호: MG + 전화번호 뒷자리 4자리</div>
+          <div class="finput-hint">신청번호: <b>MG + 전화번호 뒷자리 4자리</b> (예: MG5068)</div>
         </div>
         <button class="btnsave" onclick="submitBus()">신청하기</button>
       </div>
     </div>
   </div>
-  <div id="bus-complete-area" style="display:none">
+  <div id="bus-complete-wrap" style="display:none">
     <div class="cnt">
       <div class="cbox">
-        <div class="ce">🚌</div>
-        <h2>신청 완료!</h2>
+        <div class="ce">🚌</div><h2>신청 완료!</h2>
         <div style="font-size:14px;color:var(--text-3);margin-bottom:6px">신청번호를 저장해 두세요</div>
         <div class="cbox-code" id="bus-comp-code"></div>
         <p>위 번호로 신청 내역을 확인할 수 있습니다</p>
       </div>
-      <button class="btn btn-sec" style="width:100%;margin-bottom:10px" onclick="goTo('bus-check')">신청 내역 확인하기</button>
+      <button class="btn btn-sec" style="width:100%;margin-bottom:10px" onclick="goTo('bus-check')">신청 내역 확인</button>
       <button class="btnhome" onclick="resetBusApply()">새로 신청하기</button>
     </div>
   </div>
@@ -1807,11 +2042,20 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
     <p class="stit" style="font-size:22px;margin-bottom:4px">신청 내역 확인</p>
     <p class="ssub">신청 시 받은 번호로 확인합니다</p>
     <div class="fgroup" style="margin-top:16px">
-      <label class="flabel">신청번호 (MG + 전화번호 뒷자리)</label>
-      <input id="bchk-code" class="finput" type="text" placeholder="예: MG1234">
+      <label class="flabel">신청번호 <span style="color:var(--text-3);font-size:12px">(MG + 전화번호 뒷 4자리)</span></label>
+      <input id="bchk-code" class="finput" type="text" placeholder="예: MG5068">
     </div>
     <button class="btnsave" onclick="checkBus()">확인하기</button>
     <div id="bchk-result" style="margin-top:20px"></div>
+  </div>
+</div>
+
+<!-- ══ 귀가버스 관리자 ══ -->
+<div id="s-bus-admin" class="screen">
+  <div class="hdr"><button class="bk" onclick="history.back()">← 뒤로</button><h1>귀가버스 관리</h1></div>
+  <div class="cnt">
+    <div class="stat-row" id="bus-admin-stats"></div>
+    <div id="bus-admin-list"><div class="empty-st"><div class="ei">🚌</div><p>불러오는 중...</p></div></div>
   </div>
 </div>
 
