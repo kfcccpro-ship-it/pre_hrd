@@ -796,7 +796,7 @@ textarea.finput{resize:vertical;min-height:72px}
     </div>
     <div class="adm-panel" id="ap-bus">
       <div class="stat-row" id="adm-bus-stats"></div>
-      <div id="adm-bus-list"><div style="text-align:center;padding:24px;color:var(--text-3)">탭 선택 후 불러옵니다</div></div>
+      <div id="adm-bus-list"><div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div></div>
     </div>
   </div>
 </div>
@@ -1308,7 +1308,7 @@ window.onload = async () => {
 // ════════════════════════════════════════════════════════════
 // GAS URL (배포 후 교체)
 // ════════════════════════════════════════════════════════════
-const GAS_URL   = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyffebbRqZBQ6y3j5nW5KSkURy8XdkoNkGnk38tSGS-jTS6ERLAFy18e0twkT57sH9d/exec/exec';
+const GAS_URL   = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 const GAS_READY = !GAS_URL.includes('YOUR_SCRIPT_ID');
 
 // ════ localStorage 헬퍼 ════
@@ -1332,7 +1332,7 @@ function admTab(tab){
   document.querySelectorAll('.adm-tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===tab));
   document.querySelectorAll('.adm-panel').forEach(p=>p.classList.toggle('on',p.id==='ap-'+tab));
   if(tab==='outexit') admLoadOE();
-  if(tab==='bus')     admLoadBus();
+  if(tab==='bus')     { admLoadBus(); }
 }
 let ADM_OE_FILT='all';
 function admOeFilt(f,btn){
@@ -1368,7 +1368,7 @@ function admOECard(item){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
       ${item.status!=='returned'?`<button style="grid-column:1/-1;background:var(--success);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit" onclick="admReturnOE('${item.rowIdx}','${esc(item.name)}')">✅ 복귀 처리</button>`:''}
       <button onclick="copyApproveUrl('${url}')" style="background:var(--primary-weak);color:var(--primary);border:1.5px solid #cfe0ff;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1.4">🔗 결재 URL<br><span style="font-size:11px">부장님께 전달</span></button>
-      <button onclick="printForm(${JSON.stringify(item).replace(/</g,'\\u003c')})" style="background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--text-2)">🖨️ 출력</button>
+      <button onclick="printForm(${JSON.stringify(item).replace(/</g,'\\u003c')});sendOEEmailToAdmin(${JSON.stringify(item).replace(/</g,'\\u003c')})" style="background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--text-2)">🖨️ 출력</button>
     </div>
   </div>`;
 }
@@ -1385,18 +1385,22 @@ function admReturnOE(ri,name){
 }
 function admLoadBus(){
   const el=document.getElementById('adm-bus-list'), st=document.getElementById('adm-bus-stats');
-  const data=lsGetBus();
-  if(st) st.innerHTML=`<div class="stat-card"><div class="stat-num">${data.length}</div><div class="stat-lbl">총 신청</div></div>`;
-  if(!data.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
-  const grp={};
-  data.forEach(d=>{if(!grp[d.course])grp[d.course]=[];grp[d.course].push(d);});
-  el.innerHTML=Object.entries(grp).map(([course,ms])=>`<div class="bgroup">
-    <div class="bgroup-hd" onclick="this.nextElementSibling.classList.toggle('on');this.querySelector('span:last-child').textContent=this.nextElementSibling.classList.contains('on')?'▴':'▾'">
-      <div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 신청</div></div><span>▾</span>
-    </div>
-    <div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div><div class="bmem-name">${esc(m.name)}</div><div class="bmem-info">${esc(m.bank||'')} · ${esc(m.phone||'')}</div></div><div style="font-size:12px;color:var(--primary);font-weight:800">${esc(m.code||'')}</div></div>`).join('')}</div>
-  </div>`).join('');
-  if(GAS_READY) fetch(GAS_URL+'?action=listBus').then(r=>r.json()).then(res=>{ if(res.data&&res.data.length) admLoadBus(); }).catch(()=>{});
+  function renderBusData(data){
+    if(st) st.innerHTML=`<div class="stat-card"><div class="stat-num">${data.length}</div><div class="stat-lbl">총 신청</div></div>`;
+    if(!data.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
+    const grp={};
+    data.forEach(d=>{if(!grp[d.course])grp[d.course]=[];grp[d.course].push(d);});
+    el.innerHTML=Object.entries(grp).map(([course,ms])=>`<div class="bgroup">
+      <div class="bgroup-hd" onclick="this.nextElementSibling.classList.toggle('on');this.querySelector('span:last-child').textContent=this.nextElementSibling.classList.contains('on')?'▴':'▾'">
+        <div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 신청</div></div><span>▾</span>
+      </div>
+      <div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div><div class="bmem-name">${esc(m.name)}</div><div class="bmem-info">${esc(m.bank||'')} · ${esc(m.phone||'')}</div></div><div style="font-size:12px;color:var(--primary);font-weight:800">${esc(m.code||'')}</div></div>`).join('')}</div>
+    </div>`).join('');
+  }
+  // localStorage 즉시 렌더
+  renderBusData(lsGetBus());
+  // GAS 설정 시 병합
+  if(GAS_READY) fetch(GAS_URL+'?action=listBus').then(r=>r.json()).then(res=>{ if(res.data&&res.data.length) renderBusData(res.data); }).catch(()=>{});
 }
 
 // ════ 외출 관리자 대시보드 (standalone) ════
@@ -1433,11 +1437,11 @@ function initOEForm(){
   document.getElementById('oef-course-list').style.display='none';
   document.getElementById('oef-course').value='';
   const now=new Date();
-  ['oef-month','oef-ret-month'].forEach((id,ri)=>{const s=document.getElementById(id);if(!s)return;s.innerHTML=`<option value="">월${ri?'(미정)':''}</option>`;for(let i=1;i<=12;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'월';if(i===now.getMonth()+1)o.selected=true;s.appendChild(o);}});
-  ['oef-day','oef-ret-day'].forEach((id,ri)=>{const s=document.getElementById(id);if(!s)return;s.innerHTML=`<option value="">일${ri?'(미정)':''}</option>`;for(let i=1;i<=31;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'일';if(i===now.getDate())o.selected=true;s.appendChild(o);}});
-  ['oef-hour','oef-ret-hour'].forEach((id,ri)=>{const s=document.getElementById(id);if(!s)return;s.innerHTML=`<option value="">시${ri?'(미정)':''}</option>`;for(let i=0;i<=23;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'시';if(i===now.getHours())o.selected=true;s.appendChild(o);}});
+  const ds_m=document.getElementById('oef-month'); if(ds_m){ds_m.innerHTML='<option value="">월</option>';for(let i=1;i<=12;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'월';if(i===now.getMonth()+1)o.selected=true;ds_m.appendChild(o);}}
+  const ds_d=document.getElementById('oef-day'); if(ds_d){ds_d.innerHTML='<option value="">일</option>';for(let i=1;i<=31;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'일';if(i===now.getDate())o.selected=true;ds_d.appendChild(o);}}
+  const ds_h=document.getElementById('oef-hour'); if(ds_h){ds_h.innerHTML='<option value="">시</option>';for(let i=0;i<=23;i++){const o=document.createElement('option');o.value=i;o.textContent=i+'시';if(i===now.getHours())o.selected=true;ds_h.appendChild(o);}}
   document.getElementById('oef-time-wrap').style.display     = OE_TYPE==='overnight'?'none':'block';
-  document.getElementById('oef-ret-wrap').style.display      = OE_TYPE==='overnight'?'none':'block';
+
   document.getElementById('oef-dest-wrap').style.display     = OE_TYPE==='other'?'block':'none';
   document.getElementById('oef-reason-wrap').style.display   = OE_TYPE==='other'?'block':'none';
   document.getElementById('oef-overnight-wrap').style.display= OE_TYPE==='overnight'?'block':'none';
@@ -1480,8 +1484,7 @@ function submitOE(){
     const mon=document.getElementById('oef-month').value, day=document.getElementById('oef-day').value, hr=document.getElementById('oef-hour').value;
     if(!mon||!day||!hr){toast('⚠️ 외출 요청 시간을 선택해 주세요');return;}
     startdt=mon+'월 '+day+'일 '+hr+'시';
-    const rm=document.getElementById('oef-ret-month').value, rd=document.getElementById('oef-ret-day').value, rh=document.getElementById('oef-ret-hour').value;
-    retTime=(rm&&rd&&rh)?rm+'월 '+rd+'일 '+rh+'시':'미정';
+    retTime='미정';
     if(OE_TYPE==='other'){
       dest=document.getElementById('oef-dest').value.trim(); reason=document.getElementById('oef-reason').value.trim();
       if(!dest||!reason){toast('⚠️ 행선지와 사유를 입력해 주세요');return;}
@@ -1604,7 +1607,7 @@ function renderApproval(d,token){
         <button class="btnsave" style="background:var(--danger);font-size:15px;padding:16px" onclick="doApprove('${token}','rejected')">❌ 반려</button>
       </div>
     </div>`:''}
-    <button onclick="printForm(${JSON.stringify(d).replace(/</g,'\\u003c')})" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--text-2)">🖨️ 신청서 출력</button>`;
+    <button onclick="printForm(${JSON.stringify(d).replace(/</g,'\\u003c')});sendOEEmailToAdmin(${JSON.stringify(d).replace(/</g,'\\u003c')})" style="width:100%;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--text-2)">🖨️ 출력 & 메일발송</button>`;
 }
 function checkApvPw(token){
   const pw=document.getElementById('apv-pw')?.value||'';
@@ -1735,8 +1738,6 @@ ${apSection}
 </div></body></html>`;
   const w=window.open('','_blank','width=800,height=900');
   w.document.write(html); w.document.close(); setTimeout(()=>w.print(),600);
-  // 이메일 발송 (GAS 설정 시 자동, 미설정 시 mailto 폴백)
-  sendOEEmailToAdmin(d);
 }
 
 function sendOEEmailToAdmin(d){
@@ -1845,9 +1846,7 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
       </div></div>
     <div class="fgroup" id="oef-time-wrap"><label class="flabel">외출 요청 시간 <span class="freq">*</span></label>
       <div class="time-grid"><select class="finput" id="oef-month"><option value="">월</option></select><select class="finput" id="oef-day"><option value="">일</option></select><select class="finput" id="oef-hour"><option value="">시</option></select></div></div>
-    <div class="fgroup" id="oef-ret-wrap"><label class="flabel">귀원 예정 시간</label>
-      <div class="time-grid"><select class="finput" id="oef-ret-month"><option value="">월(미정)</option></select><select class="finput" id="oef-ret-day"><option value="">일(미정)</option></select><select class="finput" id="oef-ret-hour"><option value="">시(미정)</option></select></div>
-      <div class="finput-hint">미정이면 비워두세요 · 복귀 후 즉시 매니저에게 연락!</div></div>
+
     <div class="fgroup" id="oef-dest-wrap" style="display:none"><label class="flabel">행선지 <span class="freq">*</span></label><input id="oef-dest" class="finput" type="text" placeholder="행선지를 입력하세요"></div>
     <div class="fgroup" id="oef-reason-wrap" style="display:none"><label class="flabel">외출 사유 <span class="freq">*</span></label><textarea id="oef-reason" class="finput" rows="2" placeholder="사유를 간략히 입력하세요"></textarea></div>
     <div id="oef-overnight-wrap" style="display:none">
