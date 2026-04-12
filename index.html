@@ -1603,6 +1603,8 @@ function mergeSimpleRows(localRows, remoteRows){const map=new Map();(Array.isArr
 // ════ 공통 상태 ════
 let ADM_TAB='classroom', OE_TYPE=null, TRANSPORT_SEL=null, OE_TOKEN='', BUS_SEL='';
 let OE_CACHE=[];
+const DELETED_OE_KEYS=new Set();
+const DELETED_SIMPLE_KEYS={bus:new Set(),lesson:new Set(),sport:new Set()};
 function getOEState(item){ return String(item?.status||'')==='returned' ? 'returned' : 'pending'; }
 function filterOEData(list, filter){ const arr=Array.isArray(list)?list:[]; if(filter==='all') return arr; return arr.filter(item=>getOEState(item)===filter); }
 function findOEByToken(token){ return OE_CACHE.find(d=>String(d.token||'')===String(token)) || lsGet('oe_apps').find(d=>String(d.token||'')===String(token)) || null; }
@@ -1682,7 +1684,11 @@ async function adminDeleteOE(token,rowIdx,name){
   const label=name||'선택한 신청';
   if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?
 삭제 후 복구할 수 없습니다.`)) return;
+  const deleteKey=String(token||'') || `row-${String(rowIdx||'')}`;
   lsDeleteOE(token,rowIdx);
+  DELETED_OE_KEYS.add(deleteKey);
+  if(typeof window.__removeOeCacheRow==='function') window.__removeOeCacheRow(token,rowIdx);
+  if(typeof window.__renderOeViews==='function') window.__renderOeViews(); else admLoadOE();
   try{
     if(GAS_READY){
       const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteOE',token,rowIdx})});
@@ -1691,6 +1697,7 @@ async function adminDeleteOE(token,rowIdx,name){
     }
     toast('🗑️ 신청 내역을 삭제했습니다');
   }catch(err){
+    DELETED_OE_KEYS.delete(deleteKey);
     toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
   }
   admLoadOE();
@@ -1699,7 +1706,10 @@ async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
   const label=name||'선택한 신청';
   if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?
 삭제 후 복구할 수 없습니다.`)) return;
+  const deleteKey=[String(rowIdx||''),String(createdAt||''),String(normalizeBusCode(code)||''),String(name||''),String(phone||'')].join('|');
   lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code);
+  (DELETED_SIMPLE_KEYS[type]||(DELETED_SIMPLE_KEYS[type]=new Set())).add(deleteKey);
+  loadSimpleAdmin(type);
   try{
     if(GAS_READY){
       const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type,rowIdx,createdAt,name,phone,code})});
@@ -1708,6 +1718,7 @@ async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
     }
     toast('🗑️ 신청 내역을 삭제했습니다');
   }catch(err){
+    (DELETED_SIMPLE_KEYS[type]||(DELETED_SIMPLE_KEYS[type]=new Set())).delete(deleteKey);
     toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
   }
   loadSimpleAdmin(type);
@@ -2003,7 +2014,8 @@ function loadSimpleAdmin(type,statsId,listId){
   renderSimpleAdminData(type,local,cfg.standStats,cfg.standList);
   if(GAS_READY) fetch(GAS_URL+`?action=${cfg.listAction}`).then(r=>r.json()).then(res=>{
     const rows=(res&&res.data)||[];
-    const merged=mergeSimpleRows(local,rows);
+    const deletedSet=DELETED_SIMPLE_KEYS[type]||new Set();
+    const merged=mergeSimpleRows(local,rows).filter(r=>!deletedSet.has(simpleRowKey(r)));
     if(merged.length || !local.length){
       renderSimpleAdminData(type,merged,statsId||cfg.mainStats,listId||cfg.mainList);
       renderSimpleAdminData(type,merged,cfg.standStats,cfg.standList);
@@ -2121,7 +2133,10 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     (Array.isArray(remoteRows)?remoteRows:[]).forEach(r=>{const o=normalizeOeRow(r); const k=getOeKey(o); map.set(k, Object.assign({}, map.get(k)||{}, o));});
     return Array.from(map.values()).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
   }
-  function currentMergedOeAll(){ return mergeOERows(lsGetOE('all'), oeRemoteCache); }
+  function currentMergedOeAll(){ return mergeOERows(lsGetOE('all'), oeRemoteCache).filter(item=>!DELETED_OE_KEYS.has(getOeKey(item))); }
+  window.__removeOeCacheRow = function(token,rowIdx){
+    oeRemoteCache = oeRemoteCache.filter(item=>!(String(item?.token||'')===String(token||'') || (String(token||'')==='' && String(item?.rowIdx||'')===String(rowIdx||''))));
+  };
   function setOeButtons(containerId, active){
     const root=document.getElementById(containerId); if(!root) return;
     const map={'전체':'all','외출중':'pending','복귀완료':'returned'};
@@ -2154,6 +2169,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     if(!GAS_READY) return; try{ const res=await fetch(GAS_URL+'?action=listOE&filter=all'); const json=await res.json(); oeRemoteCache = Array.isArray(json.data)?json.data:[]; }catch(e){}
   }
   async function syncOeAndRender(){ await pullOeRemote(); renderAllOeViews(); }
+  window.__renderOeViews = function(){ renderAllOeViews(); };
   window.admRenderOE = function(){ renderAllOeViews(); };
   window.oeAdmRender = function(){ renderAllOeViews(); };
   window.admOeFilt = function(f,btn){ ADM_OE_FILT = f || 'pending'; if(btn) document.querySelectorAll('#adm-oe-filt .rfilt-btn').forEach(b=>b.classList.toggle('on',b===btn)); renderAllOeViews(); syncOeAndRender(); };
