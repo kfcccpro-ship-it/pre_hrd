@@ -882,22 +882,22 @@ textarea.finput{resize:vertical;min-height:72px}
     <div class="adm-panel" id="ap-outexit">
       <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-oe-date-sel" onchange="onAdminWeekChange('oe',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
       <div class="rfilt" id="adm-oe-filt"><button class="rfilt-btn on" onclick="admOeFilt('all',this)">전체</button><button class="rfilt-btn" onclick="admOeFilt('pending',this)">외출중</button><button class="rfilt-btn" onclick="admOeFilt('returned',this)">복귀완료</button></div>
-      <div class="stat-row" id="adm-oe-stats"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('oe')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-oe-stats"></div>
       <div id="adm-oe-list"><div style="text-align:center;padding:24px;color:var(--text-3)">탭 선택 후 불러옵니다</div></div>
     </div>
     <div class="adm-panel" id="ap-bus">
       <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-bus-date-sel" onchange="onAdminWeekChange('bus',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div class="stat-row" id="adm-bus-stats"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('bus')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-bus-stats"></div>
       <div id="adm-bus-list"><div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div></div>
     </div>
     <div class="adm-panel" id="ap-lesson">
       <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-lesson-date-sel" onchange="onAdminWeekChange('lesson',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div class="stat-row" id="adm-lesson-stats"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('lesson')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-lesson-stats"></div>
       <div id="adm-lesson-list"><div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div></div>
     </div>
     <div class="adm-panel" id="ap-sport">
       <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-sport-date-sel" onchange="onAdminWeekChange('sport',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div class="stat-row" id="adm-sport-stats"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('sport')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-sport-stats"></div>
       <div id="adm-sport-list"><div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div></div>
     </div>
   </div>
@@ -1536,7 +1536,7 @@ function setStartCountdown(step){
     btn.classList.add('ready');
   }
 }
-function handleStartBtn(){ goTo('week'); if(!appReady){ toast('데이터를 불러오는 중입니다. 잠시만 기다려 주세요.'); } }
+function handleStartBtn(){ if(!appReady){ toast('안내를 준비하고 있습니다. 잠시만 기다려 주세요.'); return; } goTo('week'); }
 
 document.addEventListener('DOMContentLoaded', () => {
   try{
@@ -1583,6 +1583,8 @@ function lsGetByToken(t){return lsGet('oe_apps').find(d=>d.token===t)||null;}
 function lsReturnOE(ri,at){const a=lsGet('oe_apps');const i=a.findIndex(d=>String(d.rowIdx)===String(ri));if(i>=0){a[i].status='returned';a[i].returnedAt=at;lsSave('oe_apps',a);}}
 function lsApproveOE(t,dec,cmt,at){const a=lsGet('oe_apps');const i=a.findIndex(d=>d.token===t);if(i>=0){a[i].approvalStatus=dec;a[i].approvedAt=at;a[i].approvalComment=cmt;lsSave('oe_apps',a);return true;}return false;}
 function lsIssueOE(t,at,by){const a=lsGet('oe_apps');const i=a.findIndex(d=>d.token===t);if(i>=0){a[i].mailSentAt=at;a[i].mailSentBy=by||'관리자';lsSave('oe_apps',a);return true;}return false;}
+function lsDeleteOE(token,rowIdx){const a=lsGet('oe_apps');const next=a.filter(d=>!(String(d.token||'')===String(token||'') || (token==null||token==='') && String(d.rowIdx||'')===String(rowIdx||'')));lsSave('oe_apps',next);return next.length!==a.length;}
+function lsResetOE(startDate){const a=lsGet('oe_apps');const next=startDate?a.filter(d=>String(d.startDate||'')!==String(startDate||'')):[];lsSave('oe_apps',next);return a.length-next.length;}
 function normalizeBusCode(code){return String(code||'').replace(/\D/g,'').slice(-4);}
 function formatOEReason(d){const base=String((d&&d.reason)||((d&&d.type)==='hospital'?'병원·약국 외출':'기타 외출')||'').trim();const extra=String((d&&d.special)||'').trim();return extra?`${base}[${extra}]`:base;}
 function getSimpleKey(type){return APP_STORAGE_KEYS[type]||`${type}_apps`;}
@@ -1590,6 +1592,8 @@ function lsAddSimpleApp(type,d){const a=lsGet(getSimpleKey(type));a.unshift({...
 function lsGetSimpleApp(type){return lsGet(getSimpleKey(type)).map(d=>({...d,code:normalizeBusCode(d.code),status:d.status||'active'}));}
 function lsCheckSimpleApp(type,code){const key=normalizeBusCode(code);return lsGetSimpleApp(type).filter(d=>normalizeBusCode(d.code)===key);}
 function lsCancelSimpleApp(type,rowIdx,at){const a=lsGet(getSimpleKey(type));const i=a.findIndex(d=>String(d.rowIdx)===String(rowIdx));if(i>=0){a[i].status='cancelled';a[i].cancelledAt=at||new Date().toISOString();lsSave(getSimpleKey(type),a);return true;}return false;}
+function lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code){const a=lsGet(getSimpleKey(type));const next=a.filter(d=>!(String(d.rowIdx||'')===String(rowIdx||'') && String(d.createdAt||'')===String(createdAt||'') && String(d.name||'')===String(name||'') && String(d.phone||'')===String(phone||'') && String(normalizeBusCode(d.code)||'')===String(normalizeBusCode(code)||'')));lsSave(getSimpleKey(type),next);return next.length!==a.length;}
+function lsResetSimpleApp(type,startDate){const a=lsGet(getSimpleKey(type));const next=startDate?a.filter(d=>String(d.startDate||'')!==String(startDate||'')):[];lsSave(getSimpleKey(type),next);return a.length-next.length;}
 function lsAddBus(d){lsAddSimpleApp('bus',d);} function lsGetBus(){return lsGetSimpleApp('bus');} function lsCheckBus(code){return lsCheckSimpleApp('bus',code);}
 function lsAddLesson(d){lsAddSimpleApp('lesson',d);} function lsGetLesson(){return lsGetSimpleApp('lesson');} function lsCheckLesson(code){return lsCheckSimpleApp('lesson',code);}
 function lsAddSport(d){lsAddSimpleApp('sport',d);} function lsGetSport(){return lsGetSimpleApp('sport');} function lsCheckSport(code){return lsCheckSimpleApp('sport',code);}
@@ -1639,10 +1643,12 @@ function admOECard(item){
   const statusBadge=state==='returned'
     ? '<span class="rbadge done">복귀완료</span>'
     : '<span class="rbadge ing">외출중</span>';
-  const issueBtn=`<button style="background:var(--primary-weak);color:var(--primary);border:1.5px solid #cfe0ff;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1.4" onclick="adminIssueOE('${esc(item.token||'')}')">📧 메일발송-출력</button>`;
+  const issueBtn=`<button style="background:var(--primary-weak);color:var(--primary);border:1.5px solid #cfe0ff;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1.4" onclick="adminIssueOE(${JSON.stringify(String(item.token||''))})">📧 메일발송·출력</button>`;
   const returnBtn=state!=='returned'
-    ? `<button style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="admReturnOE('${esc(item.token||'')}')">✅ 복귀 처리</button>`
+    ? `<button style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="admReturnOE(${JSON.stringify(String(item.token||''))})">✅ 복귀 처리</button>`
     : '';
+  const deleteBtn=`<button style="background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:10px 6px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteOE(${JSON.stringify(String(item.token||''))},${JSON.stringify(String(item.rowIdx||''))},${JSON.stringify(String(item.name||''))})">🗑️ 강제 삭제</button>`;
+  const actionCols = state!=='returned' ? '1fr 1fr 1fr' : '1fr 1fr';
   return `<div class="req-item">
     <div class="req-head"><span class="req-name">${esc(item.name||'-')} <span style="font-size:12px;color:var(--text-3)">${esc(item.typeLabel||'')}</span></span>${statusBadge}</div>
     <div style="margin-bottom:8px">${item.mailSentAt?`<span class="rbadge" style="background:var(--primary-weak);color:var(--primary)">메일발송 ${fmtDT(item.mailSentAt)}</span>`:'<span class="rbadge" style="background:#f5f7fa;color:var(--text-3)">메일 미발송</span>'}</div>
@@ -1653,7 +1659,7 @@ function admOECard(item){
       <div><b>복귀예정</b> ${esc(item.retTime||'미정')}</div>
       ${item.returnedAt?`<div><b>복귀시간</b> ${fmtDT(item.returnedAt)}</div>`:''}
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">${issueBtn}${returnBtn}</div>
+    <div style="display:grid;grid-template-columns:${actionCols};gap:6px;margin-top:10px">${issueBtn}${returnBtn}${deleteBtn}</div>
   </div>`;
 }
 function copyApproveUrl(url){ return; }
@@ -1672,7 +1678,61 @@ function admReturnOE(token){
   }
   toast('✅ 복귀 처리 완료'); admLoadOE();
 }
-
+async function adminDeleteOE(token,rowIdx,name){
+  const label=name||'선택한 신청';
+  if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?
+삭제 후 복구할 수 없습니다.`)) return;
+  lsDeleteOE(token,rowIdx);
+  try{
+    if(GAS_READY){
+      const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteOE',token,rowIdx})});
+      const json=await res.json();
+      if(!(json&&json.ok)) throw new Error((json&&json.msg)||'삭제 실패');
+    }
+    toast('🗑️ 신청 내역을 삭제했습니다');
+  }catch(err){
+    toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
+  }
+  admLoadOE();
+}
+async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
+  const label=name||'선택한 신청';
+  if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?
+삭제 후 복구할 수 없습니다.`)) return;
+  lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code);
+  try{
+    if(GAS_READY){
+      const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type,rowIdx,createdAt,name,phone,code})});
+      const json=await res.json();
+      if(!(json&&json.ok)) throw new Error((json&&json.msg)||'삭제 실패');
+    }
+    toast('🗑️ 신청 내역을 삭제했습니다');
+  }catch(err){
+    toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
+  }
+  loadSimpleAdmin(type);
+}
+async function adminResetCategory(type){
+  const week = type==='oe' ? (OE_ADM_WEEK||'') : (SIMPLE_ADM_WEEK[type]||'');
+  const labelMap={oe:'외출·외박',bus:'귀가버스',lesson:'배드민턴 레슨',sport:'스포츠 시설'};
+  const scopeMsg = week ? `선택된 주차(${week}) 신청 내역만` : '해당 카테고리의 전체 신청 내역을';
+  if(!confirm(`${labelMap[type]||type} 관리자 내역 초기화
+${scopeMsg} 한꺼번에 삭제합니다.
+삭제 후 복구할 수 없습니다.`)) return;
+  if(type==='oe') lsResetOE(week); else lsResetSimpleApp(type,week);
+  try{
+    if(GAS_READY){
+      const payload = type==='oe' ? {action:'resetOE',startDate:week} : {action:'resetSimple',type,startDate:week};
+      const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)});
+      const json=await res.json();
+      if(!(json&&json.ok)) throw new Error((json&&json.msg)||'초기화 실패');
+    }
+    toast('🧹 관리자 내역을 초기화했습니다');
+  }catch(err){
+    toast('⚠️ 서버 초기화 중 문제가 있었습니다: '+err.message);
+  }
+  if(type==='oe') admLoadOE(); else loadSimpleAdmin(type);
+}
 
 function loadOEAdmin(){ syncAdminWeekSelectors(); const sel=document.getElementById('oe-adm-date-sel'); if(sel && !OE_ADM_WEEK) OE_ADM_WEEK=getDefaultWeekValue(); if(sel) populateWeekSelect(sel, OE_ADM_WEEK); oeAdmFilt(OE_ADM_FILTER||'all',document.querySelector('#oe-adm-filt .rfilt-btn.on')||document.querySelector('#oe-adm-filt .rfilt-btn')); }
 function oeAdmFilt(f,btn){
@@ -1930,7 +1990,7 @@ function renderSimpleAdminData(type,data,statsId,listId){
   st.innerHTML=`<div class="stat-card"><div class="stat-num">${rows.length}</div><div class="stat-lbl">총 신청</div></div><div class="stat-card"><div class="stat-num">${activeCnt}</div><div class="stat-lbl">유효 신청</div></div><div class="stat-card"><div class="stat-num">${cancelCnt}</div><div class="stat-lbl">취소</div></div>`;
   if(!rows.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
   const summary=`<div class="binfo-box"><div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">과정별 신청 소계</div>${courseEntries.map(([course,ms])=>`<div class="binfo-row"><span class="binfo-lbl">${esc(course)}</span><span class="binfo-val">${ms.length}명</span></div>`).join('')}</div>`;
-  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="this.nextElementSibling.classList.toggle('on');this.querySelector('span:last-child').textContent=this.nextElementSibling.classList.contains('on')?'▴':'▾'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 신청</div></div><span>▾</span></div><div class="bgroup-body on">${ms.map(m=>`<div class="bmem"><div><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div><div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div></div>`).join('')}</div></div>`).join('');
+  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="this.nextElementSibling.classList.toggle('on');this.querySelector('span:last-child').textContent=this.nextElementSibling.classList.contains('on')?'▴':'▾'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 신청</div></div><span>▾</span></div><div class="bgroup-body on">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div><div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(${JSON.stringify(type)},${JSON.stringify(String(m.rowIdx||''))},${JSON.stringify(String(m.createdAt||''))},${JSON.stringify(String(m.name||''))},${JSON.stringify(String(m.phone||''))},${JSON.stringify(String(normalizeBusCode(m.code)||''))})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
   el.innerHTML=summary+groups;
 }
 function loadSimpleAdmin(type,statsId,listId){
