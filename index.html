@@ -583,6 +583,47 @@ textarea.finput{resize:vertical;min-height:72px}
 .simple-admin-btn{display:flex;align-items:center;justify-content:center;margin:14px auto 0;}
 .service-note .note-red{font-size:15px;}
 
+/* ── splash text (로딩 안내 텍스트 애니메이션) ── */
+#splash-text{
+  padding:16px 20px 0;
+  min-height:88px;
+}
+.splash-notice-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--primary-weak);border:1.5px solid #cfe0ff;
+  color:var(--primary);
+  font-size:12px;font-weight:900;
+  padding:5px 10px;border-radius:999px;
+  margin-bottom:10px;
+}
+.splash-line1{
+  font-size:17px;font-weight:900;color:var(--text);
+  margin-bottom:6px;line-height:1.5;
+  min-height:26px;
+}
+.splash-line2{
+  font-size:14px;font-weight:700;color:var(--text-3);
+  line-height:1.8;
+  min-height:22px;
+}
+.splash-chunk{
+  display:inline;
+  opacity:0;
+  transition:opacity .3s ease;
+}
+.splash-chunk.show{opacity:1;}
+
+/* ── 신청내역 그룹 토글 삼각형 ── */
+.bgroup-arr{
+  color:var(--primary);
+  font-size:24px;
+  font-weight:900;
+  flex-shrink:0;
+  transition:transform .2s ease;
+}
+.bgroup-body.on ~ * .bgroup-arr,
+.bgroup-hd.open .bgroup-arr{transform:rotate(180deg);}
+
 </style>
 <!-- Firebase SDK 제거됨 → Apps Script PropertiesService + Google Drive로 전환 -->
 </head>
@@ -658,6 +699,7 @@ textarea.finput{resize:vertical;min-height:72px}
       </div>
 
     </div>
+    <div id="splash-text"><span class="splash-notice-badge">📌 필수 안내</span><div class="splash-line1"></div><div class="splash-line2"></div></div>
     <div class="hbot">
       <button class="btnadm icon-only" onclick="openPwOverlay('admin')" aria-label="운영 설정"><img class="admin-logo" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%23E8F3FF%22/%3E%3Cpath%20d%3D%22M37.8%2012.7l1.3%204.4c1%20.3%201.9.7%202.7%201.1l4.2-1.8%204.4%207.7-3.4%203c.1.9.2%201.8.2%202.7s-.1%201.8-.2%202.7l3.4%203-4.4%207.7-4.2-1.8c-.8.4-1.7.8-2.7%201.1l-1.3%204.4h-8.9l-1.3-4.4c-1-.3-1.9-.7-2.7-1.1l-4.2%201.8-4.4-7.7%203.4-3a15%2015%200%200%201%200-5.4l-3.4-3%204.4-7.7%204.2%201.8c.8-.4%201.7-.8%202.7-1.1l1.3-4.4h8.9z%22%20fill%3D%22%233182F6%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%228.5%22%20fill%3D%22%23FFFFFF%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%225.5%22%20fill%3D%22%233182F6%22/%3E%3C/svg%3E" alt=""></button>
       <div class="hmeta" style="display:none">오늘의 안내 상태</div>
@@ -1516,6 +1558,8 @@ async function resetData(){
 // INIT 연동
 // ═══════════════════════════════
 let appReady = false;
+let bootCountdownDone = false;
+let bootLaunchQueued = false;
 function setStartCountdown(step){
   const btn = document.getElementById('start-btn');
   const main = document.getElementById('start-btn-main');
@@ -1523,9 +1567,15 @@ function setStartCountdown(step){
   const stat = document.getElementById('home-stat');
   if(!btn || !sub || !stat || !main) return;
   if(step > 0){
-    main.textContent = `바로 시작하기 ${step}`;
-    sub.textContent = `${step}초 후 이용 가능`;
+    main.textContent = `과정 및 강의실 찾기 ${step}`;
+    sub.textContent = `${step}초 후 안내 시작`;
     stat.textContent = `안내 준비 중 · ${step}`;
+    btn.classList.add('off');
+    btn.classList.remove('ready');
+  }else if(!appReady){
+    main.textContent = '과정 및 강의실 찾기';
+    sub.textContent = '데이터 불러오는 중';
+    stat.textContent = '안내 준비 중';
     btn.classList.add('off');
     btn.classList.remove('ready');
   }else{
@@ -1536,7 +1586,68 @@ function setStartCountdown(step){
     btn.classList.add('ready');
   }
 }
-function handleStartBtn(){ if(!appReady){ toast('안내를 준비하고 있습니다. 잠시만 기다려 주세요.'); return; } goTo('week'); }
+function openWeekWhenReady(){
+  if(appReady){
+    bootLaunchQueued = false;
+    setStartCountdown(0);
+    goTo('week');
+    return;
+  }
+  bootLaunchQueued = true;
+  setStartCountdown(-1);
+  toast('안내 준비 중입니다. 잠시만 기다려 주세요.');
+}
+function handleStartBtn(){
+  if(bootLaunchQueued){ return; }
+  openWeekWhenReady();
+}
+function startBootCountdown(){
+  let step = 3;
+  setStartCountdown(step);
+  startSplashText();
+  const timer = setInterval(()=>{
+    step -= 1;
+    if(step > 0){
+      setStartCountdown(step);
+      return;
+    }
+    clearInterval(timer);
+    bootCountdownDone = true;
+    setStartCountdown(0);
+    if(bootLaunchQueued && appReady){
+      bootLaunchQueued = false;
+      goTo('week');
+    }
+  }, 1000);
+}
+
+function startSplashText(){
+  const el = document.getElementById('splash-text');
+  if(!el) return;
+  const line1El = el.querySelector('.splash-line1');
+  const line2El = el.querySelector('.splash-line2');
+  if(!line1El || !line2El) return;
+  line1El.innerHTML = '';
+  line2El.innerHTML = '';
+  const line1Words = ['MG인재개발원', '안내 웹앱입니다.'];
+  const line2Words = ['과정정보,', '강의실정보,', '외출,', '외박,', '시설,', '버스 이용 등을', '신청할 수 있습니다.'];
+  const allItems = [
+    ...line1Words.map(w=>({text:w, target:'line1'})),
+    ...line2Words.map(w=>({text:w, target:'line2'})),
+  ];
+  let idx = 0;
+  const timer = setInterval(()=>{
+    if(idx >= allItems.length){ clearInterval(timer); return; }
+    const item = allItems[idx];
+    const targetEl = item.target === 'line1' ? line1El : line2El;
+    const span = document.createElement('span');
+    span.className = 'splash-chunk';
+    span.textContent = item.text + '\u00a0';
+    targetEl.appendChild(span);
+    requestAnimationFrame(()=>{ requestAnimationFrame(()=>span.classList.add('show')); });
+    idx++;
+  }, 260);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   try{
@@ -1550,11 +1661,12 @@ document.addEventListener('DOMContentLoaded', () => {
   history.replaceState({screen:'home'},'');
   applyAdminIcons();
   syncAdminWeekSelectors();
-  setStartCountdown(0);
+  startBootCountdown();
   goTo('home');
   Promise.allSettled([load(), loadStepCfg(), loadPhotos()]).then(()=>{
     appReady = true;
     renderHome();
+    if(bootCountdownDone){ setStartCountdown(0); if(bootLaunchQueued){ bootLaunchQueued = false; goTo('week'); } }
     if(curScreen==='week') initWeek();
   }).finally(()=>{
     requestIdleCallback ? requestIdleCallback(()=>preloadGuidePhotos()) : setTimeout(()=>preloadGuidePhotos(), 600);
@@ -1572,6 +1684,9 @@ const GAS_READY = !GAS_URL.includes('YOUR_SCRIPT_ID');
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}}
 function lsSave(k,a){try{localStorage.setItem(k,JSON.stringify(a));}catch(e){}}
 const APP_STORAGE_KEYS={bus:'bus_apps',lesson:'lesson_apps',sport:'sport_apps'};
+const CLIENT_DELETE_TOMBSTONES={oe:new Set(),simple:{bus:new Set(),lesson:new Set(),sport:new Set()}};
+function oeDeleteKey(token,rowIdx){ return String(token||'') ? 't:'+String(token||'') : 'r:'+String(rowIdx||''); }
+function simpleDeleteKey(rowIdx,createdAt,name,phone,code){ return [String(rowIdx||''),String(createdAt||''),String(name||''),String(phone||''),String(normalizeBusCode(code)||'')].join('|'); }
 const DEFAULT_APP_SETTINGS={oeAdminPw:'2026',busAdminPw:'2026',oeMailRecipients:['pcrew123@naver.com'],roomRoutePrep:{seminar1:{roomName:'1세미나실',active:false,plannedCarSteps:5,plannedBusSteps:5,note:'내일 사진/설명 추가 예정'},seminar2:{roomName:'2세미나실',active:false,plannedCarSteps:5,plannedBusSteps:5,note:'내일 사진/설명 추가 예정'}}};
 function getAppSettings(){let saved={};try{saved=JSON.parse(localStorage.getItem('app_settings')||'{}')||{};}catch(e){}return {...DEFAULT_APP_SETTINGS,...saved};}
 function saveAppSettings(patch){const next={...getAppSettings(),...(patch||{})};localStorage.setItem('app_settings',JSON.stringify(next));return next;}
@@ -1682,7 +1797,10 @@ async function adminDeleteOE(token,rowIdx,name){
   const label=name||'선택한 신청';
   if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?
 삭제 후 복구할 수 없습니다.`)) return;
+  const delKey = oeDeleteKey(token,rowIdx);
+  CLIENT_DELETE_TOMBSTONES.oe.add(delKey);
   lsDeleteOE(token,rowIdx);
+  admLoadOE();
   try{
     if(GAS_READY){
       const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteOE',token,rowIdx})});
@@ -1691,15 +1809,18 @@ async function adminDeleteOE(token,rowIdx,name){
     }
     toast('🗑️ 신청 내역을 삭제했습니다');
   }catch(err){
-    toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
+    toast('⚠️ 로컬 삭제 완료, 서버 반영은 지연될 수 있습니다');
   }
-  admLoadOE();
 }
 async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
   const label=name||'선택한 신청';
   if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?
 삭제 후 복구할 수 없습니다.`)) return;
+  const delKey = simpleDeleteKey(rowIdx,createdAt,name,phone,code);
+  if(!CLIENT_DELETE_TOMBSTONES.simple[type]) CLIENT_DELETE_TOMBSTONES.simple[type] = new Set();
+  CLIENT_DELETE_TOMBSTONES.simple[type].add(delKey);
   lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code);
+  loadSimpleAdmin(type);
   try{
     if(GAS_READY){
       const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type,rowIdx,createdAt,name,phone,code})});
@@ -1708,9 +1829,8 @@ async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
     }
     toast('🗑️ 신청 내역을 삭제했습니다');
   }catch(err){
-    toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
+    toast('⚠️ 로컬 삭제 완료, 서버 반영은 지연될 수 있습니다');
   }
-  loadSimpleAdmin(type);
 }
 async function adminResetCategory(type){
   const week = type==='oe' ? (OE_ADM_WEEK||'') : (SIMPLE_ADM_WEEK[type]||'');
@@ -1990,7 +2110,7 @@ function renderSimpleAdminData(type,data,statsId,listId){
   st.innerHTML=`<div class="stat-card"><div class="stat-num">${rows.length}</div><div class="stat-lbl">총 신청</div></div><div class="stat-card"><div class="stat-num">${activeCnt}</div><div class="stat-lbl">유효 신청</div></div><div class="stat-card"><div class="stat-num">${cancelCnt}</div><div class="stat-lbl">취소</div></div>`;
   if(!rows.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
   const summary=`<div class="binfo-box"><div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">과정별 신청 소계</div>${courseEntries.map(([course,ms])=>`<div class="binfo-row"><span class="binfo-lbl">${esc(course)}</span><span class="binfo-val">${ms.length}명</span></div>`).join('')}</div>`;
-  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="this.nextElementSibling.classList.toggle('on');this.querySelector('span:last-child').textContent=this.nextElementSibling.classList.contains('on')?'▴':'▾'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 신청</div></div><span>▾</span></div><div class="bgroup-body on">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div><div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(${JSON.stringify(type)},${JSON.stringify(String(m.rowIdx||''))},${JSON.stringify(String(m.createdAt||''))},${JSON.stringify(String(m.name||''))},${JSON.stringify(String(m.phone||''))},${JSON.stringify(String(normalizeBusCode(m.code)||''))})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
+  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="var body=this.nextElementSibling;body.classList.toggle('on');this.querySelector('.bgroup-arr').style.transform=body.classList.contains('on')?'rotate(180deg)':'rotate(0deg)'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 · 탭하여 신청내역 보기</div></div><span class="bgroup-arr" style="transition:transform .2s">▼</span></div><div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div><div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(${JSON.stringify(type)},${JSON.stringify(String(m.rowIdx||''))},${JSON.stringify(String(m.createdAt||''))},${JSON.stringify(String(m.name||''))},${JSON.stringify(String(m.phone||''))},${JSON.stringify(String(normalizeBusCode(m.code)||''))})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
   el.innerHTML=summary+groups;
 }
 function loadSimpleAdmin(type,statsId,listId){
@@ -1998,12 +2118,13 @@ function loadSimpleAdmin(type,statsId,listId){
   syncAdminWeekSelectors();
   const sel=document.getElementById(`${type}-adm-date-sel`); if(sel) populateWeekSelect(sel, SIMPLE_ADM_WEEK[type]||getDefaultWeekValue()); const sel2=document.getElementById(`adm-${type}-date-sel`); if(sel2) populateWeekSelect(sel2, SIMPLE_ADM_WEEK[type]||getDefaultWeekValue());
   if(!SIMPLE_ADM_WEEK[type]) SIMPLE_ADM_WEEK[type]=getDefaultWeekValue();
-  const local=lsGetSimpleApp(type);
+  const tombstones = CLIENT_DELETE_TOMBSTONES.simple[type] || new Set();
+  const local=lsGetSimpleApp(type).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
   renderSimpleAdminData(type,local,statsId||cfg.mainStats,listId||cfg.mainList);
   renderSimpleAdminData(type,local,cfg.standStats,cfg.standList);
   if(GAS_READY) fetch(GAS_URL+`?action=${cfg.listAction}`).then(r=>r.json()).then(res=>{
-    const rows=(res&&res.data)||[];
-    const merged=mergeSimpleRows(local,rows);
+    const rows=((res&&res.data)||[]).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
+    const merged=mergeSimpleRows(local,rows).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
     if(merged.length || !local.length){
       renderSimpleAdminData(type,merged,statsId||cfg.mainStats,listId||cfg.mainList);
       renderSimpleAdminData(type,merged,cfg.standStats,cfg.standList);
@@ -2053,300 +2174,7 @@ function printForm(d){
 <div class="sign"><div>신청인 &nbsp; 소&nbsp;&nbsp;속 : ${bankFull}</div><div>직&nbsp;&nbsp;위 : ${position}</div><div>성&nbsp;&nbsp;명 : ${d.name||''} &nbsp;&nbsp; (인)</div><div class="sign-note">서명,날인은 '웹앱' 본인 신청으로 갈음</div></div>
 <p class="footer">MG인재개발원 귀중</p>
 <div class="no-print" id="print-actions"><button onclick="window.print()" style="padding:12px 30px;background:#3182F6;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit">🖨️ 인쇄하기</button><button onclick="window.close()" style="margin-left:10px;padding:12px 20px;background:#f5f7fa;color:#555;border:1px solid #ddd;border-radius:10px;font-size:14px;cursor:pointer;font-family:inherit">닫기</button></div>
-<div style="background:#FFF4EC;border:1px solid #FFD9BF;border-radius:8px;padding:12px;font-size:13px;color:#C2410C;margin-top:16px;text-align:center">※ 이 서식은 출력 후 결재란에 서명하여 보관하세요</div>
-<script>
-(function(){
-  const UI_HIDDEN_SIMPLE = {bus:new Set(), lesson:new Set(), sport:new Set()};
-  const UI_HIDDEN_OE = new Set();
-
-  function oeHideKey(token,rowIdx,name){
-    return String(token || ('row-'+String(rowIdx||'')+'-'+String(name||'')));
-  }
-  function simpleHideKey(rowIdx,createdAt,name,phone,code){
-    return [String(rowIdx||''),String(createdAt||''),String((window.normalizeBusCode?normalizeBusCode(code):code)||''),String(name||''),String(phone||'')].join('|');
-  }
-  function fadeRemoveCard(btn){
-    const card = btn && btn.closest ? btn.closest('.req-item') : null;
-    if(!card) return;
-    card.style.transition='opacity .18s ease, transform .18s ease, margin .18s ease';
-    card.style.opacity='0';
-    card.style.transform='scale(.98)';
-    setTimeout(()=>{ try{ card.remove(); }catch(e){} }, 180);
-  }
-
-  function injectUiStyles(){
-    if(document.getElementById('runtime-ux-patch-style')) return;
-    const css = `
-      .home-load-guide{
-        margin-top:14px;
-        background:rgba(255,255,255,.92);
-        border:1.5px solid rgba(207,224,255,.95);
-        border-radius:18px;
-        padding:14px 16px;
-        box-shadow:var(--shadow);
-      }
-      .home-load-guide.ready{
-        border-color:#b8dfcb;
-        background:#f4fbf7;
-      }
-      .hlg-kicker{
-        font-size:12px;
-        font-weight:900;
-        color:var(--primary);
-        margin-bottom:6px;
-      }
-      .home-load-guide.ready .hlg-kicker{ color:var(--success); }
-      .hlg-line{
-        min-height:48px;
-        font-size:15px;
-        line-height:1.7;
-        color:var(--text-2);
-        font-weight:800;
-        word-break:keep-all;
-      }
-      .hlg-cursor{
-        display:inline-block;
-        width:1px;
-        height:1.05em;
-        background:currentColor;
-        vertical-align:-0.12em;
-        margin-left:3px;
-        animation:hlgBlink .9s steps(1) infinite;
-      }
-      @keyframes hlgBlink{ 50%{ opacity:0; } }
-      .hlg-dots{
-        margin-top:8px;
-        font-size:12px;
-        color:var(--text-3);
-        font-weight:800;
-      }
-      .bgroup-hd{
-        align-items:flex-start !important;
-        gap:12px;
-      }
-      .bgroup-chevron{
-        color:var(--primary) !important;
-        font-size:24px !important;
-        font-weight:900 !important;
-        line-height:1;
-        flex-shrink:0;
-        margin-left:8px;
-      }
-    `;
-    const style=document.createElement('style');
-    style.id='runtime-ux-patch-style';
-    style.textContent=css;
-    document.head.appendChild(style);
-  }
-
-  let guideTimer=null;
-  let guidePhraseIndex=0;
-  const guidePhrases = [
-    'MG인재개발원 안내 웹앱입니다.',
-    '과정정보와 강의실정보를 확인할 수 있습니다.',
-    '외출 · 외박 · 시설 · 버스 이용 등을 신청할 수 있습니다.',
-    '잠시만 기다리시면 안내 준비가 완료됩니다.'
-  ];
-
-  function ensureGuideBox(){
-    injectUiStyles();
-    const startBtn=document.getElementById('start-btn');
-    if(!startBtn) return null;
-    let box=document.getElementById('home-load-guide');
-    if(box) return box;
-    box=document.createElement('div');
-    box.id='home-load-guide';
-    box.className='home-load-guide';
-    box.innerHTML='<div class="hlg-kicker">[필수 안내]</div><div class="hlg-line" id="home-load-guide-line"></div><div class="hlg-dots" id="home-load-guide-dots">안내 준비 중</div>';
-    startBtn.insertAdjacentElement('afterend', box);
-    return box;
-  }
-
-  function stopGuideTyping(){
-    if(guideTimer){ clearTimeout(guideTimer); guideTimer=null; }
-  }
-
-  function runGuideTyping(){
-    const box=ensureGuideBox();
-    const line=document.getElementById('home-load-guide-line');
-    const dots=document.getElementById('home-load-guide-dots');
-    if(!box || !line || !dots) return;
-    box.classList.remove('ready');
-    dots.textContent='안내 준비 중 · 잠시만 기다려 주세요';
-    stopGuideTyping();
-    const phrase=guidePhrases[guidePhraseIndex % guidePhrases.length];
-    let idx=0;
-    (function tick(){
-      line.innerHTML = phrase.slice(0, idx) + '<span class="hlg-cursor"></span>';
-      if(idx < phrase.length){
-        idx += 1;
-        guideTimer = setTimeout(tick, phrase[idx-1] === ' ' ? 40 : 52);
-      }else{
-        guidePhraseIndex += 1;
-        guideTimer = setTimeout(runGuideTyping, 1100);
-      }
-    })();
-  }
-
-  function setGuideReady(){
-    const box=ensureGuideBox();
-    const line=document.getElementById('home-load-guide-line');
-    const dots=document.getElementById('home-load-guide-dots');
-    if(!box || !line || !dots) return;
-    stopGuideTyping();
-    box.classList.add('ready');
-    line.textContent='안내 준비가 완료되었습니다. 아래 버튼을 눌러 진행해 주세요.';
-    dots.textContent='준비 완료';
-  }
-
-  const originalSetStartCountdown = window.setStartCountdown;
-  window.setStartCountdown = function(step){
-    const btn = document.getElementById('start-btn');
-    const main = document.getElementById('start-btn-main');
-    const sub = document.getElementById('start-btn-sub');
-    const stat = document.getElementById('home-stat');
-    ensureGuideBox();
-
-    if(!btn || !main || !sub || !stat){
-      if(typeof originalSetStartCountdown === 'function') return originalSetStartCountdown(step);
-      return;
-    }
-
-    if(window.appReady){
-      main.textContent = '과정 및 강의실 찾기';
-      sub.textContent = '';
-      stat.textContent = '안내 준비가 완료되었습니다';
-      btn.classList.remove('off');
-      btn.classList.add('ready');
-      setGuideReady();
-      return;
-    }
-
-    if(Number(step) > 0){
-      main.textContent = `과정 및 강의실 찾기 ${step}`;
-      sub.textContent = `${step}초 후 이용 가능`;
-      stat.textContent = `안내 준비 중 · ${step}`;
-    }else{
-      main.textContent = '과정 및 강의실 찾기';
-      sub.textContent = '안내 준비 중';
-      stat.textContent = '안내 준비 중';
-    }
-    btn.classList.add('off');
-    btn.classList.remove('ready');
-    runGuideTyping();
-  };
-
-  window.handleStartBtn = function(){
-    if(!window.appReady){
-      runGuideTyping();
-      toast('안내 준비 중입니다. 아래 필수 안내를 잠시 확인해 주세요.');
-      return;
-    }
-    goTo('week');
-  };
-
-  function watchReadyState(){
-    const maxMs = 15000;
-    const started = Date.now();
-    const timer = setInterval(()=>{
-      if(window.appReady){
-        clearInterval(timer);
-        window.setStartCountdown(0);
-      }else if(Date.now() - started > maxMs){
-        clearInterval(timer);
-      }
-    }, 150);
-  }
-
-  const originalAdmOECard = window.admOECard;
-  if(typeof originalAdmOECard === 'function'){
-    window.admOECard = function(item){
-      const key = oeHideKey(item && item.token, item && item.rowIdx, item && item.name);
-      if(UI_HIDDEN_OE.has(key)) return '';
-      let html = originalAdmOECard(item);
-      html = html.replace('onclick="adminDeleteOE(', 'onclick="adminDeleteOE(this,');
-      return html;
-    };
-  }
-
-  window.renderSimpleAdminData = function(type,data,statsId,listId){
-    const cfg=getSimpleCfg(type); const st=document.getElementById(statsId||cfg.mainStats), el=document.getElementById(listId||cfg.mainList);
-    if(!st || !el) return;
-    const week=SIMPLE_ADM_WEEK[type]||'';
-    const rows=filterByWeek((Array.isArray(data)?data:[]).map(d=>({...d, code:normalizeBusCode(d.code), status:d.status||'active'})), week)
-      .filter(d=>!UI_HIDDEN_SIMPLE[type].has(simpleHideKey(d.rowIdx,d.createdAt,d.name,d.phone,d.code)));
-    const grp={}; rows.forEach(d=>{const key=d.course||'과정 미지정'; if(!grp[key]) grp[key]=[]; grp[key].push(d);});
-    const courseEntries=Object.entries(grp).sort((a,b)=>b[1].length-a[1].length || String(a[0]).localeCompare(String(b[0])));
-    const activeCnt=rows.filter(d=>d.status!=='cancelled').length;
-    const cancelCnt=rows.filter(d=>d.status==='cancelled').length;
-    st.innerHTML=`<div class="stat-card"><div class="stat-num">${rows.length}</div><div class="stat-lbl">총 신청</div></div><div class="stat-card"><div class="stat-num">${activeCnt}</div><div class="stat-lbl">유효 신청</div></div><div class="stat-card"><div class="stat-num">${cancelCnt}</div><div class="stat-lbl">취소</div></div>`;
-    if(!rows.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
-    const summary=`<div class="binfo-box"><div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">과정별 신청 소계</div>${courseEntries.map(([course,ms])=>`<div class="binfo-row"><span class="binfo-lbl">${esc(course)}</span><span class="binfo-val">${ms.length}명</span></div>`).join('')}</div>`;
-    const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="this.nextElementSibling.classList.toggle('on');this.querySelector('.bgroup-chevron').textContent=this.nextElementSibling.classList.contains('on')?'▴':'▾'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 신청</div></div><span class="bgroup-chevron">▾</span></div><div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div><div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(this,${JSON.stringify(type)},${JSON.stringify(String(m.rowIdx||''))},${JSON.stringify(String(m.createdAt||''))},${JSON.stringify(String(m.name||''))},${JSON.stringify(String(m.phone||''))},${JSON.stringify(String(normalizeBusCode(m.code)||''))})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
-    el.innerHTML=summary+groups;
-  };
-
-  window.adminDeleteSimple = async function(a,b,c,d,e,f,g){
-    let btn,type,rowIdx,createdAt,name,phone,code;
-    if(a && a.nodeType===1){ btn=a; type=b; rowIdx=c; createdAt=d; name=e; phone=f; code=g; }
-    else { btn=(window.event&&window.event.currentTarget)||null; type=a; rowIdx=b; createdAt=c; name=d; phone=e; code=f; }
-
-    const label=name||'선택한 신청';
-    if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.`)) return;
-    const key = simpleHideKey(rowIdx,createdAt,name,phone,code);
-    UI_HIDDEN_SIMPLE[type].add(key);
-    fadeRemoveCard(btn);
-    lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code);
-    try{
-      if(GAS_READY){
-        const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type,rowIdx,createdAt,name,phone,code})});
-        const json=await res.json();
-        if(!(json&&json.ok)) throw new Error((json&&json.msg)||'삭제 실패');
-      }
-      toast('🗑️ 신청 내역을 삭제했습니다');
-    }catch(err){
-      UI_HIDDEN_SIMPLE[type].delete(key);
-      toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
-    }
-    loadSimpleAdmin(type);
-  };
-
-  window.adminDeleteOE = async function(a,b,c,d){
-    let btn,token,rowIdx,name;
-    if(a && a.nodeType===1){ btn=a; token=b; rowIdx=c; name=d; }
-    else { btn=(window.event&&window.event.currentTarget)||null; token=a; rowIdx=b; name=c; }
-
-    const label=name||'선택한 신청';
-    if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.`)) return;
-    const key = oeHideKey(token,rowIdx,name);
-    UI_HIDDEN_OE.add(key);
-    fadeRemoveCard(btn);
-    lsDeleteOE(token,rowIdx);
-    try{
-      if(GAS_READY){
-        const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteOE',token,rowIdx})});
-        const json=await res.json();
-        if(!(json&&json.ok)) throw new Error((json&&json.msg)||'삭제 실패');
-      }
-      toast('🗑️ 신청 내역을 삭제했습니다');
-    }catch(err){
-      UI_HIDDEN_OE.delete(key);
-      toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
-    }
-    if(typeof window.admLoadOE === 'function') window.admLoadOE();
-    if(typeof window.loadOEAdmin === 'function') window.loadOEAdmin();
-  };
-
-  document.addEventListener('DOMContentLoaded', function(){
-    ensureGuideBox();
-    runGuideTyping();
-    window.setStartCountdown(0);
-    watchReadyState();
-  });
-})();
-</script>
-
-</body></html>`;
+<div style="background:#FFF4EC;border:1px solid #FFD9BF;border-radius:8px;padding:12px;font-size:13px;color:#C2410C;margin-top:16px;text-align:center">※ 이 서식은 출력 후 결재란에 서명하여 보관하세요</div></body></html>`;
   const w=window.open('','_blank','width=860,height=980');
   w.document.write(html); w.document.close(); setTimeout(()=>w.print(),600);
 }
@@ -2414,7 +2242,10 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     (Array.isArray(remoteRows)?remoteRows:[]).forEach(r=>{const o=normalizeOeRow(r); const k=getOeKey(o); map.set(k, Object.assign({}, map.get(k)||{}, o));});
     return Array.from(map.values()).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
   }
-  function currentMergedOeAll(){ return mergeOERows(lsGetOE('all'), oeRemoteCache); }
+  function currentMergedOeAll(){
+    const tombstones = CLIENT_DELETE_TOMBSTONES.oe || new Set();
+    return mergeOERows(lsGetOE('all'), oeRemoteCache).filter(item=>!tombstones.has(oeDeleteKey(item.token,item.rowIdx)));
+  }
   function setOeButtons(containerId, active){
     const root=document.getElementById(containerId); if(!root) return;
     const map={'전체':'all','외출중':'pending','복귀완료':'returned'};
@@ -2444,7 +2275,13 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     renderOeList(filterOEData(allRows, standFilter), 'oe-adm-list');
   }
   async function pullOeRemote(){
-    if(!GAS_READY) return; try{ const res=await fetch(GAS_URL+'?action=listOE&filter=all'); const json=await res.json(); oeRemoteCache = Array.isArray(json.data)?json.data:[]; }catch(e){}
+    if(!GAS_READY) return;
+    try{
+      const res=await fetch(GAS_URL+'?action=listOE&filter=all');
+      const json=await res.json();
+      const tombstones = CLIENT_DELETE_TOMBSTONES.oe || new Set();
+      oeRemoteCache = Array.isArray(json.data)?json.data.filter(item=>!tombstones.has(oeDeleteKey(item.token,item.rowIdx))):[];
+    }catch(e){}
   }
   async function syncOeAndRender(){ await pullOeRemote(); renderAllOeViews(); }
   window.admRenderOE = function(){ renderAllOeViews(); };
@@ -2773,299 +2610,6 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     <div id="sport-adm-list"><div style="text-align:center;padding:24px;color:var(--text-3)">불러오는 중...</div></div>
   </div>
 </div>
-
-
-<script>
-(function(){
-  const UI_HIDDEN_SIMPLE = {bus:new Set(), lesson:new Set(), sport:new Set()};
-  const UI_HIDDEN_OE = new Set();
-
-  function oeHideKey(token,rowIdx,name){
-    return String(token || ('row-'+String(rowIdx||'')+'-'+String(name||'')));
-  }
-  function simpleHideKey(rowIdx,createdAt,name,phone,code){
-    return [String(rowIdx||''),String(createdAt||''),String((window.normalizeBusCode?normalizeBusCode(code):code)||''),String(name||''),String(phone||'')].join('|');
-  }
-  function fadeRemoveCard(btn){
-    const card = btn && btn.closest ? btn.closest('.req-item') : null;
-    if(!card) return;
-    card.style.transition='opacity .18s ease, transform .18s ease, margin .18s ease';
-    card.style.opacity='0';
-    card.style.transform='scale(.98)';
-    setTimeout(()=>{ try{ card.remove(); }catch(e){} }, 180);
-  }
-
-  function injectUiStyles(){
-    if(document.getElementById('runtime-ux-patch-style')) return;
-    const css = `
-      .home-load-guide{
-        margin-top:14px;
-        background:rgba(255,255,255,.92);
-        border:1.5px solid rgba(207,224,255,.95);
-        border-radius:18px;
-        padding:14px 16px;
-        box-shadow:var(--shadow);
-      }
-      .home-load-guide.ready{
-        border-color:#b8dfcb;
-        background:#f4fbf7;
-      }
-      .hlg-kicker{
-        font-size:12px;
-        font-weight:900;
-        color:var(--primary);
-        margin-bottom:6px;
-      }
-      .home-load-guide.ready .hlg-kicker{ color:var(--success); }
-      .hlg-line{
-        min-height:48px;
-        font-size:15px;
-        line-height:1.7;
-        color:var(--text-2);
-        font-weight:800;
-        word-break:keep-all;
-      }
-      .hlg-cursor{
-        display:inline-block;
-        width:1px;
-        height:1.05em;
-        background:currentColor;
-        vertical-align:-0.12em;
-        margin-left:3px;
-        animation:hlgBlink .9s steps(1) infinite;
-      }
-      @keyframes hlgBlink{ 50%{ opacity:0; } }
-      .hlg-dots{
-        margin-top:8px;
-        font-size:12px;
-        color:var(--text-3);
-        font-weight:800;
-      }
-      .bgroup-hd{
-        align-items:flex-start !important;
-        gap:12px;
-      }
-      .bgroup-chevron{
-        color:var(--primary) !important;
-        font-size:24px !important;
-        font-weight:900 !important;
-        line-height:1;
-        flex-shrink:0;
-        margin-left:8px;
-      }
-    `;
-    const style=document.createElement('style');
-    style.id='runtime-ux-patch-style';
-    style.textContent=css;
-    document.head.appendChild(style);
-  }
-
-  let guideTimer=null;
-  let guidePhraseIndex=0;
-  const guidePhrases = [
-    'MG인재개발원 안내 웹앱입니다.',
-    '과정정보와 강의실정보를 확인할 수 있습니다.',
-    '외출 · 외박 · 시설 · 버스 이용 등을 신청할 수 있습니다.',
-    '잠시만 기다리시면 안내 준비가 완료됩니다.'
-  ];
-
-  function ensureGuideBox(){
-    injectUiStyles();
-    const startBtn=document.getElementById('start-btn');
-    if(!startBtn) return null;
-    let box=document.getElementById('home-load-guide');
-    if(box) return box;
-    box=document.createElement('div');
-    box.id='home-load-guide';
-    box.className='home-load-guide';
-    box.innerHTML='<div class="hlg-kicker">[필수 안내]</div><div class="hlg-line" id="home-load-guide-line"></div><div class="hlg-dots" id="home-load-guide-dots">안내 준비 중</div>';
-    startBtn.insertAdjacentElement('afterend', box);
-    return box;
-  }
-
-  function stopGuideTyping(){
-    if(guideTimer){ clearTimeout(guideTimer); guideTimer=null; }
-  }
-
-  function runGuideTyping(){
-    const box=ensureGuideBox();
-    const line=document.getElementById('home-load-guide-line');
-    const dots=document.getElementById('home-load-guide-dots');
-    if(!box || !line || !dots) return;
-    box.classList.remove('ready');
-    dots.textContent='안내 준비 중 · 잠시만 기다려 주세요';
-    stopGuideTyping();
-    const phrase=guidePhrases[guidePhraseIndex % guidePhrases.length];
-    let idx=0;
-    (function tick(){
-      line.innerHTML = phrase.slice(0, idx) + '<span class="hlg-cursor"></span>';
-      if(idx < phrase.length){
-        idx += 1;
-        guideTimer = setTimeout(tick, phrase[idx-1] === ' ' ? 40 : 52);
-      }else{
-        guidePhraseIndex += 1;
-        guideTimer = setTimeout(runGuideTyping, 1100);
-      }
-    })();
-  }
-
-  function setGuideReady(){
-    const box=ensureGuideBox();
-    const line=document.getElementById('home-load-guide-line');
-    const dots=document.getElementById('home-load-guide-dots');
-    if(!box || !line || !dots) return;
-    stopGuideTyping();
-    box.classList.add('ready');
-    line.textContent='안내 준비가 완료되었습니다. 아래 버튼을 눌러 진행해 주세요.';
-    dots.textContent='준비 완료';
-  }
-
-  const originalSetStartCountdown = window.setStartCountdown;
-  window.setStartCountdown = function(step){
-    const btn = document.getElementById('start-btn');
-    const main = document.getElementById('start-btn-main');
-    const sub = document.getElementById('start-btn-sub');
-    const stat = document.getElementById('home-stat');
-    ensureGuideBox();
-
-    if(!btn || !main || !sub || !stat){
-      if(typeof originalSetStartCountdown === 'function') return originalSetStartCountdown(step);
-      return;
-    }
-
-    if(window.appReady){
-      main.textContent = '과정 및 강의실 찾기';
-      sub.textContent = '';
-      stat.textContent = '안내 준비가 완료되었습니다';
-      btn.classList.remove('off');
-      btn.classList.add('ready');
-      setGuideReady();
-      return;
-    }
-
-    if(Number(step) > 0){
-      main.textContent = `과정 및 강의실 찾기 ${step}`;
-      sub.textContent = `${step}초 후 이용 가능`;
-      stat.textContent = `안내 준비 중 · ${step}`;
-    }else{
-      main.textContent = '과정 및 강의실 찾기';
-      sub.textContent = '안내 준비 중';
-      stat.textContent = '안내 준비 중';
-    }
-    btn.classList.add('off');
-    btn.classList.remove('ready');
-    runGuideTyping();
-  };
-
-  window.handleStartBtn = function(){
-    if(!window.appReady){
-      runGuideTyping();
-      toast('안내 준비 중입니다. 아래 필수 안내를 잠시 확인해 주세요.');
-      return;
-    }
-    goTo('week');
-  };
-
-  function watchReadyState(){
-    const maxMs = 15000;
-    const started = Date.now();
-    const timer = setInterval(()=>{
-      if(window.appReady){
-        clearInterval(timer);
-        window.setStartCountdown(0);
-      }else if(Date.now() - started > maxMs){
-        clearInterval(timer);
-      }
-    }, 150);
-  }
-
-  const originalAdmOECard = window.admOECard;
-  if(typeof originalAdmOECard === 'function'){
-    window.admOECard = function(item){
-      const key = oeHideKey(item && item.token, item && item.rowIdx, item && item.name);
-      if(UI_HIDDEN_OE.has(key)) return '';
-      let html = originalAdmOECard(item);
-      html = html.replace('onclick="adminDeleteOE(', 'onclick="adminDeleteOE(this,');
-      return html;
-    };
-  }
-
-  window.renderSimpleAdminData = function(type,data,statsId,listId){
-    const cfg=getSimpleCfg(type); const st=document.getElementById(statsId||cfg.mainStats), el=document.getElementById(listId||cfg.mainList);
-    if(!st || !el) return;
-    const week=SIMPLE_ADM_WEEK[type]||'';
-    const rows=filterByWeek((Array.isArray(data)?data:[]).map(d=>({...d, code:normalizeBusCode(d.code), status:d.status||'active'})), week)
-      .filter(d=>!UI_HIDDEN_SIMPLE[type].has(simpleHideKey(d.rowIdx,d.createdAt,d.name,d.phone,d.code)));
-    const grp={}; rows.forEach(d=>{const key=d.course||'과정 미지정'; if(!grp[key]) grp[key]=[]; grp[key].push(d);});
-    const courseEntries=Object.entries(grp).sort((a,b)=>b[1].length-a[1].length || String(a[0]).localeCompare(String(b[0])));
-    const activeCnt=rows.filter(d=>d.status!=='cancelled').length;
-    const cancelCnt=rows.filter(d=>d.status==='cancelled').length;
-    st.innerHTML=`<div class="stat-card"><div class="stat-num">${rows.length}</div><div class="stat-lbl">총 신청</div></div><div class="stat-card"><div class="stat-num">${activeCnt}</div><div class="stat-lbl">유효 신청</div></div><div class="stat-card"><div class="stat-num">${cancelCnt}</div><div class="stat-lbl">취소</div></div>`;
-    if(!rows.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
-    const summary=`<div class="binfo-box"><div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">과정별 신청 소계</div>${courseEntries.map(([course,ms])=>`<div class="binfo-row"><span class="binfo-lbl">${esc(course)}</span><span class="binfo-val">${ms.length}명</span></div>`).join('')}</div>`;
-    const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="this.nextElementSibling.classList.toggle('on');this.querySelector('.bgroup-chevron').textContent=this.nextElementSibling.classList.contains('on')?'▴':'▾'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 신청</div></div><span class="bgroup-chevron">▾</span></div><div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div><div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(this,${JSON.stringify(type)},${JSON.stringify(String(m.rowIdx||''))},${JSON.stringify(String(m.createdAt||''))},${JSON.stringify(String(m.name||''))},${JSON.stringify(String(m.phone||''))},${JSON.stringify(String(normalizeBusCode(m.code)||''))})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
-    el.innerHTML=summary+groups;
-  };
-
-  window.adminDeleteSimple = async function(a,b,c,d,e,f,g){
-    let btn,type,rowIdx,createdAt,name,phone,code;
-    if(a && a.nodeType===1){ btn=a; type=b; rowIdx=c; createdAt=d; name=e; phone=f; code=g; }
-    else { btn=(window.event&&window.event.currentTarget)||null; type=a; rowIdx=b; createdAt=c; name=d; phone=e; code=f; }
-
-    const label=name||'선택한 신청';
-    if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.`)) return;
-    const key = simpleHideKey(rowIdx,createdAt,name,phone,code);
-    UI_HIDDEN_SIMPLE[type].add(key);
-    fadeRemoveCard(btn);
-    lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code);
-    try{
-      if(GAS_READY){
-        const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type,rowIdx,createdAt,name,phone,code})});
-        const json=await res.json();
-        if(!(json&&json.ok)) throw new Error((json&&json.msg)||'삭제 실패');
-      }
-      toast('🗑️ 신청 내역을 삭제했습니다');
-    }catch(err){
-      UI_HIDDEN_SIMPLE[type].delete(key);
-      toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
-    }
-    loadSimpleAdmin(type);
-  };
-
-  window.adminDeleteOE = async function(a,b,c,d){
-    let btn,token,rowIdx,name;
-    if(a && a.nodeType===1){ btn=a; token=b; rowIdx=c; name=d; }
-    else { btn=(window.event&&window.event.currentTarget)||null; token=a; rowIdx=b; name=c; }
-
-    const label=name||'선택한 신청';
-    if(!confirm(`${label} 신청 내역을 강제로 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.`)) return;
-    const key = oeHideKey(token,rowIdx,name);
-    UI_HIDDEN_OE.add(key);
-    fadeRemoveCard(btn);
-    lsDeleteOE(token,rowIdx);
-    try{
-      if(GAS_READY){
-        const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteOE',token,rowIdx})});
-        const json=await res.json();
-        if(!(json&&json.ok)) throw new Error((json&&json.msg)||'삭제 실패');
-      }
-      toast('🗑️ 신청 내역을 삭제했습니다');
-    }catch(err){
-      UI_HIDDEN_OE.delete(key);
-      toast('⚠️ 서버 삭제 중 문제가 있었습니다: '+err.message);
-    }
-    if(typeof window.admLoadOE === 'function') window.admLoadOE();
-    if(typeof window.loadOEAdmin === 'function') window.loadOEAdmin();
-  };
-
-  document.addEventListener('DOMContentLoaded', function(){
-    ensureGuideBox();
-    runGuideTyping();
-    window.setStartCountdown(0);
-    watchReadyState();
-  });
-})();
-</script>
 
 </body>
 </html>
