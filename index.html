@@ -589,7 +589,7 @@ textarea.finput{resize:vertical;min-height:72px}
 .btnstart.splash{
   opacity:1 !important;pointer-events:none;cursor:default;
   box-shadow:0 16px 28px rgba(49,130,246,.30) !important;
-  min-height:120px !important;padding:16px 20px !important;
+  min-height:150px !important;padding:16px 20px !important;
   align-items:flex-start !important;
 }
 .btnstart.splash .main,.btnstart.splash .sub{display:none !important}
@@ -604,28 +604,35 @@ textarea.finput{resize:vertical;min-height:72px}
 }
 .btn-splash-badge{
   display:inline-flex;align-items:center;gap:4px;
-  font-size:11px;font-weight:800;opacity:.82;
-  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
-  border-radius:999px;padding:3px 9px;margin-bottom:6px;
+  font-size:13px;font-weight:900;opacity:.9;
+  background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4);
+  border-radius:999px;padding:4px 11px;margin-bottom:8px;
+  letter-spacing:.01em;
 }
 .btn-splash-l1{
   display:block;
-  font-size:17px;font-weight:900;line-height:1.5;
-  min-height:26px;letter-spacing:-0.02em;margin-bottom:3px;
+  font-size:22px;font-weight:900;line-height:1.45;
+  min-height:32px;letter-spacing:-0.03em;margin-bottom:5px;
 }
 .btn-splash-l2{
   display:block;
-  font-size:12px;font-weight:700;opacity:.88;
-  line-height:1.75;min-height:20px;
+  font-size:15px;font-weight:800;opacity:.92;
+  line-height:1.8;min-height:22px;
+}
+.btn-splash-l3{
+  display:block;
+  font-size:13px;font-weight:700;opacity:.82;
+  line-height:1.7;min-height:20px;margin-top:4px;
+  border-top:1px solid rgba(255,255,255,.2);padding-top:5px;
 }
 /* 오른쪽: 카운트다운 숫자 */
 .btn-splash-count{
   display:inline-block;
   flex-shrink:0;
-  font-size:52px;font-weight:900;
+  font-size:58px;font-weight:900;
   opacity:.92;line-height:1;
-  min-width:52px;text-align:right;
-  padding-top:2px;
+  min-width:58px;text-align:right;
+  padding-top:4px;
   transition:transform .4s ease, opacity .4s ease;
 }
 .btn-splash-count.tick{animation:countTick .35s ease;}
@@ -708,7 +715,7 @@ textarea.finput{resize:vertical;min-height:72px}
     <div class="hd1"></div><div class="hd2"></div>
     <div class="htop">
       <div class="horg">MG인재개발원 안내</div>
-      <button class="btnstart off btnstart-top" id="start-btn" onclick="handleStartBtn()"><span class="main" id="start-btn-main">과정 및 강의실 찾기</span><span class="sub" id="start-btn-sub">안내 준비 중</span><span id="btn-splash-area"><span class="btn-splash-texts"><span class="btn-splash-badge">📌 필수 안내</span><span class="btn-splash-l1" id="btn-splash-l1"></span><span class="btn-splash-l2" id="btn-splash-l2"></span></span><span class="btn-splash-count" id="btn-splash-count">6</span></span></button>
+      <button class="btnstart off btnstart-top" id="start-btn" onclick="handleStartBtn()"><span class="main" id="start-btn-main">과정 및 강의실 찾기</span><span class="sub" id="start-btn-sub">안내 준비 중</span><span id="btn-splash-area"><span class="btn-splash-texts"><span class="btn-splash-badge">📌 필수 안내</span><span class="btn-splash-l1" id="btn-splash-l1"></span><span class="btn-splash-l2" id="btn-splash-l2"></span><span class="btn-splash-l3" id="btn-splash-l3"></span></span><span class="btn-splash-count" id="btn-splash-count">8</span></span></button>
       <div class="home-extra-grid">
         <button class="home-extra-btn" onclick="goTo('outexit')"><span aria-hidden="true">🚶</span><span>외출 및 외박<br>신청</span></button>
         <button class="home-extra-btn" onclick="goTo('bus')"><span aria-hidden="true">🚌</span><span>귀가 버스<br>신청·확인</span></button>
@@ -722,7 +729,7 @@ textarea.finput{resize:vertical;min-height:72px}
       <div class="hmeta" style="display:none">오늘의 안내 상태</div>
       <div class="dstat" id="home-stat" style="display:none">데이터를 불러오는 중입니다</div>
       
-      <div class="home-mascot-wrap"><img class="home-mascot-img" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201200%20720%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23E8F3FF%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23D9ECFF%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%221200%22%20height%3D%22720%22%20rx%3D%2244%22%20fill%3D%22url%28%23g%29%22/%3E%3Ccircle%20cx%3D%22950%22%20cy%3D%22180%22%20r%3D%22120%22%20fill%3D%22%233182F6%22%20opacity%3D%220.14%22/%3E%3Ccircle%20cx%3D%22250%22%20cy%3D%22560%22%20r%3D%22180%22%20fill%3D%22%231B64DA%22%20opacity%3D%220.10%22/%3E%3Crect%20x%3D%22120%22%20y%3D%22140%22%20width%3D%22960%22%20height%3D%22440%22%20rx%3D%2232%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%23D6E6FF%22/%3E%3Ctext%20x%3D%22600%22%20y%3D%22300%22%20text-anchor%3D%22middle%22%20font-size%3D%2272%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22700%22%20fill%3D%22%231B64DA%22%3EMG%20%EC%9D%B8%EC%9E%AC%EA%B0%9C%EB%B0%9C%EC%9B%90%3C/text%3E%3Ctext%20x%3D%22600%22%20y%3D%22390%22%20text-anchor%3D%22middle%22%20font-size%3D%2242%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%234E5968%22%3E%EA%B3%BC%EC%A0%95%20%EC%95%88%EB%82%B4%20%C2%B7%20%EC%8B%A0%EC%B2%AD%20%C2%B7%20%EA%B8%B8%EC%B0%BE%EA%B8%B0%3C/text%3E%3Ctext%20x%3D%22600%22%20y%3D%22470%22%20text-anchor%3D%22middle%22%20font-size%3D%2228%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%238B95A1%22%3E%EA%B2%BD%EB%9F%89%ED%99%94%20%ED%99%94%EB%A9%B4%3C/text%3E%3C/svg%3E" alt="MG새마을금고 안내 이미지"></div>
+      <div class="home-mascot-wrap" style="display:none"></div>
     </div>
   </div>
 </div>
@@ -1233,7 +1240,7 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 // HTML 속성(큰따옴표) 안에서 안전한 JSON 문자열 생성
 // JSON.stringify 의 큰따옴표를 &quot; 로 치환 → 브라우저가 복원 후 JS 실행
 function jsa(v){ return JSON.stringify(String(v==null?'':v)).replace(/"/g,'&quot;'); }
-function showNotice(title, body, emoji='📢'){ const ov=document.getElementById('notice-overlay'); if(!ov) return alert(`${title}\n\n${body}`); document.getElementById('notice-title').textContent=title||'안내'; document.getElementById('notice-body').textContent=body||''; document.getElementById('notice-emoji').textContent=emoji||'📢'; ov.classList.add('show'); history.pushState({notice:true},''); }
+function showNotice(title, body, emoji='📢'){ const ov=document.getElementById('notice-overlay'); if(!ov) return alert(`${title}\n\n${body}`); document.getElementById('notice-title').textContent=title||'안내'; document.getElementById('notice-body').innerHTML=body||''; document.getElementById('notice-emoji').textContent=emoji||'📢'; ov.classList.add('show'); history.pushState({notice:true},''); }
 function closeNotice(e){ if(e && e.target!==document.getElementById('notice-overlay')) return; const ov=document.getElementById('notice-overlay'); if(ov && ov.classList.contains('show')){ ov.classList.remove('show'); if(!e) history.back(); } }
 function openZoom(){ const src=document.getElementById('popup-img').src; const img=document.getElementById('zoom-img'); img.src=src; img.style.transform=''; zoomState={scale:1,x:0,y:0}; document.getElementById('zoom-overlay').classList.add('show'); document.getElementById('zoom-hint').classList.remove('hide'); setTimeout(()=>document.getElementById('zoom-hint').classList.add('hide'),2500); document.body.style.overflow='hidden'; history.pushState({zoom:true},''); }
 function closeZoom(fromBack){ if(!document.getElementById('zoom-overlay').classList.contains('show')) return; document.getElementById('zoom-overlay').classList.remove('show'); document.body.style.overflow='hidden'; zoomState={scale:1,x:0,y:0}; document.getElementById('zoom-img').style.transform=''; if(!fromBack) history.back(); }
@@ -1645,7 +1652,7 @@ function setStartCountdown(step){
     stat.textContent = `안내 준비 중 · ${step}`;
     // 카운트다운 숫자 업데이트 (틱 애니메이션)
     if(countEl && isSplashing){
-      countEl.textContent = step;
+      countEl.textContent = step > 0 ? step : (appReady && splashAnimDone ? '✓' : '…');
       countEl.classList.remove('tick');
       void countEl.offsetWidth; // reflow for animation restart
       countEl.classList.add('tick');
@@ -1693,7 +1700,7 @@ function handleStartBtn(){
   openWeekWhenReady();
 }
 function startBootCountdown(){
-  let step = 6;   // 6초 카운트다운 (텍스트 애니메이션과 동기화)
+  let step = 8;   // 8초 카운트다운
   setStartCountdown(step);
   startSplashText();
   const timer = setInterval(()=>{
@@ -1713,9 +1720,10 @@ function startBootCountdown(){
 }
 
 function startSplashText(){
-  const btn = document.getElementById('start-btn');
-  const l1  = document.getElementById('btn-splash-l1');
-  const l2  = document.getElementById('btn-splash-l2');
+  const btn     = document.getElementById('start-btn');
+  const l1      = document.getElementById('btn-splash-l1');
+  const l2      = document.getElementById('btn-splash-l2');
+  const l3      = document.getElementById('btn-splash-l3');
   const countEl = document.getElementById('btn-splash-count');
   if(!btn || !l1 || !l2) return;
 
@@ -1724,25 +1732,39 @@ function startSplashText(){
   btn.classList.add('splash');
   l1.innerHTML = '';
   l2.innerHTML = '';
-  if(countEl){ countEl.textContent = '6'; }
+  if(l3) l3.innerHTML = '';
+  if(countEl){ countEl.textContent = '8'; }
 
-  // 1행 어절 (2개 × 700ms = 1.4s)
-  const line1Words = ['MG인재개발원', '안내 웹앱입니다.'];
-  // 2행 어절 (6개 × 700ms = 4.2s) → 총 5.6s ≈ 6초 카운트다운 이내
-  const line2Words = ['과정정보,', '강의실정보,', '외출·외박,', '시설,', '버스 이용 등', '신청 가능합니다.'];
+  // ─ 1행: 앱 소개 (2어절)
+  const line1 = ['MG인재개발원', '안내 웹앱입니다.'];
+  // ─ 2행: 기능 안내 (5어절)
+  const line2 = ['과정정보,', '강의실정보,', '외출·외박,', '시설·버스', '등 신청 가능합니다.'];
+  // ─ 3행: 주의사항 (4어절, 약간 늦게 시작)
+  const line3 = ['하단 버튼은', '입교 후 사용하세요.', '신청 후 미사용 시', "'취소'해 주세요."];
 
   const allItems = [
-    ...line1Words.map(w => ({text: w, el: l1})),
-    ...line2Words.map(w => ({text: w, el: l2})),
+    ...line1.map(w => ({text: w, el: l1})),
+    ...line2.map(w => ({text: w, el: l2})),
+    ...line3.map(w => ({text: w, el: l3||l2})),
   ];
 
+  // 배경 펄스 효과: 버튼이 살짝 빛나는 효과로 로딩 중임을 시각화
+  let pulseDir = 1, pulseVal = 0.30;
+  const pulseTimer = setInterval(()=>{
+    pulseVal += pulseDir * 0.015;
+    if(pulseVal >= 0.45) pulseDir = -1;
+    if(pulseVal <= 0.20) pulseDir = 1;
+    btn.style.boxShadow = `0 16px 28px rgba(49,130,246,${pulseVal.toFixed(3)})`;
+  }, 80);
+
   let idx = 0;
-  const WORD_INTERVAL = 700; // ms — 사용자 요청: 더 느리게
+  const WORD_INTERVAL = 630; // 11어절 × 630ms ≈ 6.9s (8초 카운트 안에 완료)
   const timer = setInterval(() => {
     if(idx >= allItems.length){
       clearInterval(timer);
+      clearInterval(pulseTimer);
+      btn.style.boxShadow = '';
       splashAnimDone = true;
-      // 애니메이션 완료: 카운트다운 + 데이터 로딩도 끝났으면 버튼 활성화
       if(bootCountdownDone && appReady){
         setStartCountdown(0);
         if(bootLaunchQueued){ bootLaunchQueued = false; goTo('week'); }
