@@ -602,44 +602,45 @@ textarea.finput{resize:vertical;min-height:72px}
   display:inline-flex;flex-direction:column;flex:1;text-align:left;
   min-width:0;
 }
-.btn-splash-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  font-size:13px;font-weight:900;opacity:.9;
-  background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4);
-  border-radius:999px;padding:4px 11px;margin-bottom:8px;
-  letter-spacing:.01em;
+.btn-splash-badge{display:none;}
+
+/* 오른쪽: 숫자+문장 한 줄 뱃지 */
+.btn-splash-pill{
+  display:inline-flex;align-items:baseline;gap:3px;
+  flex-shrink:0;align-self:flex-start;
+  background:rgba(0,0,0,.30);
+  border:2px solid rgba(255,255,255,.65);
+  border-radius:12px;
+  padding:6px 13px;
+  white-space:nowrap;
+  text-shadow:0 1px 4px rgba(0,0,0,.3);
 }
+/* 숫자만 노란색 */
+.btn-splash-num{
+  font-size:28px;font-weight:900;
+  color:#FFD600;
+  line-height:1;
+}
+.btn-splash-num.tick{animation:countTick .35s ease;}
+/* 나머지 텍스트 흰색 */
+.btn-splash-unit{
+  font-size:15px;font-weight:900;
+  color:#fff;
+  line-height:1.2;
+}
+
 .btn-splash-l1{
   display:block;
-  font-size:22px;font-weight:900;line-height:1.45;
-  min-height:32px;letter-spacing:-0.03em;margin-bottom:5px;
+  font-size:20px;font-weight:900;line-height:1.45;
+  min-height:30px;letter-spacing:-0.03em;margin-bottom:4px;
 }
 .btn-splash-l2{
   display:block;
-  font-size:15px;font-weight:800;opacity:.92;
-  line-height:1.8;min-height:22px;
+  font-size:14px;font-weight:800;opacity:.92;
+  line-height:1.8;min-height:20px;
 }
-.btn-splash-l3{
-  display:block;
-  font-size:13px;font-weight:700;opacity:.82;
-  line-height:1.7;min-height:20px;margin-top:4px;
-  border-top:1px solid rgba(255,255,255,.2);padding-top:5px;
-}
-/* 오른쪽: 카운트다운 숫자 */
-.btn-splash-count{
-  display:inline-block;
-  flex-shrink:0;
-  font-size:58px;font-weight:900;
-  opacity:.92;line-height:1;
-  min-width:58px;text-align:right;
-  padding-top:4px;
-  transition:transform .4s ease, opacity .4s ease;
-}
-.btn-splash-count.tick{animation:countTick .35s ease;}
-@keyframes countTick{
-  0%{transform:scale(1.3);opacity:1}
-  100%{transform:scale(1);opacity:.92}
-}
+.btn-splash-l3{display:none;} /* 3행 제거 */
+
 .btn-splash-chunk{display:inline;opacity:0;transition:opacity .35s ease}
 .btn-splash-chunk.show{opacity:1}
 #splash-text{display:none}
@@ -648,6 +649,53 @@ textarea.finput{resize:vertical;min-height:72px}
 .bgroup-arr{
   color:var(--primary);font-size:24px;font-weight:900;flex-shrink:0;
 }
+
+/* ── 홈 그리드 잠금 오버레이 ── */
+.home-extra-grid{position:relative;}
+#home-grid-lock{
+  display:none;
+  position:absolute;inset:-4px;
+  background:rgba(249,250,251,.72);
+  border-radius:26px;
+  backdrop-filter:blur(1px);
+  z-index:10;
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:6px;
+  pointer-events:all;
+}
+#home-grid-lock.on{display:flex;}
+.hgl-icon{font-size:28px;line-height:1;}
+.hgl-text{
+  font-size:13px;font-weight:900;
+  color:var(--text-2);text-align:center;line-height:1.5;
+}
+.hgl-count{
+  display:inline-block;
+  background:var(--primary);color:#fff;
+  font-size:14px;font-weight:900;
+  padding:4px 14px;border-radius:999px;
+  margin-top:2px;
+}
+
+/* 버튼 준비 완료 애니메이션 */
+@keyframes btnReady{
+  0%{transform:scale(.96);opacity:.7}
+  60%{transform:scale(1.03)}
+  100%{transform:scale(1);opacity:1}
+}
+.btnstart.ready{
+  animation:btnReady .4s ease forwards;
+}
+/* 4개 버튼 잠금 해제 페이드인 */
+@keyframes gridUnlock{
+  from{opacity:.4;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.home-extra-btn.unlocked{
+  animation:gridUnlock .35s ease forwards;
+}
+
+/* 카운트다운 초 안내 - 위 .btn-splash-after 에 통합 */
 
 </style>
 <!-- Firebase SDK 제거됨 → Apps Script PropertiesService + Google Drive로 전환 -->
@@ -715,8 +763,13 @@ textarea.finput{resize:vertical;min-height:72px}
     <div class="hd1"></div><div class="hd2"></div>
     <div class="htop">
       <div class="horg">MG인재개발원 안내</div>
-      <button class="btnstart off btnstart-top" id="start-btn" onclick="handleStartBtn()"><span class="main" id="start-btn-main">과정 및 강의실 찾기</span><span class="sub" id="start-btn-sub">안내 준비 중</span><span id="btn-splash-area"><span class="btn-splash-texts"><span class="btn-splash-badge">📌 필수 안내</span><span class="btn-splash-l1" id="btn-splash-l1"></span><span class="btn-splash-l2" id="btn-splash-l2"></span><span class="btn-splash-l3" id="btn-splash-l3"></span></span><span class="btn-splash-count" id="btn-splash-count">8</span></span></button>
+      <button class="btnstart off btnstart-top" id="start-btn" onclick="handleStartBtn()"><span class="main" id="start-btn-main">과정 및 강의실 찾기</span><span class="sub" id="start-btn-sub">안내 준비 중</span><span id="btn-splash-area"><span class="btn-splash-texts"><span class="btn-splash-l1" id="btn-splash-l1"></span><span class="btn-splash-l2" id="btn-splash-l2"></span></span><span class="btn-splash-pill"><span class="btn-splash-num" id="btn-splash-count">8</span><span class="btn-splash-unit">초 후<br>사용가능</span></span></span></button>
       <div class="home-extra-grid">
+        <div id="home-grid-lock" class="on">
+          <span class="hgl-icon">🔒</span>
+          <span class="hgl-text">안내 확인 후<br>이용해 주세요</span>
+          <span class="hgl-count" id="hgl-count-badge">8초 후 사용 가능</span>
+        </div>
         <button class="home-extra-btn" onclick="goTo('outexit')"><span aria-hidden="true">🚶</span><span>외출 및 외박<br>신청</span></button>
         <button class="home-extra-btn" onclick="goTo('bus')"><span aria-hidden="true">🚌</span><span>귀가 버스<br>신청·확인</span></button>
         <button class="home-extra-btn" onclick="goTo('lesson')"><span aria-hidden="true">🏸</span><span>배드민턴 레슨<br>신청·확인</span></button>
@@ -1639,24 +1692,41 @@ let bootCountdownDone = false;
 let bootLaunchQueued = false;
 let splashAnimDone = false;   // 안내 텍스트 애니메이션 완료 여부
 
+function unlockHomeGrid(){
+  const lockEl = document.getElementById('home-grid-lock');
+  if(!lockEl) return;
+  lockEl.classList.remove('on');
+  // 4개 버튼에 순차 등장 애니메이션
+  document.querySelectorAll('#s-home .home-extra-btn').forEach((btn,i)=>{
+    btn.style.opacity='0';
+    setTimeout(()=>{
+      btn.classList.add('unlocked');
+      btn.style.opacity='';
+    }, i * 80);
+  });
+}
+
 function setStartCountdown(step){
   const btn  = document.getElementById('start-btn');
   const main = document.getElementById('start-btn-main');
   const sub  = document.getElementById('start-btn-sub');
   const stat = document.getElementById('home-stat');
-  const countEl = document.getElementById('btn-splash-count');
+  const countEl  = document.getElementById('btn-splash-count');
+  const lockBadge = document.getElementById('hgl-count-badge');
+  const lockEl    = document.getElementById('home-grid-lock');
   if(!btn || !sub || !stat || !main) return;
   const isSplashing = btn.classList.contains('splash');
 
   if(step > 0){
     stat.textContent = `안내 준비 중 · ${step}`;
-    // 카운트다운 숫자 업데이트 (틱 애니메이션)
     if(countEl && isSplashing){
-      countEl.textContent = step > 0 ? step : (appReady && splashAnimDone ? '✓' : '…');
+      countEl.textContent = step;
       countEl.classList.remove('tick');
-      void countEl.offsetWidth; // reflow for animation restart
+      void countEl.offsetWidth;
       countEl.classList.add('tick');
     }
+    if(lockBadge) lockBadge.textContent = `${step}초 후 사용 가능`;
+    if(lockEl) lockEl.classList.add('on');
     if(!isSplashing){
       main.textContent = '과정 및 강의실 찾기';
       sub.textContent  = `${step}초 후 시작`;
@@ -1664,9 +1734,10 @@ function setStartCountdown(step){
       btn.classList.remove('ready');
     }
   }else if(!appReady || !splashAnimDone){
-    // 카운트다운 끝났지만 데이터 or 애니메이션 미완료
     stat.textContent = '안내 준비 중';
-    if(countEl && isSplashing){ countEl.textContent = '…'; }
+    if(countEl && isSplashing){ countEl.textContent = '✓'; }
+    if(lockBadge) lockBadge.textContent = '잠시만 기다려 주세요';
+    if(lockEl) lockEl.classList.add('on');
     if(!isSplashing){
       restoreStartBtn();
       main.textContent = '과정 및 강의실 찾기';
@@ -1675,13 +1746,14 @@ function setStartCountdown(step){
       btn.classList.remove('ready');
     }
   }else{
-    // 완전 준비 완료
+    // ── 완전 준비 완료 ──
     restoreStartBtn();
     main.textContent = '과정 및 강의실 찾기';
     sub.textContent  = '';
     stat.textContent = '안내 준비가 완료되었습니다';
     btn.classList.remove('off');
     btn.classList.add('ready');
+    unlockHomeGrid(); // 잠금 해제 + 순차 등장
   }
 }
 function openWeekWhenReady(){
@@ -1723,7 +1795,6 @@ function startSplashText(){
   const btn     = document.getElementById('start-btn');
   const l1      = document.getElementById('btn-splash-l1');
   const l2      = document.getElementById('btn-splash-l2');
-  const l3      = document.getElementById('btn-splash-l3');
   const countEl = document.getElementById('btn-splash-count');
   if(!btn || !l1 || !l2) return;
 
@@ -1732,20 +1803,16 @@ function startSplashText(){
   btn.classList.add('splash');
   l1.innerHTML = '';
   l2.innerHTML = '';
-  if(l3) l3.innerHTML = '';
   if(countEl){ countEl.textContent = '8'; }
 
-  // ─ 1행: 앱 소개 (2어절)
-  const line1 = ['MG인재개발원', '안내 웹앱입니다.'];
-  // ─ 2행: 기능 안내 (5어절)
-  const line2 = ['과정정보,', '강의실정보,', '외출·외박,', '시설·버스', '등 신청 가능합니다.'];
-  // ─ 3행: 주의사항 (4어절, 약간 늦게 시작)
-  const line3 = ['하단 버튼은', '입교 후 사용하세요.', '신청 후 미사용 시', "'취소'해 주세요."];
+  // 1행: 앱 소개
+  const line1 = ['📌 MG인재개발원', '안내 웹앱입니다.'];
+  // 2행: 기능+주의사항 통합
+  const line2 = ['과정·강의실정보,', '외출·외박,', '시설·버스 신청.', '입교 후 사용하세요.'];
 
   const allItems = [
     ...line1.map(w => ({text: w, el: l1})),
     ...line2.map(w => ({text: w, el: l2})),
-    ...line3.map(w => ({text: w, el: l3||l2})),
   ];
 
   // 배경 펄스 효과: 버튼이 살짝 빛나는 효과로 로딩 중임을 시각화
@@ -2049,13 +2116,12 @@ function submitOE(){
   const bankPfx=(document.getElementById('oef-bank')?.value||'').trim();
   const position=(document.getElementById('oef-position')?.value||'').trim();
   const name=(document.getElementById('oef-name')?.value||'').trim();
-  const idcode=(document.getElementById('oef-idcode')?.value||'').trim();
+  const idcode=(document.getElementById('oef-phone')?.value||'').replace(/\D/g,'').slice(-4)||OE_TOKEN.slice(-4);
   const phone=(document.getElementById('oef-phone')?.value||'').trim();
   if(!course){toast('⚠️ 과정을 선택해 주세요');return;}
   if(!bankPfx){toast('⚠️ 소속 금고명을 입력해 주세요');return;}
   if(!position){toast('⚠️ 직위를 입력해 주세요');return;}
   if(!name){toast('⚠️ 성명을 입력해 주세요');return;}
-  if(!idcode){toast('⚠️ 금고코드-사번을 입력해 주세요');return;}
   if(!phone){toast('⚠️ 연락처를 입력해 주세요');return;}
   if(!TRANSPORT_SEL){toast('⚠️ 이동수단을 선택해 주세요');return;}
   const bankFull=bankPfx+'새마을금고';
@@ -2504,7 +2570,6 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       <div class="bank-wrap"><input id="oef-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div></div>
     <div class="fgroup"><label class="flabel">직위 <span class="freq">*</span></label><input id="oef-position" class="finput" type="text" placeholder="예: 대리, 과장, 팀장"></div>
     <div class="fgroup"><label class="flabel">성명 <span class="freq">*</span></label><input id="oef-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
-    <div class="fgroup"><label class="flabel">금고코드-사번 <span class="freq">*</span></label><input id="oef-idcode" class="finput" type="text" placeholder="예: 1234-A20001"><div class="finput-hint">신청 완료번호 · 복귀 처리 시 조회 가능</div></div>
     <div class="fgroup">
       <label class="flabel" style="color:var(--danger)">📞 연락처 <span class="freq">*</span> <span style="font-size:12px;font-weight:700">복귀처리 시 필수</span></label>
       <input id="oef-phone" class="phone-emph" type="tel" placeholder="010-0000-0000">
