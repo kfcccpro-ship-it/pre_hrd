@@ -1942,7 +1942,6 @@ async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
       .catch(()=>{}); // 실패해도 로컬 삭제는 유지
   }
 }
-}
 async function adminResetCategory(type){
   const week = type==='oe' ? (OE_ADM_WEEK||'') : (SIMPLE_ADM_WEEK[type]||'');
   const labelMap={oe:'외출·외박',bus:'귀가버스',lesson:'배드민턴 레슨',sport:'스포츠 시설'};
