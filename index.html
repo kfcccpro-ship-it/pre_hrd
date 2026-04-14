@@ -589,59 +589,56 @@ textarea.finput{resize:vertical;min-height:72px}
 .btnstart.splash{
   opacity:1 !important;pointer-events:none;cursor:default;
   box-shadow:0 16px 28px rgba(49,130,246,.30) !important;
-  min-height:150px !important;padding:16px 20px !important;
+  min-height:140px !important;padding:14px 18px !important;
   align-items:flex-start !important;
+  flex-direction:column !important;gap:10px !important;
 }
 .btnstart.splash .main,.btnstart.splash .sub{display:none !important}
 #btn-splash-area{display:none;width:100%}
 .btnstart.splash #btn-splash-area{
-  display:inline-flex;align-items:flex-start;gap:10px;width:100%;
-}
-/* 왼쪽: 텍스트 영역 */
-.btn-splash-texts{
-  display:inline-flex;flex-direction:column;flex:1;text-align:left;
-  min-width:0;
+  display:flex;flex-direction:column;align-items:stretch;gap:10px;width:100%;
 }
 .btn-splash-badge{display:none;}
 
-/* 오른쪽: 숫자+문장 한 줄 뱃지 */
+/* 상단: 카운트다운 pill — 전체 폭, 한 줄 */
 .btn-splash-pill{
-  display:inline-flex;align-items:baseline;gap:3px;
-  flex-shrink:0;align-self:flex-start;
-  background:rgba(0,0,0,.30);
-  border:2px solid rgba(255,255,255,.65);
-  border-radius:12px;
-  padding:6px 13px;
-  white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;
+  background:rgba(0,0,0,.32);
+  border:2px solid rgba(255,255,255,.70);
+  border-radius:14px;
+  padding:8px 14px;
   text-shadow:0 1px 4px rgba(0,0,0,.3);
 }
-/* 숫자만 노란색 */
+/* 숫자 노란색 */
 .btn-splash-num{
-  font-size:28px;font-weight:900;
+  font-size:36px;font-weight:900;
   color:#FFD600;
   line-height:1;
 }
 .btn-splash-num.tick{animation:countTick .35s ease;}
-/* 나머지 텍스트 흰색 */
+/* "초 후 사용가능" 흰색, 큼직하게 */
 .btn-splash-unit{
-  font-size:15px;font-weight:900;
+  font-size:20px;font-weight:900;
   color:#fff;
   line-height:1.2;
+  white-space:nowrap;
 }
 
-.btn-splash-l1{
-  display:block;
-  font-size:20px;font-weight:900;line-height:1.45;
-  min-height:30px;letter-spacing:-0.03em;margin-bottom:4px;
+/* 텍스트 영역 — pill 아래 */
+.btn-splash-texts{
+  display:flex;flex-direction:column;text-align:left;width:100%;
 }
+.btn-splash-l1{display:none;} /* line1 제거 */
 .btn-splash-l2{
   display:block;
-  font-size:14px;font-weight:800;opacity:.92;
-  line-height:1.8;min-height:20px;
+  font-size:22px;font-weight:900;
+  line-height:1.7;
+  opacity:.96;
 }
-.btn-splash-l3{display:none;} /* 3행 제거 */
+.btn-splash-l3{display:none;}
 
-.btn-splash-chunk{display:inline;opacity:0;transition:opacity .35s ease}
+.btn-splash-chunk{display:inline;opacity:0;transition:opacity .32s ease}
 .btn-splash-chunk.show{opacity:1}
 #splash-text{display:none}
 
@@ -763,12 +760,12 @@ textarea.finput{resize:vertical;min-height:72px}
     <div class="hd1"></div><div class="hd2"></div>
     <div class="htop">
       <div class="horg">MG인재개발원 안내</div>
-      <button class="btnstart off btnstart-top" id="start-btn" onclick="handleStartBtn()"><span class="main" id="start-btn-main">과정 및 강의실 찾기</span><span class="sub" id="start-btn-sub">안내 준비 중</span><span id="btn-splash-area"><span class="btn-splash-texts"><span class="btn-splash-l1" id="btn-splash-l1"></span><span class="btn-splash-l2" id="btn-splash-l2"></span></span><span class="btn-splash-pill"><span class="btn-splash-num" id="btn-splash-count">8</span><span class="btn-splash-unit">초 후<br>사용가능</span></span></span></button>
+      <button class="btnstart off btnstart-top" id="start-btn" onclick="handleStartBtn()"><span class="main" id="start-btn-main">과정 및 강의실 찾기</span><span class="sub" id="start-btn-sub">안내 준비 중</span><span id="btn-splash-area"><span class="btn-splash-pill"><span class="btn-splash-num" id="btn-splash-count">6</span><span class="btn-splash-unit">초 후 사용가능</span></span><span class="btn-splash-texts"><span class="btn-splash-l2" id="btn-splash-l2"></span></span></span></button>
       <div class="home-extra-grid">
         <div id="home-grid-lock" class="on">
           <span class="hgl-icon">🔒</span>
           <span class="hgl-text">안내 확인 후<br>이용해 주세요</span>
-          <span class="hgl-count" id="hgl-count-badge">8초 후 사용 가능</span>
+          <span class="hgl-count" id="hgl-count-badge">6초 후 사용 가능</span>
         </div>
         <button class="home-extra-btn" onclick="goTo('outexit')"><span aria-hidden="true">🚶</span><span>외출 및 외박<br>신청</span></button>
         <button class="home-extra-btn" onclick="goTo('bus')"><span aria-hidden="true">🚌</span><span>귀가 버스<br>신청·확인</span></button>
@@ -1772,7 +1769,7 @@ function handleStartBtn(){
   openWeekWhenReady();
 }
 function startBootCountdown(){
-  let step = 8;   // 8초 카운트다운
+  let step = 6;   // 6초 카운트다운
   setStartCountdown(step);
   startSplashText();
   const timer = setInterval(()=>{
@@ -1793,27 +1790,19 @@ function startBootCountdown(){
 
 function startSplashText(){
   const btn     = document.getElementById('start-btn');
-  const l1      = document.getElementById('btn-splash-l1');
   const l2      = document.getElementById('btn-splash-l2');
   const countEl = document.getElementById('btn-splash-count');
-  if(!btn || !l1 || !l2) return;
+  if(!btn || !l2) return;
 
   splashAnimDone = false;
   btn.classList.remove('off');
   btn.classList.add('splash');
-  l1.innerHTML = '';
   l2.innerHTML = '';
-  if(countEl){ countEl.textContent = '8'; }
+  if(countEl){ countEl.textContent = '6'; }
 
-  // 1행: 앱 소개
-  const line1 = ['📌 MG인재개발원', '안내 웹앱입니다.'];
-  // 2행: 기능+주의사항 통합
+  // l1 제거 — l2만: 기능+주의사항 (4어절 × 800ms = 3.2s → 6초 안에 완료)
   const line2 = ['과정·강의실정보,', '외출·외박,', '시설·버스 신청.', '입교 후 사용하세요.'];
-
-  const allItems = [
-    ...line1.map(w => ({text: w, el: l1})),
-    ...line2.map(w => ({text: w, el: l2})),
-  ];
+  const allItems = line2.map(w => ({text: w, el: l2}));
 
   // 배경 펄스 효과: 버튼이 살짝 빛나는 효과로 로딩 중임을 시각화
   let pulseDir = 1, pulseVal = 0.30;
@@ -1825,7 +1814,7 @@ function startSplashText(){
   }, 80);
 
   let idx = 0;
-  const WORD_INTERVAL = 630; // 11어절 × 630ms ≈ 6.9s (8초 카운트 안에 완료)
+  const WORD_INTERVAL = 800; // 4어절 × 800ms = 3.2s (6초 카운트 안에 완료)
   const timer = setInterval(() => {
     if(idx >= allItems.length){
       clearInterval(timer);
