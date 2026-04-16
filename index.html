@@ -577,7 +577,7 @@ textarea.finput{resize:vertical;min-height:72px}
 .note-red{color:#c62828 !important;font-weight:900 !important;display:block;margin-top:6px;}
 .stat-card.clickable{cursor:pointer;transition:all .18s ease;}
 .stat-card.clickable.active{border:2px solid var(--primary);box-shadow:0 0 0 3px rgba(49,130,246,.10);}
-.hdr-admin-btn{margin-left:auto !important;width:56px !important;min-width:56px !important;height:56px !important;padding:0 !important;border-radius:18px !important;display:flex !important;align-items:center !important;justify-content:center !important;line-height:0;flex-shrink:0;}
+.hdr-admin-btn{margin-left:auto !important;border-radius:14px !important;display:flex !important;align-items:center !important;justify-content:center !important;flex-shrink:0;}
 .hdr-admin-btn .admin-logo{width:34px !important;height:34px !important;display:block !important;margin:auto !important;object-fit:contain !important;object-position:center center !important;}
 .home-topbar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;}
 .home-topbar .horg{margin-bottom:0 !important;}
@@ -697,7 +697,7 @@ textarea.finput{resize:vertical;min-height:72px}
 /* 인쇄 오버레이 */
 .print-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:9999;overflow-y:auto;padding:0}
 .print-overlay.show{display:block}
-.print-overlay-inner{max-width:760px;margin:0 auto;padding:24px 28px}
+.print-overlay-inner{max-width:760px;margin:0 auto;padding:16px 20px}
 .print-top-bar{display:flex;gap:10px;justify-content:center;padding:14px 20px;background:#f9fafb;border-bottom:1px solid #e5e8eb;position:sticky;top:0;z-index:1}
 @media print{.print-top-bar{display:none!important}}
 </style>
@@ -1909,7 +1909,20 @@ const GAS_READY = !GAS_URL.includes('YOUR_SCRIPT_ID');
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}}
 function lsSave(k,a){try{localStorage.setItem(k,JSON.stringify(a));}catch(e){}}
 const APP_STORAGE_KEYS={bus:'bus_apps',lesson:'lesson_apps',sport:'sport_apps'};
-const CLIENT_DELETE_TOMBSTONES={oe:new Set(),simple:{bus:new Set(),lesson:new Set(),sport:new Set()}};
+// tombstone: 삭제된 항목이 GAS 응답에 다시 나타나는 것을 방지 (localStorage에 영속 저장)
+function loadTombstonesFromLS_(){
+  const t={oe:new Set(),simple:{bus:new Set(),lesson:new Set(),sport:new Set()}};
+  try{const oe=JSON.parse(localStorage.getItem('ts_oe')||'[]');oe.forEach(k=>t.oe.add(k));}catch(e){}
+  ['bus','lesson','sport'].forEach(type=>{
+    try{const arr=JSON.parse(localStorage.getItem('ts_'+type)||'[]');arr.forEach(k=>t.simple[type].add(k));}catch(e){}
+  });
+  return t;
+}
+function saveTombstoneToLS_(type,key){
+  if(type==='oe'){try{const arr=JSON.parse(localStorage.getItem('ts_oe')||'[]');arr.push(key);localStorage.setItem('ts_oe',JSON.stringify(arr));}catch(e){}}
+  else{try{const arr=JSON.parse(localStorage.getItem('ts_'+type)||'[]');arr.push(key);localStorage.setItem('ts_'+type,JSON.stringify(arr));}catch(e){}}
+}
+const CLIENT_DELETE_TOMBSTONES=loadTombstonesFromLS_();
 function oeDeleteKey(token,rowIdx){ return String(token||'') ? 't:'+String(token||'') : 'r:'+String(rowIdx||''); }
 function simpleDeleteKey(rowIdx,createdAt,name,phone,code){ return [String(rowIdx||''),String(createdAt||''),String(name||''),String(phone||''),String(normalizeBusCode(code)||'')].join('|'); }
 const DEFAULT_APP_SETTINGS={oeAdminPw:'2026',busAdminPw:'2026',oeMailRecipients:['pcrew123@naver.com'],roomRoutePrep:{seminar1:{roomName:'1세미나실',active:false,plannedCarSteps:5,plannedBusSteps:5,note:'내일 사진/설명 추가 예정'},seminar2:{roomName:'2세미나실',active:false,plannedCarSteps:5,plannedBusSteps:5,note:'내일 사진/설명 추가 예정'}}};
@@ -1938,7 +1951,24 @@ function lsAddBus(d){lsAddSimpleApp('bus',d);} function lsGetBus(){return lsGetS
 function lsAddLesson(d){lsAddSimpleApp('lesson',d);} function lsGetLesson(){return lsGetSimpleApp('lesson');} function lsCheckLesson(code){return lsCheckSimpleApp('lesson',code);}
 function lsAddSport(d){lsAddSimpleApp('sport',d);} function lsGetSport(){return lsGetSimpleApp('sport');} function lsCheckSport(code){return lsCheckSimpleApp('sport',code);}
 function simpleRowKey(d){return [String(d.rowIdx||''),String(d.createdAt||''),String(normalizeBusCode(d.code)||''),String(d.name||''),String(d.phone||'')].join('|');}
-function mergeSimpleRows(localRows, remoteRows){const map=new Map();(Array.isArray(localRows)?localRows:[]).forEach(r=>{const row={...r,code:normalizeBusCode(r.code),status:r.status||'active'};map.set(simpleRowKey(row),row);});(Array.isArray(remoteRows)?remoteRows:[]).forEach(r=>{const row={...r,code:normalizeBusCode(r.code),status:r.status||'active'};map.set(simpleRowKey(row),{...(map.get(simpleRowKey(row))||{}),...row});});return Array.from(map.values()).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));}
+function mergeSimpleRows(localRows, remoteRows){
+  const map=new Map();
+  // 1. 원격 데이터 먼저 세팅
+  (Array.isArray(remoteRows)?remoteRows:[]).forEach(r=>{
+    const row={...r,code:normalizeBusCode(r.code),status:r.status||'active'};
+    map.set(simpleRowKey(row),row);
+  });
+  // 2. 로컬 데이터로 덮어쓰기 — 로컬 취소/삭제 상태는 항상 우선
+  (Array.isArray(localRows)?localRows:[]).forEach(r=>{
+    const row={...r,code:normalizeBusCode(r.code),status:r.status||'active'};
+    const key=simpleRowKey(row);
+    const existing=map.get(key)||{};
+    // 로컬이 cancelled면 원격 active여도 cancelled 유지
+    const finalStatus=(row.status==='cancelled'||existing.status==='cancelled')?'cancelled':row.status;
+    map.set(key,{...existing,...row,status:finalStatus});
+  });
+  return Array.from(map.values()).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+}
 
 // ════ 공통 상태 ════
 let ADM_TAB='classroom', OE_TYPE=null, TRANSPORT_SEL=null, OE_TOKEN='', BUS_SEL='';
@@ -2029,6 +2059,7 @@ async function adminDeleteOE(token,rowIdx,name){
   if(!confirm(`${label} 신청 내역을 삭제하시겠습니까?`)) return;
   const delKey = oeDeleteKey(token,rowIdx);
   CLIENT_DELETE_TOMBSTONES.oe.add(delKey);
+  saveTombstoneToLS_('oe',delKey);
   lsDeleteOE(token,rowIdx);
   // 로컬 캐시로 즉시 재렌더 (GAS 재조회 없음 → 빠름)
   if(typeof window.admRenderOE === 'function') window.admRenderOE();
@@ -2044,6 +2075,7 @@ async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
   const delKey = simpleDeleteKey(rowIdx,createdAt,name,phone,code);
   if(!CLIENT_DELETE_TOMBSTONES.simple[type]) CLIENT_DELETE_TOMBSTONES.simple[type] = new Set();
   CLIENT_DELETE_TOMBSTONES.simple[type].add(delKey);
+  saveTombstoneToLS_(type,delKey);
   lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code);
   loadSimpleAdmin(type, undefined, undefined, true); // ← GAS 재조회 없이 즉시 반영
   toast('🗑️ 삭제되었습니다');
@@ -2305,7 +2337,7 @@ function checkSimpleApp(type){
   if(GAS_READY) fetch(GAS_URL+`?action=${cfg.checkAction}&code=`+encodeURIComponent(code)).then(r=>r.json()).then(res=>{
     const remoteRows=(res&&res.data)||[];
     const merged=mergeSimpleRows(localRows,remoteRows);
-    if(merged.length || !localRows.length) renderSimpleCheckResult(type,merged);
+    renderSimpleCheckResult(type,merged);
   }).catch(()=>{});
 }
 function cancelSimpleApp(type,rowIdx){
@@ -2350,10 +2382,9 @@ function loadSimpleAdmin(type,statsId,listId,skipRemote){
   fetch(GAS_URL+`?action=${cfg.listAction}`).then(r=>r.json()).then(res=>{
     const rows=((res&&res.data)||[]).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
     const merged=mergeSimpleRows(local,rows).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
-    if(merged.length || !local.length){
-      renderSimpleAdminData(type,merged,statsId||cfg.mainStats,listId||cfg.mainList);
-      renderSimpleAdminData(type,merged,cfg.standStats,cfg.standList);
-    }
+    // 항상 렌더링 (tombstone 필터링 후 빈 결과도 표시)
+    renderSimpleAdminData(type,merged,statsId||cfg.mainStats,listId||cfg.mainList);
+    renderSimpleAdminData(type,merged,cfg.standStats,cfg.standList);
   }).catch(()=>{});
 }
 function initBusApply(){ initSimpleApply('bus'); }
@@ -2389,20 +2420,32 @@ function printForm(d){
   const inner = document.getElementById('print-overlay-content');
   if(!inner) return;
   inner.innerHTML = `
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px">
-  <div><p style="font-size:10pt">[별지2] 외출외박신청서&lt;개정 2017.11.23&gt;</p><h1 style="font-size:24pt;font-weight:900;margin:8px 0 10px">외출·외박 신청서</h1></div>
-  <table style="border-collapse:collapse;font-size:11pt;width:260px"><tr><td style="border:1px solid #000;text-align:center;padding:6px 10px;width:80px" rowspan="2">결재</td><td style="border:1px solid #000;text-align:center;padding:6px 10px;width:90px">담당자</td><td style="border:1px solid #000;text-align:center;padding:6px 10px;width:90px">부장</td></tr><tr><td style="border:1px solid #000;height:70px"></td><td style="border:1px solid #000;height:70px"></td></tr></table>
+<style>@media print{body,html{margin:0;padding:0}.print-overlay-inner{padding:12px 16px!important}}</style>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px">
+  <div><p style="font-size:9pt;color:#555">[별지2] 외출외박신청서&lt;개정 2017.11.23&gt;</p><h1 style="font-size:20pt;font-weight:900;margin:4px 0 6px">외출·외박 신청서</h1></div>
+  <table style="border-collapse:collapse;font-size:10pt;width:240px">
+    <tr>
+      <td style="border:1px solid #000;text-align:center;padding:5px 8px;width:60px;font-weight:700">결재</td>
+      <td style="border:1px solid #000;text-align:center;padding:5px 8px;width:90px;font-weight:700">담당자</td>
+      <td style="border:1px solid #000;text-align:center;padding:5px 8px;width:90px;font-weight:700">부장</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #000;height:52px"></td>
+      <td style="border:1px solid #000;height:52px"></td>
+      <td style="border:1px solid #000;height:52px"></td>
+    </tr>
+  </table>
 </div>
-<p style="font-size:10.2pt;line-height:1.35;margin:12px 0 16px">「교육훈련규정 시행세칙」 제6조제3항에 의거 아래와 같이 외출(외박)신청하오니 승인하여 주시기 바랍니다.</p>
-<p style="font-size:13pt;font-weight:700;margin-bottom:6px">□ 신청자 인적사항</p>
-<table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12.5pt"><thead><tr><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center">소속</th><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center">직위</th><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center">성명</th><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center">과정명</th><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center">비고</th></tr></thead><tbody><tr><td style="border:1px solid #000;padding:10px;text-align:center">${bankFull}</td><td style="border:1px solid #000;padding:10px;text-align:center">${position}</td><td style="border:1px solid #000;padding:10px;text-align:center">${d.name||''}</td><td style="border:1px solid #000;padding:10px;text-align:center">${d.course||''}</td><td style="border:1px solid #000;padding:10px"></td></tr></tbody></table>
-<p style="font-size:13pt;font-weight:700;margin-bottom:6px">□ 신청내용</p>
-<table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12.5pt"><thead><tr><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center;width:40%">사유</th><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center">외박(외출)시간</th><th style="border:1px solid #000;background:#f5f5f5;padding:8px;text-align:center">귀원시간</th></tr></thead><tbody><tr><td style="border:1px solid #000;padding:10px;text-align:center">${reason}</td><td style="border:1px solid #000;padding:10px;text-align:center">${d.startdt||''}</td><td style="border:1px solid #000;padding:10px;text-align:center">${retTime}<br><span style="font-size:11pt;font-weight:700">귀원후 매니져에게 유선연락</span></td></tr></tbody></table>
-<div style="border:1px solid #000;padding:18px 20px;font-size:12.5pt;line-height:1.9;margin-bottom:20px;text-align:center">본인은 중앙회 「교육훈련규정 시행세칙」 제6조제3항(귀원시간)을 준수하겠으며<br>외출·외박 기간 동안의 사고 및 질병·부상·기타 재해에 대하여 중앙회에 이의를<br>제기하지 않을 것임을 확약합니다.</div>
-<div style="text-align:center;font-size:12.5pt;margin-bottom:16px">${yy}년 &nbsp; ${mm}월 &nbsp; ${dd}일</div>
-<div style="text-align:right;font-size:12pt;line-height:2.4;padding-right:10px;margin-top:12px"><div>신청인 &nbsp; 소&nbsp;&nbsp;속 : ${bankFull}</div><div>직&nbsp;&nbsp;위 : ${position}</div><div>성&nbsp;&nbsp;명 : ${d.name||''} &nbsp;&nbsp; (인)</div><div style="font-size:10.5pt;padding-right:24px">서명,날인은 '웹앱' 본인 신청으로 갈음</div></div>
-<p style="font-size:12pt;font-weight:900;margin-top:30px">MG인재개발원 귀중</p>
-<div style="background:#FFF4EC;border:1px solid #FFD9BF;border-radius:8px;padding:12px;font-size:13px;color:#C2410C;margin-top:16px;text-align:center">※ 이 서식은 출력 후 결재란에 서명하여 보관하세요</div>`;
+<p style="font-size:9.5pt;line-height:1.3;margin:6px 0 8px">「교육훈련규정 시행세칙」 제6조제3항에 의거 아래와 같이 외출(외박)신청하오니 승인하여 주시기 바랍니다.</p>
+<p style="font-size:11pt;font-weight:700;margin-bottom:4px">□ 신청자 인적사항</p>
+<table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:10.5pt"><thead><tr><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center">소속</th><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center">직위</th><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center">성명</th><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center">과정명</th><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center">비고</th></tr></thead><tbody><tr><td style="border:1px solid #000;padding:7px 5px;text-align:center">${bankFull}</td><td style="border:1px solid #000;padding:7px 5px;text-align:center">${position}</td><td style="border:1px solid #000;padding:7px 5px;text-align:center">${d.name||''}</td><td style="border:1px solid #000;padding:7px 5px;text-align:center">${d.course||''}</td><td style="border:1px solid #000;padding:7px 5px"></td></tr></tbody></table>
+<p style="font-size:11pt;font-weight:700;margin-bottom:4px">□ 신청내용</p>
+<table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:10.5pt"><thead><tr><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center;width:40%">사유</th><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center">외박(외출)시간</th><th style="border:1px solid #000;background:#f5f5f5;padding:5px;text-align:center">귀원시간</th></tr></thead><tbody><tr><td style="border:1px solid #000;padding:7px 5px;text-align:center">${reason}</td><td style="border:1px solid #000;padding:7px 5px;text-align:center">${d.startdt||''}</td><td style="border:1px solid #000;padding:7px 5px;text-align:center">${retTime}<br><span style="font-size:9.5pt;font-weight:700">귀원후 매니져에게 유선연락</span></td></tr></tbody></table>
+<div style="border:1px solid #000;padding:10px 14px;font-size:10.5pt;line-height:1.65;margin-bottom:10px;text-align:center">본인은 중앙회 「교육훈련규정 시행세칙」 제6조제3항(귀원시간)을 준수하겠으며<br>외출·외박 기간 동안의 사고 및 질병·부상·기타 재해에 대하여 중앙회에 이의를<br>제기하지 않을 것임을 확약합니다.</div>
+<div style="text-align:center;font-size:11pt;margin-bottom:8px">${yy}년 &nbsp; ${mm}월 &nbsp; ${dd}일</div>
+<div style="text-align:right;font-size:10.5pt;line-height:2.0;padding-right:8px;margin-top:8px"><div>신청인 &nbsp; 소&nbsp;&nbsp;속 : ${bankFull}</div><div>직&nbsp;&nbsp;위 : ${position}</div><div>성&nbsp;&nbsp;명 : ${d.name||''} &nbsp;&nbsp; (인)</div><div style="font-size:9.5pt;padding-right:20px">서명,날인은 '웹앱' 본인 신청으로 갈음</div></div>
+<p style="font-size:11pt;font-weight:900;margin-top:16px">MG인재개발원 귀중</p>
+<div style="background:#FFF4EC;border:1px solid #FFD9BF;border-radius:6px;padding:8px;font-size:11px;color:#C2410C;margin-top:10px;text-align:center">※ 이 서식은 출력 후 결재란에 서명하여 보관하세요</div>`;
   const overlay = document.getElementById('print-overlay');
   overlay.classList.add('show');
   document.body.style.overflow='hidden';
@@ -2537,7 +2580,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     ['s-outexit','s-bus','s-lesson','s-sport'].forEach(id=>{
       const screen=document.getElementById(id); if(!screen) return;
       const hdr=screen.querySelector('.hdr'); const btn=screen.querySelector('.simple-admin-btn');
-      if(hdr && btn){ if(btn.previousElementSibling && btn.previousElementSibling.classList.contains('sep')) btn.previousElementSibling.remove(); btn.classList.add('hdr-admin-btn'); btn.classList.remove('simple-admin-btn'); hdr.appendChild(btn); }
+      if(hdr && btn){ if(btn.previousElementSibling && btn.previousElementSibling.classList.contains('sep')) btn.previousElementSibling.remove(); btn.style.cssText+='margin-left:auto;margin-top:0;flex-shrink:0;'; btn.classList.add('hdr-admin-btn'); btn.classList.remove('simple-admin-btn'); hdr.appendChild(btn); }
     });
     const home=document.getElementById('s-home');
     if(home){ const htop=home.querySelector('.htop'); const horg=home.querySelector('.horg'); const btn=home.querySelector('.hbot .btnadm.icon-only'); if(htop && horg && btn && !htop.querySelector('.home-topbar')){ const wrap=document.createElement('div'); wrap.className='home-topbar'; horg.parentNode.insertBefore(wrap, horg); wrap.appendChild(horg); btn.classList.add('hdr-admin-btn'); wrap.appendChild(btn); } }
@@ -2577,7 +2620,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       </button>
     </div>
     <div class="sep"></div>
-    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('oe-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">👥 대상자 확인</button>
+    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('oe-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">관리자 확인</button>
   </div>
 </div>
 
@@ -2689,7 +2732,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       <button class="home-extra-btn" onclick="goTo('bus-check')"><span aria-hidden="true">🔍</span><span>신청 내역<br>확인·취소</span></button>
     </div>
     <div class="service-note">버스 이용이 어려워지면 꼭 신청 내역에서 취소해 주세요.</div>
-    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('bus-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">👥 대상자 확인</button>
+    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('bus-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">관리자 확인</button>
   </div>
 </div>
 
@@ -2752,7 +2795,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       <button class="home-extra-btn" onclick="goTo('lesson-check')"><span aria-hidden="true">🔍</span><span>신청 내역<br>확인·취소</span></button>
     </div>
     <div class="service-note">레슨을 이용하지 않을 경우 꼭 취소해 주세요.</div>
-    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('lesson-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">👥 대상자 확인</button>
+    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('lesson-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">관리자 확인</button>
   </div>
 </div>
 
@@ -2805,7 +2848,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       <button class="home-extra-btn" onclick="goTo('sport-check')"><span aria-hidden="true">🔍</span><span>신청 내역<br>확인·취소</span></button>
     </div>
     <div class="service-note">식당 지하 골프 · 게임방 시설입니다. 운영시간은 18:00~23:00 입니다.</div>
-    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('sport-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">👥 대상자 확인</button>
+    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('sport-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">관리자 확인</button>
   </div>
 </div>
 
