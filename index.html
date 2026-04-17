@@ -505,6 +505,7 @@ a{text-decoration:none;color:inherit}
 .bnav-btn .bni{font-size:20px;line-height:1}.bnav-btn.active{color:var(--primary)}.cnt{padding-bottom:72px!important}
 .warn-box{background:#FFFBDB;border:2.5px solid #F5C400;border-radius:16px;padding:16px 18px;margin-bottom:20px;font-size:15px;font-weight:900;color:#7A5C00;line-height:1.65;text-align:center}
 .fgroup{margin-bottom:14px}.flabel{font-size:16px;font-weight:900;color:var(--text-2);margin-bottom:6px;display:block}.freq{color:var(--danger)}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#1B64DA;color:#fff;border-radius:50%;font-size:15px;font-weight:900;margin-right:9px;flex-shrink:0;vertical-align:middle;box-shadow:0 2px 6px rgba(27,100,218,.25)}
 .finput{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;background:#fff;color:var(--text);font-family:inherit;box-sizing:border-box}
 .finput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,130,246,.1)}.finput-hint{font-size:12px;color:var(--text-3);margin-top:5px;line-height:1.5}
 textarea.finput{resize:vertical;min-height:72px}
@@ -2796,39 +2797,39 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
   <div class="hdr"><button class="bk" onclick="goTo('outexit-type')">← 뒤로</button><h1 id="oef-title">외출 신청</h1></div>
   <div class="cnt">
     <div class="fgroup">
-      <label class="flabel">과정이 시작되는 주차 <span class="freq">*</span></label>
+      <label class="flabel"><span class="step-num">1</span>과정이 시작되는 주차 <span class="freq">*</span></label>
       <div class="ddwrap" style="margin-bottom:8px"><select class="csel" id="oef-date-sel" onchange="onOEDateSel(this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
       <div id="oef-course-list" style="display:none;margin-bottom:8px"></div>
       <input id="oef-course" class="finput" type="text" readonly placeholder="위에서 과정을 선택하세요" style="background:#f5f7fa;color:var(--text-2)">
     </div>
-    <div class="fgroup"><label class="flabel">소속 금고명 <span class="freq">*</span></label>
+    <div class="fgroup"><label class="flabel"><span class="step-num">2</span>소속 금고명 <span class="freq">*</span></label>
       <div class="bank-wrap"><input id="oef-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div></div>
-    <div class="fgroup"><label class="flabel">직위 <span class="freq">*</span></label><input id="oef-position" class="finput" type="text" placeholder="예: 대리, 과장, 팀장"></div>
-    <div class="fgroup"><label class="flabel">성명 <span class="freq">*</span></label><input id="oef-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
+    <div class="fgroup"><label class="flabel"><span class="step-num">3</span>직위 <span class="freq">*</span></label><input id="oef-position" class="finput" type="text" placeholder="예: 대리, 과장, 팀장"></div>
+    <div class="fgroup"><label class="flabel"><span class="step-num">4</span>성명 <span class="freq">*</span></label><input id="oef-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
     <div class="fgroup">
-      <label class="flabel" style="color:var(--danger)">📞 연락처 <span class="freq">*</span> <span style="font-size:12px;font-weight:700">복귀처리 시 필수</span></label>
+      <label class="flabel" style="color:var(--danger)"><span class="step-num">5</span>📞 연락처 <span class="freq">*</span> <span style="font-size:12px;font-weight:700">복귀처리 시 필수</span></label>
       <input id="oef-phone" class="phone-emph" type="tel" placeholder="010-0000-0000">
       <div class="phone-notice">⚠️ 전화번호 뒷자리 4자리로 복귀 처리됩니다. 정확하게 입력해 주세요!</div>
     </div>
-    <div class="fgroup"><label class="flabel">이동수단 <span class="freq">*</span></label>
+    <div class="fgroup"><label class="flabel"><span class="step-num">6</span>이동수단 <span class="freq">*</span></label>
       <div class="transport-opts">
         <button class="transport-opt" onclick="setTransport('개인차량',this)">🚗 개인차량</button>
         <button class="transport-opt" onclick="setTransport('택시',this)">🚕 택시</button>
         <button class="transport-opt" onclick="setTransport('기타',this)">🚶 기타</button>
       </div></div>
-    <div class="fgroup" id="oef-time-wrap"><label class="flabel" id="oef-time-label">외출 요청 시간 <span class="freq">*</span></label>
+    <div class="fgroup" id="oef-time-wrap"><label class="flabel" id="oef-time-label"><span class="step-num">7</span>외출 요청 시간 <span class="freq">*</span></label>
       <div class="time-grid"><select class="finput" id="oef-month"><option value="">월</option></select><select class="finput" id="oef-day"><option value="">일</option></select><select class="finput" id="oef-hour"><option value="">시</option></select></div></div>
-    <div class="fgroup" id="oef-ret-wrap" style="display:none"><label class="flabel">복귀 예정 시간 <span class="freq">*</span></label>
+    <div class="fgroup" id="oef-ret-wrap" style="display:none"><label class="flabel"><span class="step-num">8</span>복귀 예정 시간 <span class="freq">*</span></label>
       <div class="time-grid"><select class="finput" id="oef-ret-month"><option value="">월</option></select><select class="finput" id="oef-ret-day"><option value="">일</option></select><select class="finput" id="oef-ret-hour"><option value="">시</option></select></div></div>
 
-    <div class="fgroup" id="oef-dest-wrap" style="display:none"><label class="flabel">행선지 <span class="freq">*</span></label><input id="oef-dest" class="finput" type="text" placeholder="행선지를 입력하세요"></div>
-    <div class="fgroup" id="oef-reason-wrap" style="display:none"><label class="flabel">외출 사유 <span class="freq">*</span></label><textarea id="oef-reason" class="finput" rows="2" placeholder="사유를 간략히 입력하세요"></textarea></div>
+    <div class="fgroup" id="oef-dest-wrap" style="display:none"><label class="flabel"><span class="step-num">9</span>행선지 <span class="freq">*</span></label><input id="oef-dest" class="finput" type="text" placeholder="행선지를 입력하세요"></div>
+    <div class="fgroup" id="oef-reason-wrap" style="display:none"><label class="flabel"><span class="step-num">10</span>외출 사유 <span class="freq">*</span></label><textarea id="oef-reason" class="finput" rows="2" placeholder="사유를 간략히 입력하세요"></textarea></div>
     <div id="oef-overnight-wrap" style="display:none">
-      <div class="fgroup"><label class="flabel">행선지 <span class="freq">*</span></label><input id="oef-on-dest" class="finput" type="text" placeholder="행선지"></div>
-      <div class="fgroup"><label class="flabel">외박 사유 <span class="freq">*</span></label><textarea id="oef-on-reason" class="finput" rows="2" placeholder="외박 사유"></textarea></div>
+      <div class="fgroup"><label class="flabel"><span class="step-num">9</span>행선지 <span class="freq">*</span></label><input id="oef-on-dest" class="finput" type="text" placeholder="행선지"></div>
+      <div class="fgroup"><label class="flabel"><span class="step-num">10</span>외박 사유 <span class="freq">*</span></label><textarea id="oef-on-reason" class="finput" rows="2" placeholder="외박 사유"></textarea></div>
     </div>
     <div class="fgroup" id="oef-special-wrap" style="display:none">
-      <label class="flabel">현재 상태 <span style="font-size:12px;color:var(--text-3);font-weight:700">(민감정보 보호)</span></label>
+      <label class="flabel"><span class="step-num">11</span>현재 상태 <span style="font-size:12px;color:var(--text-3);font-weight:700">(민감정보 보호)</span></label>
       <input id="oef-special" class="finput" type="text" placeholder="아픈 곳 등 대략적인 내용, 없으면 비워두세요">
     </div>
     <button class="btnsave" style="margin-top:12px" onclick="submitOE()">신청하기</button>
@@ -2899,12 +2900,12 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       <div id="bus-clist" style="display:none;margin-bottom:14px"></div>
       <div id="bus-form-area" style="display:none">
         <div class="sep"></div>
-        <div class="fgroup"><label class="flabel">과정명</label><input id="busf-course" class="finput" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
-        <div class="fgroup"><label class="flabel">금고명 <span class="freq">*</span></label>
+        <div class="fgroup"><label class="flabel"><span class="step-num">1</span>과정명</label><input id="busf-course" class="finput" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">2</span>금고명 <span class="freq">*</span></label>
           <div class="bank-wrap"><input id="busf-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div>
           <div class="finput-hint">앞부분만 입력 · 예) <b>강남</b>새마을금고 → "강남" 입력</div></div>
-        <div class="fgroup"><label class="flabel">성명 <span class="freq">*</span></label><input id="busf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
-        <div class="fgroup"><label class="flabel">연락처 <span class="freq">*</span></label><input id="busf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">3</span>성명 <span class="freq">*</span></label><input id="busf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">4</span>연락처 <span class="freq">*</span></label><input id="busf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
         <button class="btnsave" onclick="submitBus()">신청하기</button>
       </div>
     </div>
@@ -2960,10 +2961,10 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       <div id="lesson-clist" style="display:none;margin-bottom:14px"></div>
       <div id="lesson-form-area" style="display:none">
         <div class="sep"></div>
-        <div class="fgroup"><label class="flabel">과정명</label><input id="lessonf-course" class="finput" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
-        <div class="fgroup"><label class="flabel">금고명 <span class="freq">*</span></label><div class="bank-wrap"><input id="lessonf-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div></div>
-        <div class="fgroup"><label class="flabel">성명 <span class="freq">*</span></label><input id="lessonf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
-        <div class="fgroup"><label class="flabel">연락처 <span class="freq">*</span></label><input id="lessonf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">1</span>과정명</label><input id="lessonf-course" class="finput" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">2</span>금고명 <span class="freq">*</span></label><div class="bank-wrap"><input id="lessonf-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">3</span>성명 <span class="freq">*</span></label><input id="lessonf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">4</span>연락처 <span class="freq">*</span></label><input id="lessonf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
         <button class="btnsave" onclick="submitLesson()">신청하기</button>
       </div>
     </div></div>
@@ -3013,10 +3014,10 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
       <div id="sport-clist" style="display:none;margin-bottom:14px"></div>
       <div id="sport-form-area" style="display:none">
         <div class="sep"></div>
-        <div class="fgroup"><label class="flabel">과정명</label><input id="sportf-course" class="finput" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
-        <div class="fgroup"><label class="flabel">금고명 <span class="freq">*</span></label><div class="bank-wrap"><input id="sportf-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div></div>
-        <div class="fgroup"><label class="flabel">성명 <span class="freq">*</span></label><input id="sportf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
-        <div class="fgroup"><label class="flabel">연락처 <span class="freq">*</span></label><input id="sportf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">1</span>과정명</label><input id="sportf-course" class="finput" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">2</span>금고명 <span class="freq">*</span></label><div class="bank-wrap"><input id="sportf-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">3</span>성명 <span class="freq">*</span></label><input id="sportf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
+        <div class="fgroup"><label class="flabel"><span class="step-num">4</span>연락처 <span class="freq">*</span></label><input id="sportf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
         <button class="btnsave" onclick="submitSport()">신청하기</button>
       </div>
     </div></div>
