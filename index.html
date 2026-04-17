@@ -2392,7 +2392,7 @@ async function adminIssueOE(token){
   const issuedAt=new Date().toISOString();
   if(GAS_READY){
     try{
-      const res=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sendOEEmail',...item,bankFull:item.bankFull||item.sosok||'',position:item.position||item.jikwi||'',reason:formatOEReason(item),retTime:item.retTime||'미정',mailSentAt:issuedAt,mailSentBy:'관리자'})});
+      const res=await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'sendOEEmail',...item,bankFull:item.bankFull||item.sosok||'',position:item.position||item.jikwi||'',reason:formatOEReason(item),retTime:item.retTime||'미정',mailSentAt:issuedAt,mailSentBy:'관리자'})});
       const json=await res.json();
       if(!json.ok) throw new Error(json.msg||'메일 발송 실패');
       lsIssueOE(token,json.issuedAt||issuedAt,'관리자');
@@ -2623,7 +2623,7 @@ function sendOEEmailToAdmin(d){
   const retTime=d.retTime||'미정';
 
   if(GAS_READY){
-    fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sendOEEmail',...d,bankFull,position,reason,retTime,mailSentBy:'관리자'})})
+    fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'sendOEEmail',...d,bankFull,position,reason,retTime,mailSentBy:'관리자'})})
       .then(r=>r.json())
       .then(res=>{ if(!res.ok) throw new Error(res.msg||'메일 발송 실패'); toast('✅ 관리자 메일 발송 완료'); })
       .catch(err=>toast('❌ '+err.message));
