@@ -49,6 +49,8 @@ body{
   margin:0 auto;
   overflow-x:hidden;
   letter-spacing:-0.02em;
+  font-size:16px;
+  word-break:keep-all;
 }
 button,input,select,textarea{font:inherit}
 a{text-decoration:none;color:inherit}
@@ -76,13 +78,13 @@ a{text-decoration:none;color:inherit}
   box-shadow:0 2px 12px rgba(15,23,42,.03);
 }
 .hdr.adm{background:rgba(255,255,255,.94);color:var(--text)}
-.hdr h1{font-size:17px;font-weight:800;flex:1;letter-spacing:-0.03em}
+.hdr h1{font-size:19px;font-weight:900;flex:1;letter-spacing:-0.03em}
 .bk{
   background:var(--bg-subtle);
   border:1px solid var(--line);
   color:var(--text-2);
-  font-size:13px;
-  font-weight:800;
+  font-size:14px;
+  font-weight:900;
   cursor:pointer;
   padding:8px 12px;
   border-radius:999px;
@@ -117,7 +119,7 @@ a{text-decoration:none;color:inherit}
   color:var(--primary);
   background:var(--primary-weak);
 }
-.cinfo h3{font-size:17px;line-height:1.35;font-weight:800;margin-bottom:8px;letter-spacing:-0.03em}
+.cinfo h3{font-size:18px;line-height:1.35;font-weight:900;margin-bottom:8px;letter-spacing:-0.03em}
 .rtag{
   display:inline-flex;align-items:center;gap:3px;
   font-size:12px;font-weight:800;
@@ -135,14 +137,14 @@ a{text-decoration:none;color:inherit}
 #s-week #clist-area .rtag{display:block;max-width:100%;font-size:13px;padding:6px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #s-week #clist-area .chev{font-size:18px;padding-top:3px}
 .ddwrap{position:relative;margin-bottom:28px}
-.ddlabel{font-size:14px;font-weight:800;color:var(--text-2);margin-bottom:10px}
+.ddlabel{font-size:15px;font-weight:900;color:var(--text-2);margin-bottom:10px}
 .csel{
   width:100%;appearance:none;-webkit-appearance:none;
   background:var(--surface);
   border:1.5px solid var(--line);
   border-radius:20px;
   padding:18px 50px 18px 18px;
-  font-size:17px;font-weight:800;
+  font-size:18px;font-weight:900;
   color:var(--text);cursor:pointer;
   transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
   box-shadow:var(--shadow);
@@ -400,7 +402,7 @@ a{text-decoration:none;color:inherit}
 .bulkdel:disabled{opacity:.45;cursor:not-allowed}
 .ckcell{text-align:center;width:52px}
 .ckcell input{width:18px;height:18px;cursor:pointer;accent-color:var(--primary)}
-.btnsave{width:100%;background:var(--primary);color:#fff;border:none;border-radius:16px;padding:15px;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 10px 20px rgba(49,130,246,.22);margin-top:6px;transition:all .18s ease}
+.btnsave{width:100%;background:var(--primary);color:#fff;border:none;border-radius:16px;padding:16px;font-size:17px;font-weight:900;cursor:pointer;box-shadow:0 10px 20px rgba(49,130,246,.22);margin-top:6px;transition:all .18s ease}
 .btnsave:hover{background:var(--primary-strong)}
 .btnsave.saved{background:var(--success)}
 .statsrow{display:flex;gap:8px;margin-bottom:16px}
@@ -502,8 +504,8 @@ a{text-decoration:none;color:inherit}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-size:10px;font-weight:800;color:var(--text-3);padding:9px 0 10px;font-family:inherit}
 .bnav-btn .bni{font-size:20px;line-height:1}.bnav-btn.active{color:var(--primary)}.cnt{padding-bottom:72px!important}
 .warn-box{background:#FFFBDB;border:2.5px solid #F5C400;border-radius:16px;padding:16px 18px;margin-bottom:20px;font-size:15px;font-weight:900;color:#7A5C00;line-height:1.65;text-align:center}
-.fgroup{margin-bottom:14px}.flabel{font-size:14px;font-weight:800;color:var(--text-2);margin-bottom:6px;display:block}.freq{color:var(--danger)}
-.finput{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;background:#fff;color:var(--text);font-family:inherit;box-sizing:border-box}
+.fgroup{margin-bottom:14px}.flabel{font-size:16px;font-weight:900;color:var(--text-2);margin-bottom:6px;display:block}.freq{color:var(--danger)}
+.finput{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;background:#fff;color:var(--text);font-family:inherit;box-sizing:border-box}
 .finput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,130,246,.1)}.finput-hint{font-size:12px;color:var(--text-3);margin-top:5px;line-height:1.5}
 textarea.finput{resize:vertical;min-height:72px}
 .transport-opts{display:flex;gap:8px;flex-wrap:wrap}
@@ -518,18 +520,18 @@ textarea.finput{resize:vertical;min-height:72px}
 .bank-inp:focus{outline:none;border-color:var(--primary)}
 .bank-suffix{background:#f5f7fa;border:1.5px solid var(--line);border-left:none;border-radius:0 12px 12px 0;padding:12px 14px;font-size:15px;font-weight:800;color:var(--text-2);white-space:nowrap;flex-shrink:0;display:flex;align-items:center}
 .cbox{background:linear-gradient(135deg,#E8F3FF,#F0F7FF);border:2px solid #b6d0ff;border-radius:24px;padding:28px 20px;text-align:center;margin-bottom:14px}
-.cbox .ce{font-size:44px;margin-bottom:10px}.cbox h2{font-size:20px;font-weight:900;margin-bottom:8px;color:var(--text)}
+.cbox .ce{font-size:44px;margin-bottom:10px}.cbox h2{font-size:22px;font-weight:900;margin-bottom:8px;color:var(--text)}
 .cbox-code{font-size:20px;font-weight:900;color:var(--primary);margin:10px 0;padding:12px;background:#fff;border-radius:12px;border:1.5px solid #b6d0ff;word-break:break-all}
-.cbox p{font-size:13px;color:var(--text-2);line-height:1.7}
+.cbox p{font-size:15px;color:var(--text-2);line-height:1.7}
 .req-item{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
 .req-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap}
-.req-name{font-size:15px;font-weight:900;color:var(--text)}
-.rbadge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
+.req-name{font-size:17px;font-weight:900;color:var(--text)}
+.rbadge{padding:5px 12px;border-radius:999px;font-size:13px;font-weight:800;white-space:nowrap}
 .rbadge.ing{background:var(--warning-weak);color:var(--warning)}.rbadge.done{background:var(--success-weak);color:var(--success)}
 .rbadge.approved{background:var(--success-weak);color:var(--success)}.rbadge.rejected{background:var(--danger-weak);color:var(--danger)}
-.req-info{font-size:13px;color:var(--text-3);line-height:1.9}.req-info b{color:var(--text-2)}
+.req-info{font-size:15px;color:var(--text-3);line-height:1.9}.req-info b{color:var(--text-2)}
 .rfilt{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.rfilt-btn{padding:8px 14px;border:1.5px solid var(--line);border-radius:14px;font-size:13px;font-weight:800;cursor:pointer;background:#fff;color:var(--text-2);font-family:inherit;transition:all .15s}
+.rfilt-btn{padding:9px 16px;border:1.5px solid var(--line);border-radius:14px;font-size:15px;font-weight:900;cursor:pointer;background:#fff;color:var(--text-2);font-family:inherit;transition:all .15s}
 .rfilt-btn.on{background:var(--primary);color:#fff;border-color:var(--primary)}
 .adm-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .adm-tab{padding:10px 14px;border:1.5px solid var(--line);border-radius:20px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;background:#fff;color:var(--text-2);transition:all .18s;font-family:inherit;flex-shrink:0}
@@ -537,19 +539,19 @@ textarea.finput{resize:vertical;min-height:72px}
 .adm-panel{display:none}.adm-panel.on{display:block}
 .binfo-box{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
 .binfo-row{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}.binfo-row:last-child{border-bottom:none}
-.binfo-lbl{font-size:13px;color:var(--text-3);font-weight:700;min-width:68px;flex-shrink:0}.binfo-val{font-size:14px;color:var(--text);font-weight:800}
+.binfo-lbl{font-size:15px;color:var(--text-3);font-weight:800;min-width:68px;flex-shrink:0}.binfo-val{font-size:16px;color:var(--text);font-weight:900}
 .bgroup{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
 .bgroup-hd{font-size:15px;font-weight:900;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 .bgroup-sub{font-size:13px;color:var(--primary);font-weight:800;margin-top:2px}
 .bgroup-body{display:none;margin-top:10px;border-top:1px solid var(--line);padding-top:10px}.bgroup-body.on{display:block}
 .bmem{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}.bmem:last-child{border-bottom:none}
-.bmem-name{font-size:14px;font-weight:800;color:var(--text)}.bmem-info{font-size:12px;color:var(--text-3);margin-top:2px}
+.bmem-name{font-size:16px;font-weight:900;color:var(--text)}.bmem-info{font-size:14px;color:var(--text-3);margin-top:2px}
 .type-card{background:#fff;border:2px solid var(--line);border-radius:20px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow);margin-bottom:10px}
 .type-card:active{transform:scale(.985)}.tc-icon{font-size:26px;flex-shrink:0}
 .tc-text h3{font-size:15px;font-weight:900;color:var(--text);margin-bottom:2px}.tc-text p{font-size:12px;color:var(--text-3);line-height:1.5}
 .stat-row{display:flex;gap:8px;margin-bottom:14px}
 .stat-card{flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center;box-shadow:var(--shadow)}
-.stat-num{font-size:24px;font-weight:900;color:var(--text)}.stat-lbl{font-size:11px;color:var(--text-3);margin-top:2px;font-weight:800}
+.stat-num{font-size:24px;font-weight:900;color:var(--text)}.stat-lbl{font-size:13px;color:var(--text-3);margin-top:2px;font-weight:800}
 .sep{height:1px;background:var(--line);margin:16px 0}
 .approve-info-table{width:100%;font-size:13px;border-collapse:collapse;line-height:2.2}
 .approve-info-table td:first-child{color:var(--text-3);width:80px;vertical-align:top}
@@ -2590,7 +2592,7 @@ function printForm(d){
 </div>
 <p style="font-size:12pt;line-height:1.4;margin:5px 0 6px">「교육훈련규정 시행세칙」 제6조제3항에 의거 아래와 같이 외출(외박)신청하오니 승인하여 주시기 바랍니다.</p>
 <p style="font-size:14pt;font-weight:700;margin-bottom:4px">□ 신청자 인적사항</p>
-<table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:15pt;line-height:1.5"><thead><tr><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">소속</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">직위</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">성명</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">과정명</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">비고</th></tr></thead><tbody><tr><td style="border:1px solid #000;padding:8px 5px;text-align:center">${bankFull}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${position}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${d.name||''}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${d.course||''}</td><td style="border:1px solid #000;padding:8px 5px"></td></tr></tbody></table>
+<table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:15pt;line-height:1.5"><thead><tr><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">소속</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">직위</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">성명</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">과정명</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">비고</th></tr></thead><tbody><tr><td style="border:1px solid #000;padding:8px 5px;text-align:center">${bankFull}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${position}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${d.name||''}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${d.course||''}</td><td style="border:1px solid #000;padding:6px 4px;text-align:center;font-size:13pt;line-height:1.4">${(function(){var ph=String(d.phone||'').replace(/[^0-9]/g,'');if(ph.length===11)return 'M:'+ph.slice(0,3)+'<br>'+ph.slice(3,7)+'-'+ph.slice(7);if(ph.length===10)return 'M:'+ph.slice(0,3)+'<br>'+ph.slice(3,6)+'-'+ph.slice(6);return d.phone||'';})()}</td></tr></tbody></table>
 <p style="font-size:14pt;font-weight:700;margin-bottom:4px">□ 신청내용</p>
 <table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:15pt;line-height:1.5"><thead><tr><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center;width:40%">사유</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">외박(외출)시간</th><th style="border:1px solid #000;background:#f5f5f5;padding:6px 4px;text-align:center">귀원시간</th></tr></thead><tbody><tr><td style="border:1px solid #000;padding:8px 5px;text-align:center">${reason}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${d.startdt||''}</td><td style="border:1px solid #000;padding:8px 5px;text-align:center">${retTime}<br><span style="font-size:13pt;font-weight:700">귀원후 매니져에게 유선연락<br>및 앱내에서 '복귀 처리' 진행</span></td></tr></tbody></table>
 <div style="border:1px solid #000;padding:10px 14px;font-size:15pt;line-height:1.65;margin-bottom:8px;text-align:center">본인은 중앙회 「교육훈련규정 시행세칙」 제6조제3항(귀원시간)을 준수하겠으며<br>외출·외박 기간 동안의 사고 및 질병·부상·기타 재해에 대하여 중앙회에 이의를<br>제기하지 않을 것임을 확약합니다.</div>
