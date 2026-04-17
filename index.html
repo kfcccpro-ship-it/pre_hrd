@@ -978,6 +978,23 @@ textarea.finput{resize:vertical;min-height:72px}
         </div>
       </div>
       <div style="height:14px"></div>
+
+      <!-- ★ 1,2세미나실 전용 경로 사진 -->
+      <div class="asec" style="background:linear-gradient(180deg,#fff8e8 0%,#fffdf5 100%);border:1.5px solid #ffe0a0">
+        <h3>🏛️ 1,2세미나실 전용 경로 사진</h3>
+        <p>1세미나실 또는 2세미나실이 배정된 과정에만 표시됩니다.</p>
+        <div style="font-size:13px;font-weight:800;color:var(--text-2);margin-bottom:8px">자차 경로 사진 (최대 4장)</div>
+        <div class="photo-grid" id="seminar-car-photo-grid"></div>
+        <input type="file" id="seminar-car-photo-inp" accept="image/*" multiple style="display:none" onchange="handleSeminarPhotos('car',this)">
+        <button class="btnsave" style="margin-top:8px;background:var(--warning);box-shadow:none" onclick="document.getElementById('seminar-car-photo-inp').click()">📷 자차 사진 업로드</button>
+        <div style="height:14px"></div>
+        <div style="font-size:13px;font-weight:800;color:var(--text-2);margin-bottom:8px">대중교통 경로 사진 (최대 5장)</div>
+        <div class="photo-grid" id="seminar-bus-photo-grid"></div>
+        <input type="file" id="seminar-bus-photo-inp" accept="image/*" multiple style="display:none" onchange="handleSeminarPhotos('bus',this)">
+        <button class="btnsave" style="margin-top:8px;background:var(--warning);box-shadow:none" onclick="document.getElementById('seminar-bus-photo-inp').click()">📷 대중교통 사진 업로드</button>
+      </div>
+
+      <div style="height:14px"></div>
       <div class="stedit-wrap">
         <div class="stedit-head">
           <div class="stedit-title">대중교통 이동 경로</div>
@@ -1064,6 +1081,36 @@ const DEFAULT_BUS_DESC = [
   {emoji:'🏢',title:'건물 방향 진입',     desc:'횡단보도 건넌 후 왼쪽으로 이동하면\nMG인재개발원 건물이 보입니다.',          bg1:'#4E5968',bg2:'#3A4756'},
   {emoji:'🚪',title:'건물 정문 입장',     desc:'본관 정문(자동문)으로 입장합니다.\n교육 참가 명찰을 착용해 주세요.',          bg1:'#3182F6',bg2:'#1B64DA'},
 ];
+
+// ═══════════════════════════════
+// 1,2세미나실 전용 경로 단계
+// ═══════════════════════════════
+const SEMINAR_CAR_DESC = [
+  {emoji:'🚗', title:'본관',         desc:'주차장에서 하차 후\n본관 1층 진입', bg1:'#3182F6', bg2:'#1B64DA'},
+  {emoji:'🚶', title:'엘리베이터',   desc:'진입후 우측\n엘리베이터 탑승',    bg1:'#5B8DEF', bg2:'#3C74E8'},
+  {emoji:'🚶', title:'엘리베이터 탑승', desc:'2층 선택',                      bg1:'#4E5968', bg2:'#3A4756'},
+  {emoji:'🏛️', title:'2층 하차',     desc:'2층 하차후 정면 계단 방향 이동\n1,2세미나실', bg1:'#03B26C', bg2:'#02995B'},
+];
+const SEMINAR_BUS_DESC = [
+  {emoji:'🚌', title:'식당 옆 입구', desc:'버스 하차후\n식당 옆 입구 진입',      bg1:'#5368FF', bg2:'#4054D8'},
+  {emoji:'🚶', title:'진입 후 이동', desc:'진입 후 좌측 이동\n매점 방향',        bg1:'#667085', bg2:'#4E5968'},
+  {emoji:'🚶', title:'계단 이동',    desc:'매점방향 계단 쪽\n진입 및 이동',      bg1:'#5B8DEF', bg2:'#3182F6'},
+  {emoji:'🏢', title:'직진 이동',    desc:'20m 내외 직진 이동\n1,2세미나실',    bg1:'#4E5968', bg2:'#3A4756'},
+  {emoji:'🚪', title:'도착',         desc:'2세미나실 - 1세미나실 도착',           bg1:'#03B26C', bg2:'#02995B'},
+];
+
+// 세미나실 사진 캐시 (자차 4장, 대중교통 5장)
+let SEMINAR_PHOTO_CACHE = {car: Array(4).fill(null), bus: Array(5).fill(null)};
+
+// 세미나실 강의실 판별 함수
+function isSeminarRoom(roomId){
+  return String(roomId||'').includes('세미나실');
+}
+
+// 세미나실 전용 단계 반환
+function getSeminarStepDesc(type){ return type==='car' ? SEMINAR_CAR_DESC : SEMINAR_BUS_DESC; }
+function getSeminarPhotoUrl_(slot){ return slot ? (typeof slot==='string' ? slot : (slot.url||null)) : null; }
+function getSeminarPhotoFileId_(slot){ return (slot && typeof slot==='object') ? (slot.fileId||null) : null; }
 
 // ═══════════════════════════════
 // FIREBASE STORAGE 연동
@@ -1513,8 +1560,21 @@ function openTransportScreen(){
 }
 function pickTransport(type){
   if(!ST.course){ toast('과정을 먼저 선택해 주세요'); return; }
-  ST.transport = type; applyGuideFont(type); const cache = PHOTO_CACHE[type]; const desc = getStepDesc(type); const count = Math.max(cache.filter(Boolean).length, desc.length, 1); ST.steps = [];
-  for(let i=0;i<count;i++){ const d = desc[i] || {emoji:'📸',title:`${i+1}단계`,desc:'다음 안내를 따라 이동하세요.',bg1:'#3182F6',bg2:'#1B64DA'}; ST.steps.push({...d, photoUrl: getPhotoUrl_(cache[i]) || null}); }
+  ST.transport = type;
+  applyGuideFont(type);
+
+  // ★ 세미나실이면 전용 경로, 아니면 기존 경로
+  const isSeminar = isSeminarRoom(ST.roomId);
+  const desc  = isSeminar ? getSeminarStepDesc(type) : getStepDesc(type);
+  const cache = isSeminar ? SEMINAR_PHOTO_CACHE[type] : PHOTO_CACHE[type];
+
+  const count = Math.max((cache||[]).filter(Boolean).length, desc.length, 1);
+  ST.steps = [];
+  for(let i=0;i<count;i++){
+    const d = desc[i] || {emoji:'📸',title:`${i+1}단계`,desc:'다음 안내를 따라 이동하세요.',bg1:'#3182F6',bg2:'#1B64DA'};
+    const photoUrl = isSeminar ? (getSeminarPhotoUrl_((cache||[])[i]) || null) : (getPhotoUrl_((cache||[])[i]) || null);
+    ST.steps.push({...d, photoUrl});
+  }
   ST.step = 0; goTo('guide');
 }
 function closeGuide(){ history.back(); }
@@ -1596,6 +1656,28 @@ async function savePhotoCache(){
   }catch(e){}
 }
 
+// ★ 세미나실 전용 사진 로드/저장
+async function loadSeminarPhotos(){
+  if(!GAS_READY) return;
+  try{
+    const res  = await fetch(GAS_URL+'?action=getAppData&key=app_seminar_photos');
+    const json = await res.json();
+    if(json.ok && json.data){
+      if(Array.isArray(json.data.car)) SEMINAR_PHOTO_CACHE.car = json.data.car;
+      if(Array.isArray(json.data.bus)) SEMINAR_PHOTO_CACHE.bus = json.data.bus;
+    }
+  }catch(e){}
+}
+async function saveSeminarPhotoCache(){
+  if(!GAS_READY) return;
+  try{
+    await fetch(GAS_URL, {
+      method:'POST',
+      body: JSON.stringify({action:'saveAppData', key:'app_seminar_photos', data:SEMINAR_PHOTO_CACHE})
+    });
+  }catch(e){}
+}
+
 async function handlePhotos(type, inp){
   const files = Array.from(inp.files||[]); if(!files.length) return;
   const cache = PHOTO_CACHE[type]; const emptySlots=[];
@@ -1650,6 +1732,70 @@ async function confirmDelPhoto(type, idx){
   await savePhotoCache(); renderPhotoGrid(type); toast('삭제되었습니다');
 }
 
+// ★ 세미나실 사진 그리드 렌더링
+function renderSeminarPhotoGrid(type){
+  const maxSlots = type==='car' ? 4 : 5;
+  const cache = SEMINAR_PHOTO_CACHE[type];
+  const grid  = document.getElementById('seminar-'+type+'-photo-grid');
+  if(!grid) return;
+  let html = '';
+  for(let i=0;i<maxSlots;i++){
+    const url = getSeminarPhotoUrl_(cache[i]);
+    if(url){
+      html += `<div class="photo-slot" id="sps-${type}-${i}"><img src="${url}" alt="세미나실사진${i+1}" style="width:100%;height:100%;object-fit:cover;display:block"><button class="del-photo" onclick="deleteSeminarPhoto('${type}',${i})">✕</button></div>`;
+    } else {
+      html += `<div class="photo-slot" id="sps-${type}-${i}"><div class="slot-num"><span>📷</span>${i+1}번</div></div>`;
+    }
+  }
+  grid.innerHTML = html;
+}
+
+// 세미나실 사진 업로드
+async function handleSeminarPhotos(type, inp){
+  const maxSlots = type==='car' ? 4 : 5;
+  const files = Array.from(inp.files||[]); if(!files.length) return;
+  const cache = SEMINAR_PHOTO_CACHE[type];
+  const emptySlots = [];
+  for(let i=0;i<maxSlots;i++){ if(!getSeminarPhotoUrl_(cache[i])) emptySlots.push(i); }
+  if(!emptySlots.length){ toast('⚠️ 슬롯이 꽉 찼습니다 (최대 '+maxSlots+'장)'); inp.value=''; return; }
+  if(!GAS_READY){ toast('⚠️ GAS URL이 설정되지 않아 업로드할 수 없습니다'); inp.value=''; return; }
+  const toAdd = files.slice(0, emptySlots.length);
+  toast('사진을 업로드하는 중입니다.'); let saved=0;
+  for(let j=0;j<toAdd.length;j++){
+    const idx=emptySlots[j], f=toAdd[j];
+    try{
+      const blob = await compressToBlob(f);
+      const base64 = await new Promise((res,rej)=>{
+        const reader=new FileReader();
+        reader.onload = e => res(e.target.result.split(',')[1]);
+        reader.onerror = ()=> rej(new Error('읽기 실패'));
+        reader.readAsDataURL(blob);
+      });
+      const response = await fetch(GAS_URL, {
+        method:'POST',
+        body: JSON.stringify({action:'uploadPhoto', base64, fileName:'seminar_'+type+'_'+idx+'_'+Date.now()+'.jpg', mimeType:'image/jpeg'})
+      });
+      const result = await response.json();
+      if(!result.ok) throw new Error(result.msg||'업로드 실패');
+      cache[idx] = {url: result.url, fileId: result.fileId};
+      saved++;
+    }catch(e){ toast('❌ '+f.name+' 업로드 실패: '+e.message); }
+  }
+  inp.value=''; await saveSeminarPhotoCache(); renderSeminarPhotoGrid(type);
+  if(saved>0) toast('✅ 세미나실 사진 업로드 완료!');
+}
+
+// 세미나실 사진 삭제
+async function deleteSeminarPhoto(type, idx){
+  const oldSlot = SEMINAR_PHOTO_CACHE[type][idx];
+  SEMINAR_PHOTO_CACHE[type][idx] = null;
+  const fileId = getSeminarPhotoFileId_(oldSlot);
+  if(fileId && GAS_READY){
+    try{ await fetch(GAS_URL, {method:'POST', body:JSON.stringify({action:'deletePhoto', fileId})}); }catch(e){}
+  }
+  await saveSeminarPhotoCache(); renderSeminarPhotoGrid(type); toast('삭제되었습니다');
+}
+
 function deletePhoto(type, idx){
   const grid = document.getElementById(type+'-photo-grid'); const slot = grid ? grid.querySelectorAll('.photo-slot')[idx] : null; if(!slot) return;
   const existing = slot.querySelector('.del-confirm-row'); if(existing){ existing.remove(); return; }
@@ -1676,7 +1822,7 @@ function renderAdmin(){
   document.querySelectorAll('.adm-panel').forEach(p=>p.classList.toggle('on',p.id==='ap-'+(ADM_TAB||'classroom')));
   const n=D.courses.length, ok=D.courses.filter(c=>c.room).length, ud=uniqueDates().length;
   document.getElementById('adm-stats').innerHTML=`<div class="sbox"><div class="snum">${ud}</div><div class="slbl">시작일 수</div></div><div class="sbox"><div class="snum">${n}</div><div class="slbl">전체 과정</div></div><div class="sbox"><div class="snum">${ok}</div><div class="slbl">강의실 배정</div></div>`;
-  renderPhotoGrid('car'); renderPhotoGrid('bus'); renderStepEditors(); loadServerAppConfig().then(()=>renderAdminPwSettings());
+  renderPhotoGrid('car'); renderPhotoGrid('bus'); renderSeminarPhotoGrid('car'); renderSeminarPhotoGrid('bus'); renderStepEditors(); loadServerAppConfig().then(()=>renderAdminPwSettings());
   if(!n){ document.getElementById('assign-sec').style.display='none'; return; }
   document.getElementById('assign-sec').style.display='block'; pruneCourseSel();
   document.getElementById('assign-tbody').innerHTML=D.courses.map((c,i)=>{
@@ -1894,7 +2040,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(curScreen==='week') initWeek();
   }).finally(()=>{
     // 사진은 idle 시간에 백그라운드로 로딩 (홈 화면에서는 불필요)
-    requestIdleCallback ? requestIdleCallback(()=>loadPhotos()) : setTimeout(()=>loadPhotos(), 3000);
+    requestIdleCallback ? requestIdleCallback(()=>{ loadPhotos(); loadSeminarPhotos(); }) : setTimeout(()=>{ loadPhotos(); loadSeminarPhotos(); }, 3000);
   });
 });
 
