@@ -506,6 +506,17 @@ a{text-decoration:none;color:inherit}
 .warn-box{background:#FFFBDB;border:2.5px solid #F5C400;border-radius:16px;padding:16px 18px;margin-bottom:20px;font-size:15px;font-weight:900;color:#7A5C00;line-height:1.65;text-align:center}
 .fgroup{margin-bottom:14px}.flabel{font-size:16px;font-weight:900;color:var(--text-2);margin-bottom:6px;display:block}.freq{color:var(--danger)}
 .step-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#1B64DA;color:#fff;border-radius:50%;font-size:15px;font-weight:900;margin-right:9px;flex-shrink:0;vertical-align:middle;box-shadow:0 2px 6px rgba(27,100,218,.25)}
+.bus-dest-btn{display:block;width:100%;padding:17px 14px;border-radius:16px;font-size:17px;font-weight:900;cursor:pointer;font-family:inherit;border:2.5px solid transparent;margin-bottom:10px;text-align:center;transition:all .18s;letter-spacing:-.3px}
+.bus-dest-btn.dest-a{background:#FFFBEB;border-color:#FCD34D;color:#92400E}
+.bus-dest-btn.dest-b{background:#EFF6FF;border-color:#60A5FA;color:#1E3A8A}
+.bus-dest-btn.dest-c{background:#F0FDF4;border-color:#34D399;color:#065F46}
+.bus-dest-btn.selected.dest-a{background:#FCD34D;border-color:#F59E0B;color:#78350F;box-shadow:0 4px 14px rgba(245,158,11,.35)}
+.bus-dest-btn.selected.dest-b{background:#3B82F6;border-color:#1D4ED8;color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.4)}
+.bus-dest-btn.selected.dest-c{background:#10B981;border-color:#059669;color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.35)}
+.dest-total-card{background:linear-gradient(135deg,#FEF9C3 0%,#DBEAFE 100%);border:2px solid #FCD34D;border-radius:16px;padding:16px;margin-bottom:14px}
+.dest-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#fff;border-radius:10px;margin-bottom:6px}
+.dest-row-label{font-size:14px;font-weight:800;color:#1E3A8A}
+.dest-row-cnt{font-size:19px;font-weight:900}
 .finput{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font-size:16px;background:#fff;color:var(--text);font-family:inherit;box-sizing:border-box}
 .finput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,130,246,.1)}.finput-hint{font-size:12px;color:var(--text-3);margin-top:5px;line-height:1.5}
 textarea.finput{resize:vertical;min-height:72px}
@@ -2425,6 +2436,23 @@ const SIMPLE_APP_CFG={
 function getSimpleCfg(type){ return SIMPLE_APP_CFG[type]; }
 function initSimpleHub(type){ return; }
 function showSportIntro(){ showNotice('스포츠 시설 안내','식당 지하에 있는 골프, 게임방 시설입니다.<br>운영시간은 18:00~23:00 까지 입니다.<br><br>[신청]은 단순히 이용자 수를 파악하는 것 입니다.<br><span class="note-red">실제 사용을 위한 신청은 식당 아래층에서 오프라인으로 진행하셔야 합니다.</span>','⛳',true); }
+var BUS_SELECTED_DEST = '';
+var BUS_DEST_OPTS = [
+  {id:'busf-dest-a', val:'천안버스터미널'},
+  {id:'busf-dest-b', val:'천안역'},
+  {id:'busf-dest-c', val:'천안아산역'}
+];
+function selectBusDest(val){
+  BUS_SELECTED_DEST = val;
+  BUS_DEST_OPTS.forEach(o=>{
+    const btn=document.getElementById(o.id);
+    if(btn) btn.classList.toggle('selected', o.val===val);
+  });
+}
+function resetBusDestSel(){
+  BUS_SELECTED_DEST='';
+  BUS_DEST_OPTS.forEach(o=>{const btn=document.getElementById(o.id);if(btn)btn.classList.remove('selected');});
+}
 function initSimpleApply(type){
   const cfg=getSimpleCfg(type); if(!cfg) return;
   const sel=document.getElementById(`${type}-date-sel`); if(!sel) return;
@@ -2435,6 +2463,7 @@ function initSimpleApply(type){
   document.getElementById(`${type}-apply-wrap`).style.display='block';
   document.getElementById(`${type}-complete-wrap`).style.display='none';
   [cfg.bankInput,cfg.nameInput,cfg.phoneInput,cfg.courseInput].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  if(type==='bus') resetBusDestSel();
   if(type==='sport') showSportIntro();
   if(SIMPLE_SELECTED_DATE[type]) setTimeout(()=>onSimpleDateSel(type, sel),0);
 }
@@ -2456,8 +2485,9 @@ function submitSimpleApp(type){
   const phone=document.getElementById(cfg.phoneInput).value.trim();
   if(!course||!bankPfx||!name||!phone){toast('⚠️ 모든 항목을 입력해 주세요');return;}
   const digits=phone.replace(/\D/g,''); if(digits.length<8){toast('⚠️ 연락처를 올바르게 입력해 주세요');return;}
+  if(type==='bus' && !BUS_SELECTED_DEST){toast('⚠️ 하차 정류장을 선택해 주세요');return;}
   const bank=bankPfx+'새마을금고'; const code=digits.slice(-4);
-  const payload={course,startDate:(SIMPLE_SELECTED_DATE[type]||document.getElementById(`${type}-date-sel`)?.value||inferStartDateByCourse(course)||''),bank,name,phone,code,status:'active',createdAt:new Date().toISOString(),cancelledAt:''};
+  const payload={course,startDate:(SIMPLE_SELECTED_DATE[type]||document.getElementById(`${type}-date-sel`)?.value||inferStartDateByCourse(course)||''),bank,name,phone,code,status:'active',createdAt:new Date().toISOString(),cancelledAt:'',busDest:type==='bus'?BUS_SELECTED_DEST:''};
   if(type==='bus') lsAddBus(payload); else if(type==='lesson') lsAddLesson(payload); else lsAddSport(payload);
   if(GAS_READY) fetch(GAS_URL,{method:'POST',body:JSON.stringify({...payload,action:cfg.addAction})}).catch(()=>{});
   const codeEl=document.getElementById(cfg.completeCode); if(codeEl) codeEl.textContent=code;
@@ -2479,6 +2509,7 @@ function renderSimpleCheckResult(type,data){
     <div class="binfo-row"><span class="binfo-lbl">금고명</span><span class="binfo-val">${esc(d.bank||'-')}</span></div>
     <div class="binfo-row"><span class="binfo-lbl">성명</span><span class="binfo-val">${esc(d.name||'-')}</span></div>
     <div class="binfo-row"><span class="binfo-lbl">연락처</span><span class="binfo-val">${esc(d.phone||'-')}</span></div>
+    ${d.busDest?`<div class="binfo-row"><span class="binfo-lbl">하차 정류장</span><span class="binfo-val" style="font-weight:900;color:#1D4ED8;font-size:15px">${esc(d.busDest)}</span></div>`:''}
     <div class="binfo-row"><span class="binfo-lbl">상태</span><span class="binfo-val">${d.status==='cancelled'?'취소됨':'신청완료'}</span></div>
     ${d.cancelledAt?`<div class="binfo-row"><span class="binfo-lbl">취소시각</span><span class="binfo-val">${esc(String(d.cancelledAt).slice(0,16).replace('T',' '))}</span></div>`:''}
     ${d.status!=='cancelled'?`<button type="button" class="btnsave" style="margin-top:12px;background:var(--danger)" onclick="return cancelSimpleApp(${jsa(type)},${jsa(d.rowIdx||'')})">신청 취소</button>`:''}
@@ -2519,9 +2550,35 @@ function renderSimpleAdminData(type,data,statsId,listId){
   const cancelCnt=rows.filter(d=>d.status==='cancelled').length;
   st.innerHTML=`<div class="stat-card"><div class="stat-num">${rows.length}</div><div class="stat-lbl">총 신청</div></div><div class="stat-card"><div class="stat-num">${activeCnt}</div><div class="stat-lbl">유효 신청</div></div><div class="stat-card"><div class="stat-num">${cancelCnt}</div><div class="stat-lbl">취소</div></div>`;
   if(!rows.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
-  const summary=`<div class="binfo-box"><div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">과정별 신청 소계</div>${courseEntries.map(([course,ms])=>`<div class="binfo-row"><span class="binfo-lbl">${esc(course)}</span><span class="binfo-val">${ms.length}명</span></div>`).join('')}</div>`;
-  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="var body=this.nextElementSibling;body.classList.toggle('on');this.querySelector('.bgroup-arr').style.transform=body.classList.contains('on')?'rotate(180deg)':'rotate(0deg)'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 · 탭하여 신청내역 보기</div></div><span class="bgroup-arr" style="transition:transform .2s">▼</span></div><div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div><div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(${jsa(type)},${jsa(m.rowIdx||'')},${jsa(m.createdAt||'')},${jsa(m.name||'')},${jsa(m.phone||'')},${jsa(normalizeBusCode(m.code)||'')})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
-  el.innerHTML=summary+groups;
+
+  // ── 버스 전용: 목적지별 통계 ──────────────────────────────
+  var destSummaryHtml = '';
+  if(type==='bus'){
+    const DESTS=[{val:'천안버스터미널',icon:'🚌',color:'#D97706',border:'#F59E0B',lborder:'#F59E0B'},{val:'천안역',icon:'🚄',color:'#1D4ED8',border:'#3B82F6',lborder:'#3B82F6'},{val:'천안아산역',icon:'🚅',color:'#059669',border:'#10B981',lborder:'#10B981'}];
+    const activeRows=rows.filter(d=>d.status!=='cancelled');
+    const totalDest={};
+    DESTS.forEach(d=>totalDest[d.val]=0);
+    activeRows.forEach(r=>{if(r.busDest&&totalDest[r.busDest]!==undefined)totalDest[r.busDest]++;});
+    destSummaryHtml=`<div class="dest-total-card">
+      <div style="font-size:15px;font-weight:900;color:#1E3A8A;margin-bottom:12px">🚌 전체 하차 정류장별 인원 (유효 신청 기준)</div>
+      ${DESTS.map(d=>`<div class="dest-row" style="border-left:5px solid ${d.lborder}">
+        <span class="dest-row-label">${d.icon} ${d.val}</span>
+        <span class="dest-row-cnt" style="color:${d.color}">${totalDest[d.val]}명</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  const summary=`<div class="binfo-box"><div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">과정별 신청 소계</div>${courseEntries.map(([course,ms])=>{
+    if(type!=='bus') return `<div class="binfo-row"><span class="binfo-lbl">${esc(course)}</span><span class="binfo-val">${ms.length}명</span></div>`;
+    const DESTS=['천안버스터미널','천안역','천안아산역'];
+    const icons={'천안버스터미널':'🚌','천안역':'🚄','천안아산역':'🚅'};
+    const dc={};DESTS.forEach(d=>dc[d]=0);
+    ms.filter(m=>m.status!=='cancelled').forEach(m=>{if(m.busDest&&dc[m.busDest]!==undefined)dc[m.busDest]++;});
+    const destLine=DESTS.filter(d=>dc[d]>0).map(d=>`${icons[d]}${d} ${dc[d]}명`).join(' · ');
+    return `<div class="binfo-row" style="flex-direction:column;align-items:flex-start;gap:3px"><span class="binfo-lbl" style="font-size:14px">${esc(course)} · ${ms.length}명</span>${destLine?`<span style="font-size:12px;color:var(--primary);font-weight:700">${destLine}</span>`:''}</div>`;
+  }).join('')}</div>`;
+  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="var body=this.nextElementSibling;body.classList.toggle('on');this.querySelector('.bgroup-arr').style.transform=body.classList.contains('on')?'rotate(180deg)':'rotate(0deg)'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 · 탭하여 신청내역 보기</div></div><span class="bgroup-arr" style="transition:transform .2s">▼</span></div><div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div>${m.busDest?`<div class="bmem-info" style="color:#1D4ED8;font-weight:800">🚏 ${esc(m.busDest)}</div>`:''}<div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(${jsa(type)},${jsa(m.rowIdx||'')},${jsa(m.createdAt||'')},${jsa(m.name||'')},${jsa(m.phone||'')},${jsa(normalizeBusCode(m.code)||'')})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
+  el.innerHTML=destSummaryHtml+summary+groups;
 }
 function loadSimpleAdmin(type,statsId,listId,skipRemote){
   const cfg=getSimpleCfg(type);
@@ -2906,6 +2963,12 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
           <div class="finput-hint">앞부분만 입력 · 예) <b>강남</b>새마을금고 → "강남" 입력</div></div>
         <div class="fgroup"><label class="flabel"><span class="step-num">3</span>성명 <span class="freq">*</span></label><input id="busf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
         <div class="fgroup"><label class="flabel"><span class="step-num">4</span>연락처 <span class="freq">*</span></label><input id="busf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
+        <div class="fgroup" id="busf-dest-group">
+          <label class="flabel"><span class="step-num">5</span>하차 정류장 <span class="freq">*</span></label>
+          <button type="button" class="bus-dest-btn dest-a" id="busf-dest-a" onclick="selectBusDest('천안버스터미널')">🚌 천안버스터미널</button>
+          <button type="button" class="bus-dest-btn dest-b" id="busf-dest-b" onclick="selectBusDest('천안역')">🚄 천안역</button>
+          <button type="button" class="bus-dest-btn dest-c" id="busf-dest-c" onclick="selectBusDest('천안아산역')">🚅 천안아산역</button>
+        </div>
         <button class="btnsave" onclick="submitBus()">신청하기</button>
       </div>
     </div>
