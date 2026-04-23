@@ -1389,7 +1389,7 @@ function populateWeekSelect(sel, selected){ if(!sel) return; const current=selec
 function inferStartDateByCourse(course){ const vals=[...new Set(D.courses.filter(c=>String(c.courseName||'')===String(course||'')).map(c=>c.startDate).filter(Boolean))]; return vals.length===1?vals[0]:''; }
 function getRowStartDate(row){ return row && (row.startDate || inferStartDateByCourse(row.course) || ''); }
 function filterByWeek(rows, week){ if(!week) return Array.isArray(rows)?rows:[]; return (Array.isArray(rows)?rows:[]).filter(r=>getRowStartDate(r)===week); }
-function syncAdminWeekSelectors(){ const def=getDefaultWeekValue(); if(!OE_ADM_WEEK) OE_ADM_WEEK=def; ['oe-adm-date-sel','adm-oe-date-sel','bus-adm-date-sel','adm-bus-date-sel','lesson-adm-date-sel','adm-lesson-date-sel','sport-adm-date-sel','adm-sport-date-sel'].forEach(id=>{ const sel=document.getElementById(id); const key=id.includes('oe')?'oe':(id.includes('lesson')?'lesson':'bus'); const selected=(key==='oe'?OE_ADM_WEEK:SIMPLE_ADM_WEEK[key]||def); ifpopulateWeekSelect(sel, selected); }); }
+function syncAdminWeekSelectors(){ const def=getDefaultWeekValue(); if(!OE_ADM_WEEK) OE_ADM_WEEK=def; ['oe-adm-date-sel','adm-oe-date-sel','bus-adm-date-sel','adm-bus-date-sel','lesson-adm-date-sel','adm-lesson-date-sel'].forEach(id=>{ const sel=document.getElementById(id); const key=id.includes('oe')?'oe':(id.includes('lesson')?'lesson':'bus'); const selected=(key==='oe'?OE_ADM_WEEK:SIMPLE_ADM_WEEK[key]||def); if(!SIMPLE_ADM_WEEK[key]&&key!=='oe') SIMPLE_ADM_WEEK[key]=def; populateWeekSelect(sel, selected); }); }
 function onAdminWeekChange(type, sel){ if(type==='oe'){ OE_ADM_WEEK=sel.value; syncAdminWeekSelectors(); OE_ADM_FILTER=OE_ADM_FILTER||'all'; const local=filterByWeek(filterOEData(lsGetOE('all'), OE_ADM_FILTER), OE_ADM_WEEK); oeAdmRender(local); admRenderOE(local); if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter='+OE_ADM_FILTER).then(r=>r.json()).then(res=>{ if(res.data){ const rows=filterByWeek(res.data, OE_ADM_WEEK); oeAdmRender(rows); admRenderOE(rows); } }).catch(()=>{}); } else { SIMPLE_ADM_WEEK[type]=sel.value; syncAdminWeekSelectors(); loadSimpleAdmin(type); } if(sel) sel.classList.toggle('ok', !!sel.value); }
 
 function initWeek(){
@@ -2349,7 +2349,7 @@ function submitSimpleApp(type){
   if(type==='bus' && !BUS_SELECTED_DEST){toast('⚠️ 하차 정류장을 선택해 주세요');return;}
   const bank=bankPfx+'새마을금고'; const code=digits.slice(-4);
   const payload={course,startDate:(SIMPLE_SELECTED_DATE[type]||document.getElementById(`${type}-date-sel`)?.value||inferStartDateByCourse(course)||''),bank,name,phone,code,status:'active',createdAt:new Date().toISOString(),cancelledAt:'',busDest:type==='bus'?BUS_SELECTED_DEST:''};
-  if(type==='bus') lsAddBus(payload); else if(type==='lesson') lsAddLesson(payload); else lsAddSport(payload);
+  if(type==='bus') lsAddBus(payload); else if(type==='lesson') lsAddLesson(payload);
   if(GAS_READY) fetch(GAS_URL,{method:'POST',body:JSON.stringify({...payload,action:cfg.addAction})}).catch(()=>{});
   const codeEl=document.getElementById(cfg.completeCode); if(codeEl) codeEl.textContent=code;
   document.getElementById(`${type}-apply-wrap`).style.display='none';
