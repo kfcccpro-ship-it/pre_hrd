@@ -506,10 +506,10 @@ a{text-decoration:none;color:inherit}
 .warn-box{background:#FFFBDB;border:2.5px solid #F5C400;border-radius:16px;padding:16px 18px;margin-bottom:20px;font-size:15px;font-weight:900;color:#7A5C00;line-height:1.65;text-align:center}
 .fgroup{margin-bottom:14px}.flabel{font-size:16px;font-weight:900;color:var(--text-2);margin-bottom:6px;display:block}.freq{color:var(--danger)}
 .step-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#1B64DA;color:#fff;border-radius:50%;font-size:15px;font-weight:900;margin-right:9px;flex-shrink:0;vertical-align:middle;box-shadow:0 2px 6px rgba(27,100,218,.25)}
-.bus-dest-btn{display:block;width:100%;padding:17px 14px;border-radius:16px;font-size:17px;font-weight:900;cursor:pointer;font-family:inherit;border:2.5px solid transparent;margin-bottom:10px;text-align:center;transition:all .18s;letter-spacing:-.3px}
-.bus-dest-btn.dest-a{background:#FFFBEB;border-color:#FCD34D;color:#92400E}
-.bus-dest-btn.dest-b{background:#EFF6FF;border-color:#60A5FA;color:#1E3A8A}
-.bus-dest-btn.dest-c{background:#F0FDF4;border-color:#34D399;color:#065F46}
+.bus-dest-btn{display:block;width:100%;padding:17px 14px;border-radius:16px;font-size:17px;font-weight:900;cursor:pointer;font-family:inherit;border:2.5px solid #D1D5DB;margin-bottom:10px;text-align:center;transition:all .18s;letter-spacing:-.3px;background:#F9FAFB;color:#9CA3AF}
+.bus-dest-btn.dest-a{background:#F9FAFB;border-color:#D1D5DB;color:#9CA3AF}
+.bus-dest-btn.dest-b{background:#F9FAFB;border-color:#D1D5DB;color:#9CA3AF}
+.bus-dest-btn.dest-c{background:#F9FAFB;border-color:#D1D5DB;color:#9CA3AF}
 .bus-dest-btn.selected.dest-a{background:#FCD34D;border-color:#F59E0B;color:#78350F;box-shadow:0 4px 14px rgba(245,158,11,.35)}
 .bus-dest-btn.selected.dest-b{background:#3B82F6;border-color:#1D4ED8;color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.4)}
 .bus-dest-btn.selected.dest-c{background:#10B981;border-color:#059669;color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.35)}
@@ -804,7 +804,7 @@ textarea.finput{resize:vertical;min-height:72px}
         <button class="home-extra-btn" onclick="goTo('outexit')"><span aria-hidden="true">🚶</span><span>외출 및 외박<br>신청</span></button>
         <button class="home-extra-btn" onclick="goTo('bus')"><span aria-hidden="true">🚌</span><span>귀가 버스<br>신청·확인</span></button>
         <button class="home-extra-btn" onclick="goTo('lesson')"><span aria-hidden="true">🏸</span><span>배드민턴 레슨<br>신청·확인</span></button>
-        <button class="home-extra-btn" onclick="goTo('sport')"><span aria-hidden="true">⛳🎮</span><span>스포츠 시설<br>신청·확인</span></button>
+        
       </div>
 
     </div>
@@ -914,7 +914,7 @@ textarea.finput{resize:vertical;min-height:72px}
       <button class="adm-tab" data-tab="outexit" onclick="admTab('outexit')">🚶 외출·외박</button>
       <button class="adm-tab" data-tab="bus" onclick="admTab('bus')">🚌 귀가버스</button>
       <button class="adm-tab" data-tab="lesson" onclick="admTab('lesson')">🏸 배드민턴</button>
-      <button class="adm-tab" data-tab="sport" onclick="admTab('sport')">⛳🎮 스포츠시설</button>
+      
     </div>
     <div class="adm-panel on" id="ap-classroom">
     <div class="statsrow" id="adm-stats"></div>
@@ -929,143 +929,7 @@ textarea.finput{resize:vertical;min-height:72px}
     <div class="asec">
       <h3>관리자 메일 수신 주소 설정</h3>
       <p>외출·외박 신청서를 받을 관리자 메일 주소를 직접 추가·수정할 수 있습니다.<br>여러 주소를 등록하면 동시에 발송됩니다.</p>
-      <div id="mail-recipient-list"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-        <button class="btnmini" onclick="addMailRecipientField()">➕ 주소 추가</button>
-        <button class="btnsave" style="margin-top:0" onclick="saveMailRecipientSettings()">메일 주소 저장</button>
-      </div>
-    </div>
-
-    <div class="asec">
-      <h3>강의실별 개별 경로 준비</h3>
-      <p>1세미나실, 2세미나실 전용 경로를 내일부터 추가할 수 있도록 준비 슬롯을 만들어 두었습니다.<br>현재는 <strong>미적용 준비 상태</strong>이며, 사진과 설명을 추가한 뒤 활성화하면 적용할 수 있도록 설계했습니다.</p>
-      <div id="room-route-prep" class="stedit-grid"></div>
-    </div>
-
-    <div class="asec">
-      <h3>① CSV 파일 업로드</h3>
-      <p>엑셀을 <strong>CSV로 저장</strong>한 후 업로드하세요.<br>형식: <code>월,교육시작일,과목명</code></p>
-      <div class="csvex">월,교육시작일,과목명
-3월,3.16(월),여신기본(L) 1차</div>
-      <div class="uarea" id="uarea" onclick="document.getElementById('csv-inp').click()">
-        <input type="file" id="csv-inp" accept=".csv,.txt" style="display:none" onchange="handleCSV(this)">
-        <div class="uicon" id="uicon">📂</div>
-        <div class="utxt" id="utxt">CSV 파일을 선택하세요</div>
-        <div class="usub" id="usub">클릭하여 파일 선택</div>
-      </div>
-    </div>
-
-    <div class="asec">
-      <h3>② 이동경로 사진 업로드</h3>
-      <p>자차/버스 경로 사진을 각각 최대 10장 업로드하세요.<br>모든 과정에 공통으로 사용됩니다.</p>
-      <div style="margin-bottom:16px">
-        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px">자차 경로 사진 (최대 10장)</div>
-        <div class="photo-grid" id="car-photo-grid"></div>
-        <input type="file" id="car-photo-inp" accept="image/*" multiple style="display:none" onchange="handlePhotos('car',this)">
-        <button onclick="document.getElementById('car-photo-inp').click()" style="width:100%;background:var(--primary-weak);color:var(--primary);border:1px solid #cfe0ff;border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">자차 사진 추가</button>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px">대중교통 경로 사진 (최대 10장)</div>
-        <div class="photo-grid" id="bus-photo-grid"></div>
-        <input type="file" id="bus-photo-inp" accept="image/*" multiple style="display:none" onchange="handlePhotos('bus',this)">
-        <button onclick="document.getElementById('bus-photo-inp').click()" style="width:100%;background:#EFF2FF;color:#5368FF;border:1px solid #d8ddff;border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">대중교통 사진 추가</button>
-      </div>
-    </div>
-
-    <div class="asec">
-      <h3>③ 이동경로 STEP 설명 편집</h3>
-      <div class="stedit-wrap">
-        <div class="stedit-head">
-          <div class="stedit-title">자차 이동 경로</div>
-          <div class="fontctl">
-            <span class="fontlbl">폰트</span>
-            <input type="range" min="12" max="22" step="1" id="car-font" oninput="onFontSlider('car',this.value)">
-            <span class="fontval" id="car-font-val">14px</span>
-          </div>
-        </div>
-        <div id="car-step-editor" class="stedit-grid"></div>
-        <div class="stedit-actions">
-          <button class="btnmini" onclick="addStep('car')">➕ 추가</button>
-          <button class="btnmini" onclick="removeStep('car')">➖ 제거</button>
-          <button class="btnmini" onclick="resetSteps('car')">↩︎ 기본값</button>
-          <button class="btnsave" style="margin-top:0" onclick="saveSteps('car')">저장</button>
-        </div>
-      </div>
-      <div style="height:14px"></div>
-
-      <!-- ★ 1,2세미나실 전용 경로 사진 -->
-      <div class="asec" style="background:linear-gradient(180deg,#fff8e8 0%,#fffdf5 100%);border:1.5px solid #ffe0a0">
-        <h3>🏛️ 1,2세미나실 전용 경로 사진</h3>
-        <p>1세미나실 또는 2세미나실이 배정된 과정에만 표시됩니다.</p>
-        <div style="font-size:13px;font-weight:800;color:var(--text-2);margin-bottom:8px">자차 경로 사진 (최대 4장)</div>
-        <div class="photo-grid" id="seminar-car-photo-grid"></div>
-        <input type="file" id="seminar-car-photo-inp" accept="image/*" multiple style="display:none" onchange="handleSeminarPhotos('car',this)">
-        <button class="btnsave" style="margin-top:8px;background:var(--warning);box-shadow:none" onclick="document.getElementById('seminar-car-photo-inp').click()">📷 자차 사진 업로드</button>
-        <div style="height:14px"></div>
-        <div style="font-size:13px;font-weight:800;color:var(--text-2);margin-bottom:8px">대중교통 경로 사진 (최대 5장)</div>
-        <div class="photo-grid" id="seminar-bus-photo-grid"></div>
-        <input type="file" id="seminar-bus-photo-inp" accept="image/*" multiple style="display:none" onchange="handleSeminarPhotos('bus',this)">
-        <button class="btnsave" style="margin-top:8px;background:var(--warning);box-shadow:none" onclick="document.getElementById('seminar-bus-photo-inp').click()">📷 대중교통 사진 업로드</button>
-      </div>
-
-      <div style="height:14px"></div>
-      <div class="stedit-wrap">
-        <div class="stedit-head">
-          <div class="stedit-title">대중교통 이동 경로</div>
-          <div class="fontctl">
-            <span class="fontlbl">폰트</span>
-            <input type="range" min="12" max="22" step="1" id="bus-font" oninput="onFontSlider('bus',this.value)">
-            <span class="fontval" id="bus-font-val">14px</span>
-          </div>
-        </div>
-        <div id="bus-step-editor" class="stedit-grid"></div>
-        <div class="stedit-actions">
-          <button class="btnmini" onclick="addStep('bus')">➕ 추가</button>
-          <button class="btnmini" onclick="removeStep('bus')">➖ 제거</button>
-          <button class="btnmini" onclick="resetSteps('bus')">↩︎ 기본값</button>
-          <button class="btnsave" style="margin-top:0" onclick="saveSteps('bus')">저장</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="asec" id="assign-sec" style="display:none">
-      <h3>④ 강의실 배정 (수기 입력)</h3>
-      <div class="bulkbar">
-        <label class="cklbl"><input type="checkbox" id="ck-all" onchange="toggleAllCourses(this)"> 전체 선택</label>
-        <div class="selcount" id="sel-count">0개 선택</div>
-        <button class="bulkdel" id="bulk-del-btn" onclick="bulkDeleteCourses()" disabled>선택 삭제</button>
-      </div>
-      <div style="overflow-x:auto">
-        <table class="atable">
-          <thead><tr><th style="width:52px">선택</th><th>시작일</th><th>과정명</th><th>강의실</th><th></th></tr></thead>
-          <tbody id="assign-tbody"></tbody>
-        </table>
-      </div>
-      <button class="btnsave" id="save-btn" onclick="saveAll()">강의실 배정 저장</button>
-    </div>
-
-    <div style="text-align:center;padding-bottom:16px"><button onclick="resetData()" style="background:none;border:none;color:var(--danger);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit;font-weight:800">전체 데이터 초기화</button></div>
-    </div><!-- /ap-classroom -->
-    <div class="adm-panel" id="ap-outexit">
-      <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-oe-date-sel" onchange="onAdminWeekChange('oe',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div class="rfilt" id="adm-oe-filt"><button class="rfilt-btn on" onclick="admOeFilt('all',this)">전체</button><button class="rfilt-btn" onclick="admOeFilt('pending',this)">외출중</button><button class="rfilt-btn" onclick="admOeFilt('returned',this)">복귀완료</button></div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('oe')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-oe-stats"></div>
-      <div id="adm-oe-list"><div style="text-align:center;padding:24px;color:var(--text-3)">탭 선택 후 불러옵니다</div></div>
-    </div>
-    <div class="adm-panel" id="ap-bus">
-      <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-bus-date-sel" onchange="onAdminWeekChange('bus',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('bus')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-bus-stats"></div>
-      <div id="adm-bus-list"><div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div></div>
-    </div>
-    <div class="adm-panel" id="ap-lesson">
-      <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-lesson-date-sel" onchange="onAdminWeekChange('lesson',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('lesson')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-lesson-stats"></div>
-      <div id="adm-lesson-list"><div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div></div>
-    </div>
-    <div class="adm-panel" id="ap-sport">
-      <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="adm-sport-date-sel" onchange="onAdminWeekChange('sport',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin:-4px 0 12px"><button class="btnmini" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74" onclick="adminResetCategory('sport')">🧹 현재 신청 초기화</button></div><div class="stat-row" id="adm-sport-stats"></div>
-      <div id="adm-sport-list"><div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div></div>
+      <div id="mail-recipient-list"></div></div>
     </div>
   </div>
 </div>
@@ -1089,11 +953,13 @@ const DEFAULT_CAR_DESC = [
   {emoji:'🏛️',title:'목적지 인근 안내',   desc:'이제 목적지 인근입니다.\n주변 표지판을 확인하고 여유 있게 입실해 주세요.',bg1:'#03B26C',bg2:'#02995B'},
 ];
 const DEFAULT_BUS_DESC = [
-  {emoji:'🚌',title:'버스 하차',           desc:'MG인재개발원 앞 정류장에서 하차합니다.\n하차 후 진행 방향을 확인하세요.',  bg1:'#5368FF',bg2:'#4054D8'},
-  {emoji:'🚶',title:'정류장에서 도보',    desc:'정류장에서 오른쪽 방향으로\n약 100m 직진합니다.',                            bg1:'#667085',bg2:'#4E5968'},
-  {emoji:'🌉',title:'횡단보도 건너기',    desc:'신호등 횡단보도를 건넙니다.\n신호를 반드시 확인하고 건너세요.',               bg1:'#5B8DEF',bg2:'#3182F6'},
-  {emoji:'🏢',title:'건물 방향 진입',     desc:'횡단보도 건넌 후 왼쪽으로 이동하면\nMG인재개발원 건물이 보입니다.',          bg1:'#4E5968',bg2:'#3A4756'},
-  {emoji:'🚪',title:'건물 정문 입장',     desc:'본관 정문(자동문)으로 입장합니다.\n교육 참가 명찰을 착용해 주세요.',          bg1:'#3182F6',bg2:'#1B64DA'},
+  {emoji:'🚌',title:'버스 하차',             desc:'식당 근처 버스 하차장에서\n하차한후 북쪽방향으로 이동합니다.',       bg1:'#5368FF',bg2:'#4054D8'},
+  {emoji:'🚶',title:'버스 하차장 북쪽 이동', desc:'하차후 북쪽으로 20m 이동합니다.\n연수관 안내 팻말을 확인합니다.',   bg1:'#667085',bg2:'#4E5968'},
+  {emoji:'🌉',title:'건물 입구 확인',        desc:'건물사이의 통로\n연수관 입구를 확인합니다.',                       bg1:'#5B8DEF',bg2:'#3182F6'},
+  {emoji:'🏢',title:'입구앞 종합 표지판',    desc:'입구 앞의 종합 표지판을\n확인한후 이동합니다.',                    bg1:'#4E5968',bg2:'#3A4756'},
+  {emoji:'🚪',title:'건물 진입',            desc:'건물 진입후 벽면, 기둥 등\n안내 표지판에 따라 해당 강의장\n이동합니다.',bg1:'#3182F6',bg2:'#1B64DA'},
+  {emoji:'🚪',title:'강의실 이동',          desc:'진입후 건물 각층에 배정된\n강의실로 이동합니다.',                  bg1:'#5368FF',bg2:'#4054D8'},
+  {emoji:'🏛️',title:'도착',               desc:'배정된 강의실에 도착했습니다.\n입실 후 안내에 따라 착석하세요.',    bg1:'#03B26C',bg2:'#02995B'},
 ];
 
 // ═══════════════════════════════
@@ -1116,9 +982,11 @@ const SEMINAR_BUS_DESC = [
 // 세미나실 사진 캐시 (자차 4장, 대중교통 5장)
 let SEMINAR_PHOTO_CACHE = {car: Array(4).fill(null), bus: Array(5).fill(null)};
 
-// 세미나실 강의실 판별 함수
+// 강의실 경로 분기 판별
+// '세미나관' 키워드 → 세미나실 전용 경로
+// '연수관' 키워드 → 기존 전통 경로
 function isSeminarRoom(roomId){
-  return String(roomId||'').includes('세미나실');
+  return String(roomId||'').includes('세미나관');
 }
 
 // 세미나실 전용 단계 반환
@@ -1133,7 +1001,7 @@ let D  = {courses:[]};
 const STEP_MAX = 10;
 let STEP_CFG = {
   car: { steps: DEFAULT_CAR_DESC.map(s=>({...s})), font: 14 },
-  bus: { steps: DEFAULT_BUS_DESC.map(s=>({...s})), font: 14 },
+  bus: { steps: DEFAULT_BUS_DESC.map(s=>({...s})), font: 14 }
 };
 
 function clampInt(v, lo, hi, d){ v = parseInt(v, 10); if(Number.isNaN(v)) v = d; return Math.max(lo, Math.min(hi, v)); }
@@ -1279,7 +1147,7 @@ function getAllowedPwForDest(dest){
   const s=getAppSettings();
   const master=new Set(['2026','0525']);
   if(dest==='oe-admin') return new Set([...master, String(s.oeAdminPw||'2026')]);
-  if(dest==='bus-admin' || dest==='lesson-admin' || dest==='sport-admin') return new Set([...master, String(s.busAdminPw||'2026')]);
+  if(dest==='bus-admin' || dest==='lesson-admin') return new Set([...master, String(s.busAdminPw||'2026')]);
   return master;
 }
 function syncPwInput(){ const inp=document.getElementById('pw-key-input'); if(inp) inp.value=pwBuf; }
@@ -1500,9 +1368,6 @@ function goTo(name,fromBack){
   if(name==='lesson')   initSimpleHub('lesson');
   if(name==='lesson-apply') initSimpleApply('lesson');
   if(name==='lesson-admin') loadSimpleAdmin('lesson');
-  if(name==='sport')    {initSimpleHub('sport'); showSportIntro();}
-  if(name==='sport-apply') initSimpleApply('sport');
-  if(name==='sport-admin') loadSimpleAdmin('sport');
   if(name==='oe-form')   initOEForm();
   if(name==='oe-admin')  loadOEAdmin();
   const navMap={home:'bnav-home',week:'bnav-week',outexit:'bnav-outexit','outexit-type':'bnav-outexit','oe-form':'bnav-outexit','oe-complete':'bnav-outexit','oe-return':'bnav-outexit','oe-admin':'bnav-outexit',bus:'bnav-bus','bus-apply':'bnav-bus','bus-check':'bnav-bus','bus-admin':'bnav-bus'};
@@ -1515,8 +1380,8 @@ const ADMIN_ICON_SRC = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22htt
 let OE_SELECTED_DATE='';
 let OE_ADM_WEEK='';
 let OE_ADM_FILTER='all';
-const SIMPLE_SELECTED_DATE={bus:'',lesson:'',sport:''};
-const SIMPLE_ADM_WEEK={bus:'',lesson:'',sport:''};
+const SIMPLE_SELECTED_DATE={bus:'',lesson:''};
+const SIMPLE_ADM_WEEK={bus:'',lesson:''};
 function applyAdminIcons(){ document.querySelectorAll('.admin-logo').forEach(img=>{ img.src=ADMIN_ICON_SRC; img.alt=''; }); }
 function parseStartDateLoose(v){ const m=String(v||'').match(/(\d{1,2})\D+(\d{1,2})/); if(!m) return null; const now=new Date(); let y=now.getFullYear(); const dt=new Date(y, Number(m[1])-1, Number(m[2])); return isNaN(dt.getTime())?null:dt; }
 function getDefaultWeekValue(){ const dates=uniqueDates().filter(Boolean); if(!dates.length) return ''; const items=dates.map(v=>({v, d:parseStartDateLoose(v)})).filter(x=>x.d).sort((a,b)=>a.d-b.d); if(!items.length) return dates[0]; const today=new Date(); today.setHours(0,0,0,0); let pick=items[0].v; for(const item of items){ if(item.d<=today) pick=item.v; else break; } return pick || items[0].v; }
@@ -1524,7 +1389,7 @@ function populateWeekSelect(sel, selected){ if(!sel) return; const current=selec
 function inferStartDateByCourse(course){ const vals=[...new Set(D.courses.filter(c=>String(c.courseName||'')===String(course||'')).map(c=>c.startDate).filter(Boolean))]; return vals.length===1?vals[0]:''; }
 function getRowStartDate(row){ return row && (row.startDate || inferStartDateByCourse(row.course) || ''); }
 function filterByWeek(rows, week){ if(!week) return Array.isArray(rows)?rows:[]; return (Array.isArray(rows)?rows:[]).filter(r=>getRowStartDate(r)===week); }
-function syncAdminWeekSelectors(){ const def=getDefaultWeekValue(); if(!OE_ADM_WEEK) OE_ADM_WEEK=def; ['oe-adm-date-sel','adm-oe-date-sel','bus-adm-date-sel','adm-bus-date-sel','lesson-adm-date-sel','adm-lesson-date-sel','sport-adm-date-sel','adm-sport-date-sel'].forEach(id=>{ const sel=document.getElementById(id); const key=id.includes('oe')?'oe':(id.includes('lesson')?'lesson':(id.includes('sport')?'sport':'bus')); const selected=(key==='oe'?OE_ADM_WEEK:SIMPLE_ADM_WEEK[key]||def); if(key!=='oe' && !SIMPLE_ADM_WEEK[key]) SIMPLE_ADM_WEEK[key]=def; populateWeekSelect(sel, selected); }); }
+function syncAdminWeekSelectors(){ const def=getDefaultWeekValue(); if(!OE_ADM_WEEK) OE_ADM_WEEK=def; ['oe-adm-date-sel','adm-oe-date-sel','bus-adm-date-sel','adm-bus-date-sel','lesson-adm-date-sel','adm-lesson-date-sel','sport-adm-date-sel','adm-sport-date-sel'].forEach(id=>{ const sel=document.getElementById(id); const key=id.includes('oe')?'oe':(id.includes('lesson')?'lesson':'bus'); const selected=(key==='oe'?OE_ADM_WEEK:SIMPLE_ADM_WEEK[key]||def); ifpopulateWeekSelect(sel, selected); }); }
 function onAdminWeekChange(type, sel){ if(type==='oe'){ OE_ADM_WEEK=sel.value; syncAdminWeekSelectors(); OE_ADM_FILTER=OE_ADM_FILTER||'all'; const local=filterByWeek(filterOEData(lsGetOE('all'), OE_ADM_FILTER), OE_ADM_WEEK); oeAdmRender(local); admRenderOE(local); if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter='+OE_ADM_FILTER).then(r=>r.json()).then(res=>{ if(res.data){ const rows=filterByWeek(res.data, OE_ADM_WEEK); oeAdmRender(rows); admRenderOE(rows); } }).catch(()=>{}); } else { SIMPLE_ADM_WEEK[type]=sel.value; syncAdminWeekSelectors(); loadSimpleAdmin(type); } if(sel) sel.classList.toggle('ok', !!sel.value); }
 
 function initWeek(){
@@ -2068,12 +1933,12 @@ const GAS_READY = !GAS_URL.includes('YOUR_SCRIPT_ID');
 // ════ localStorage 헬퍼 ════
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}}
 function lsSave(k,a){try{localStorage.setItem(k,JSON.stringify(a));}catch(e){}}
-const APP_STORAGE_KEYS={bus:'bus_apps',lesson:'lesson_apps',sport:'sport_apps'};
+const APP_STORAGE_KEYS={bus:'bus_apps',lesson:'lesson_apps'};
 // tombstone: 삭제된 항목이 GAS 응답에 다시 나타나는 것을 방지 (localStorage에 영속 저장)
 function loadTombstonesFromLS_(){
-  const t={oe:new Set(),simple:{bus:new Set(),lesson:new Set(),sport:new Set()}};
+  const t={oe:new Set(),simple:{bus:new Set(),lesson:new Set()}};
   try{const oe=JSON.parse(localStorage.getItem('ts_oe')||'[]');oe.forEach(k=>t.oe.add(k));}catch(e){}
-  ['bus','lesson','sport'].forEach(type=>{
+  ['bus','lesson'].forEach(type=>{
     try{const arr=JSON.parse(localStorage.getItem('ts_'+type)||'[]');arr.forEach(k=>t.simple[type].add(k));}catch(e){}
   });
   return t;
@@ -2115,7 +1980,6 @@ function lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code){const a=lsGet(
 function lsResetSimpleApp(type,startDate){const a=lsGet(getSimpleKey(type));const next=startDate?a.filter(d=>String(d.startDate||'')!==String(startDate||'')):[];lsSave(getSimpleKey(type),next);return a.length-next.length;}
 function lsAddBus(d){lsAddSimpleApp('bus',d);} function lsGetBus(){return lsGetSimpleApp('bus');} function lsCheckBus(code){return lsCheckSimpleApp('bus',code);}
 function lsAddLesson(d){lsAddSimpleApp('lesson',d);} function lsGetLesson(){return lsGetSimpleApp('lesson');} function lsCheckLesson(code){return lsCheckSimpleApp('lesson',code);}
-function lsAddSport(d){lsAddSimpleApp('sport',d);} function lsGetSport(){return lsGetSimpleApp('sport');} function lsCheckSport(code){return lsCheckSimpleApp('sport',code);}
 function simpleRowKey(d){return [String(d.rowIdx||''),String(d.createdAt||''),String(normalizeBusCode(d.code)||''),String(d.name||''),String(d.phone||'')].join('|');}
 function mergeSimpleRows(localRows, remoteRows){
   const map=new Map();
@@ -2153,7 +2017,6 @@ function admTab(tab){
   if(tab==='outexit') admLoadOE();
   if(tab==='bus') loadSimpleAdmin('bus','adm-bus-stats','adm-bus-list');
   if(tab==='lesson') loadSimpleAdmin('lesson','adm-lesson-stats','adm-lesson-list');
-  if(tab==='sport') loadSimpleAdmin('sport','adm-sport-stats','adm-sport-list');
 }
 let ADM_OE_FILT='all';
 function admOeFilt(f,btn){
@@ -2253,7 +2116,7 @@ async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
 }
 async function adminResetCategory(type){
   const week = type==='oe' ? (OE_ADM_WEEK||'') : (SIMPLE_ADM_WEEK[type]||'');
-  const labelMap={oe:'외출·외박',bus:'귀가버스',lesson:'배드민턴 레슨',sport:'스포츠 시설'};
+  const labelMap={oe:'외출·외박',bus:'귀가버스',lesson:'배드민턴 레슨'};
   const scopeMsg = week ? `선택된 주차(${week}) 신청 내역만` : '해당 카테고리의 전체 신청 내역을';
   if(!confirm(`${labelMap[type]||type} 관리자 내역 초기화
 ${scopeMsg} 한꺼번에 삭제합니다.
@@ -2431,11 +2294,10 @@ function loadApprovalByToken(token){
 const SIMPLE_APP_CFG={
   bus:{key:'bus',label:'귀가 버스',icon:'🚌',courseInput:'busf-course',bankInput:'busf-bank',nameInput:'busf-name',phoneInput:'busf-phone',codeInput:'bus-chk-code',completeCode:'bus-comp-code',listAction:'listBus',checkAction:'checkBus',addAction:'addBus',cancelAction:'cancelBus',mainStats:'adm-bus-stats',mainList:'adm-bus-list',standStats:'bus-adm-stats',standList:'bus-adm-list'},
   lesson:{key:'lesson',label:'배드민턴 레슨',icon:'🏸',courseInput:'lessonf-course',bankInput:'lessonf-bank',nameInput:'lessonf-name',phoneInput:'lessonf-phone',codeInput:'lesson-chk-code',completeCode:'lesson-comp-code',listAction:'listLesson',checkAction:'checkLesson',addAction:'addLesson',cancelAction:'cancelLesson',mainStats:'adm-lesson-stats',mainList:'adm-lesson-list',standStats:'lesson-adm-stats',standList:'lesson-adm-list'},
-  sport:{key:'sport',label:'스포츠 시설',icon:'⛳🎮',courseInput:'sportf-course',bankInput:'sportf-bank',nameInput:'sportf-name',phoneInput:'sportf-phone',codeInput:'sport-chk-code',completeCode:'sport-comp-code',listAction:'listSport',checkAction:'checkSport',addAction:'addSport',cancelAction:'cancelSport',mainStats:'adm-sport-stats',mainList:'adm-sport-list',standStats:'sport-adm-stats',standList:'sport-adm-list'}
+
 };
 function getSimpleCfg(type){ return SIMPLE_APP_CFG[type]; }
 function initSimpleHub(type){ return; }
-function showSportIntro(){ showNotice('스포츠 시설 안내','식당 지하에 있는 골프, 게임방 시설입니다.<br>운영시간은 18:00~23:00 까지 입니다.<br><br>[신청]은 단순히 이용자 수를 파악하는 것 입니다.<br><span class="note-red">실제 사용을 위한 신청은 식당 아래층에서 오프라인으로 진행하셔야 합니다.</span>','⛳',true); }
 var BUS_SELECTED_DEST = '';
 var BUS_DEST_OPTS = [
   {id:'busf-dest-a', val:'천안버스터미널'},
@@ -2464,7 +2326,6 @@ function initSimpleApply(type){
   document.getElementById(`${type}-complete-wrap`).style.display='none';
   [cfg.bankInput,cfg.nameInput,cfg.phoneInput,cfg.courseInput].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   if(type==='bus') resetBusDestSel();
-  if(type==='sport') showSportIntro();
   if(SIMPLE_SELECTED_DATE[type]) setTimeout(()=>onSimpleDateSel(type, sel),0);
 }
 function onSimpleDateSel(type, sel){
@@ -2493,11 +2354,7 @@ function submitSimpleApp(type){
   const codeEl=document.getElementById(cfg.completeCode); if(codeEl) codeEl.textContent=code;
   document.getElementById(`${type}-apply-wrap`).style.display='none';
   document.getElementById(`${type}-complete-wrap`).style.display='block';
-  if(type==='sport'){
-    showNotice('꼭 확인해 주세요',"[신청]은 단순히 이용자 수를 파악하는 것 입니다.<br><span class='note-red'>실제 사용을 위한 신청은 식당 아래층에서 오프라인으로 진행하셔야 합니다.</span><br><br>이용하지 않을 경우 반드시 취소 신청해 주세요.",'📢',true);
-  } else {
-    showNotice('꼭 확인해 주세요',"버스, 레슨 신청후 이용하지 않을시 반드시 '취소'신청해주세요",'📌');
-  }
+  showNotice('꼭 확인해 주세요',"버스, 레슨 신청후 이용하지 않을시 반드시 '취소'신청해주세요",'📌');
 }
 function renderSimpleCheckResult(type,data){
   const el=document.getElementById(`${type}-chk-result`); if(!el) return;
@@ -2613,13 +2470,6 @@ function submitLesson(){ submitSimpleApp('lesson'); }
 function resetLessonApply(){ initSimpleApply('lesson'); }
 function checkLesson(){ checkSimpleApp('lesson'); }
 function loadLessonAdmin(){ loadSimpleAdmin('lesson'); }
-function initSportApply(){ initSimpleApply('sport'); }
-function onSportDateSel(sel){ onSimpleDateSel('sport', sel); }
-function pickSportCourse(name){ pickSimpleCourse('sport', name); }
-function submitSport(){ submitSimpleApp('sport'); }
-function resetSportApply(){ initSimpleApply('sport'); }
-function checkSport(){ checkSimpleApp('sport'); }
-function loadSportAdmin(){ loadSimpleAdmin('sport'); }
 
 // ════ 공식 서식 출력 ════
 function printForm(d){
@@ -2789,7 +2639,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     if(sel) sel.classList.toggle('ok', !!sel.value);
   };
   function moveAdminButtons(){
-    ['s-outexit','s-bus','s-lesson','s-sport'].forEach(id=>{
+    ['s-outexit','s-bus','s-lesson'].forEach(id=>{
       const screen=document.getElementById(id); if(!screen) return;
       const hdr=screen.querySelector('.hdr'); const btn=screen.querySelector('.simple-admin-btn');
       if(hdr && btn){ if(btn.previousElementSibling && btn.previousElementSibling.classList.contains('sep')) btn.previousElementSibling.remove(); btn.style.cssText+='margin-left:auto;margin-top:0;flex-shrink:0;'; btn.classList.add('hdr-admin-btn'); btn.classList.remove('simple-admin-btn'); hdr.appendChild(btn); }
@@ -2800,10 +2650,8 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
   function patchTextsAndNotes(){
     const weekTitle=document.querySelector('#s-week .stit'); if(weekTitle) weekTitle.textContent='과정이 시작되는 주차를 선택';
     document.querySelectorAll('option').forEach(o=>{ if((o.textContent||'').includes('과정이 시작되는 주차를 선택해주세요')) o.textContent=o.textContent.replace(/과정이 시작되는 주차를 선택해주세요/g,'과정이 시작되는 주차를 선택'); });
-    const sportNote=document.querySelector('#s-sport .service-note'); if(sportNote) sportNote.innerHTML='식당 지하 골프 · 게임방 시설입니다. 운영시간은 18:00~23:00 입니다.<br><span class="note-red">실제 사용을 위한 신청은 식당 아래층에서 오프라인으로 진행하셔야 합니다.</span>';
-  }
+    }
   window.showSportIntro = function(){
-    showNotice('스포츠 시설 안내',`식당 지하에 있는 골프, 게임방 시설입니다.<br>운영시간은 18:00~23:00 까지 입니다.<br><br>[신청]은 단순히 이용자 수를 파악하는 것 입니다.<br><span class="note-red">실제 사용을 위한 신청은 식당 아래층에서 오프라인으로 진행하셔야 합니다.</span>`,'⛳',true);
   };
   const __oldOnload = window.onload;
   window.onload = async function(){ if(__oldOnload) await __oldOnload(); ADM_OE_FILT='pending'; OE_ADM_FILTER='pending'; moveAdminButtons(); patchTextsAndNotes(); renderAllOeViews(); syncOeAndRender(); };
@@ -2964,7 +2812,7 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
         <div class="fgroup"><label class="flabel"><span class="step-num">3</span>성명 <span class="freq">*</span></label><input id="busf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
         <div class="fgroup"><label class="flabel"><span class="step-num">4</span>연락처 <span class="freq">*</span></label><input id="busf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
         <div class="fgroup" id="busf-dest-group">
-          <label class="flabel"><span class="step-num">5</span>하차 정류장 <span class="freq">*</span></label>
+          <label class="flabel"><span class="step-num">5</span>아래의 세곳중 한곳을 선택해주세요 <span class="freq">*</span></label>
           <button type="button" class="bus-dest-btn dest-a" id="busf-dest-a" onclick="selectBusDest('천안버스터미널')">🚌 천안버스터미널</button>
           <button type="button" class="bus-dest-btn dest-b" id="busf-dest-b" onclick="selectBusDest('천안역')">🚄 천안역</button>
           <button type="button" class="bus-dest-btn dest-c" id="busf-dest-c" onclick="selectBusDest('천안아산역')">🚅 천안아산역</button>
@@ -3053,59 +2901,6 @@ const CAMPUS_PHOTO = 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%
     <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="lesson-adm-date-sel" onchange="onAdminWeekChange('lesson',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
     <div class="stat-row" id="lesson-adm-stats"></div>
     <div id="lesson-adm-list"><div style="text-align:center;padding:24px;color:var(--text-3)">불러오는 중...</div></div>
-  </div>
-</div>
-
-<!-- ══ 스포츠 시설 메인 ══ -->
-<div id="s-sport" class="screen">
-  <div class="hdr"><button class="bk" onclick="goTo('home')">← 홈</button><h1>스포츠 시설 신청·확인</h1></div>
-  <div class="cnt">
-    <p class="stit" style="font-size:22px;margin-bottom:4px">스포츠 시설</p>
-    <div class="home-extra-grid" style="margin-top:16px">
-      <button class="home-extra-btn" onclick="goTo('sport-apply')"><span aria-hidden="true">⛳🎮</span><span>시설<br>신청</span></button>
-      <button class="home-extra-btn" onclick="goTo('sport-check')"><span aria-hidden="true">🔍</span><span>신청 내역<br>확인·취소</span></button>
-    </div>
-    <div class="service-note">식당 지하 골프 · 게임방 시설입니다. 운영시간은 18:00~23:00 입니다.</div>
-    <button class="btnadm simple-admin-btn" onclick="openPwOverlay('sport-admin')" style="gap:6px;padding:10px 18px;border-radius:14px;font-size:14px;font-weight:900;color:var(--primary);background:var(--primary-weak);border:1.5px solid #cfe0ff;width:auto;min-width:unset;">관리자 확인</button>
-  </div>
-</div>
-
-<div id="s-sport-apply" class="screen">
-  <div class="hdr"><button class="bk" onclick="goTo('sport')">← 뒤로</button><h1>스포츠 시설 신청</h1></div>
-  <div id="sport-apply-wrap"><div class="cnt">
-      <div class="ddwrap" style="margin-bottom:14px"><select class="csel" id="sport-date-sel" onchange="onSportDateSel(this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-      <div id="sport-clist" style="display:none;margin-bottom:14px"></div>
-      <div id="sport-form-area" style="display:none">
-        <div class="sep"></div>
-        <div class="fgroup"><label class="flabel"><span class="step-num">1</span>과정명</label><input id="sportf-course" class="finput" readonly style="background:#f5f7fa;color:var(--text-2)"></div>
-        <div class="fgroup"><label class="flabel"><span class="step-num">2</span>금고명 <span class="freq">*</span></label><div class="bank-wrap"><input id="sportf-bank" class="bank-inp" type="text" placeholder="예: 강남"><div class="bank-suffix">새마을금고</div></div></div>
-        <div class="fgroup"><label class="flabel"><span class="step-num">3</span>성명 <span class="freq">*</span></label><input id="sportf-name" class="finput" type="text" placeholder="이름을 입력하세요"></div>
-        <div class="fgroup"><label class="flabel"><span class="step-num">4</span>연락처 <span class="freq">*</span></label><input id="sportf-phone" class="finput" type="tel" placeholder="010-0000-0000"><div class="finput-hint">확인번호: <b>전화번호 뒤 4자리</b></div></div>
-        <button class="btnsave" onclick="submitSport()">신청하기</button>
-      </div>
-    </div></div>
-  <div id="sport-complete-wrap" style="display:none"><div class="cnt">
-      <div class="cbox"><div class="ce">⛳🎮</div><h2>신청 완료!</h2><div style="font-size:14px;color:var(--text-3);margin-bottom:6px">확인번호를 저장해 두세요</div><div class="cbox-code" id="sport-comp-code"></div><p>위 4자리 번호로 신청 내역을 확인할 수 있습니다</p></div>
-      <button class="btn btn-sec" style="width:100%;margin-bottom:10px" onclick="goTo('sport-check')">신청 내역 확인</button>
-      <button class="btnhome" onclick="resetSportApply()">새로 신청하기</button>
-    </div></div>
-</div>
-
-<div id="s-sport-check" class="screen">
-  <div class="hdr"><button class="bk" onclick="goTo('sport')">← 뒤로</button><h1>스포츠 시설 확인</h1></div>
-  <div class="cnt">
-    <div class="fgroup" style="margin-top:16px"><label class="flabel">전화번호 뒤 4자리</label><input id="sport-chk-code" class="finput" type="text" placeholder="예: 5068"></div>
-    <button class="btnsave" onclick="checkSport()">확인 / 취소하기</button>
-    <div id="sport-chk-result" style="margin-top:20px"></div>
-  </div>
-</div>
-
-<div id="s-sport-admin" class="screen">
-  <div class="hdr"><button class="bk" onclick="goTo('sport')">← 뒤로</button><h1>스포츠 시설 관리</h1></div>
-  <div class="cnt">
-    <div class="ddwrap" style="margin-bottom:12px"><div class="ddlabel">과정이 시작되는 주차</div><select class="csel" id="sport-adm-date-sel" onchange="onAdminWeekChange('sport',this)"><option value="">-- 과정이 시작되는 주차를 선택 --</option></select><span class="sarr">▾</span></div>
-    <div class="stat-row" id="sport-adm-stats"></div>
-    <div id="sport-adm-list"><div style="text-align:center;padding:24px;color:var(--text-3)">불러오는 중...</div></div>
   </div>
 </div>
 
