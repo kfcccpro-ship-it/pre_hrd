@@ -568,6 +568,80 @@ textarea.finput{resize:vertical;min-height:72px}
 .approve-info-table{width:100%;font-size:13px;border-collapse:collapse;line-height:2.2}
 .approve-info-table td:first-child{color:var(--text-3);width:80px;vertical-align:top}
 .approve-info-table td:last-child{font-weight:800;color:var(--text)}
+
+/* ===== PC / 태블릿 호환 (768px 이상) ===== */
+@media (min-width:768px){
+  html{ font-size:18px }
+  body{
+    max-width:600px;
+    font-size:18px;
+  }
+  .hdr{ max-width:600px }
+  .bottom-nav{ max-width:600px }
+  .popup{ max-width:600px }
+
+  /* 홈 화면 */
+  .horg{ font-size:36px; padding:16px 24px }
+  .btnstart{ font-size:20px; padding:22px 24px }
+  .home-extra-btn>span:first-child{ font-size:40px }
+  .home-extra-btn>span:last-child{ font-size:19px }
+
+  /* 과정 목록 */
+  .stit{ font-size:38px }
+  .ssub{ font-size:18px }
+  .cinfo h3{ font-size:22px }
+  .cbadge{ font-size:15px }
+  .chev{ font-size:24px }
+
+  /* 팝업 */
+  .popup-title{ font-size:34px }
+  .popup-room-line strong{ font-size:38px }
+  .popup-meta{ font-size:17px }
+  .guide-link-btn{ font-size:19px; padding:18px 20px }
+
+  /* 경로 안내 */
+  .sdesc h3{ font-size:var(--g-title,28px) }
+  .sdesc p{ font-size:var(--g-desc,20px) }
+  .btn{ font-size:19px; padding:18px }
+  .sbadge,.tbadge{ font-size:14px }
+
+  /* 이동수단 선택 */
+  .ts-title{ font-size:38px }
+  .ts-subtitle{ font-size:18px }
+  .ts-label{ font-size:24px }
+  .ts-desc{ font-size:17px }
+  .ts-kicker{ font-size:14px }
+
+  /* 신청서 폼 */
+  .ddlabel{ font-size:19px }
+  select,input[type=text],input[type=tel],input[type=date],textarea{
+    font-size:17px !important;
+    padding:14px 16px !important;
+  }
+  .btn-dest{ font-size:17px }
+
+  /* 바텀 네비 */
+  .bnav-btn{ font-size:15px }
+  .bnav-btn .bni{ font-size:28px }
+
+  /* 관리자 */
+  .atable th,.atable td{ font-size:15px }
+  .sttitle,.stedit-title{ font-size:20px }
+  .fontlbl,.fontval{ font-size:16px }
+  .stnum{ font-size:16px }
+  .stdesc{ font-size:16px }
+}
+
+@media (min-width:1024px){
+  body{ max-width:680px; font-size:19px }
+  .hdr,.bottom-nav,.popup{ max-width:680px }
+  .horg{ font-size:40px }
+  .stit{ font-size:42px }
+  .cinfo h3{ font-size:24px }
+  .sdesc h3{ font-size:var(--g-title,32px) }
+  .sdesc p{ font-size:var(--g-desc,22px) }
+}
+
 @media print{.bottom-nav,.hdr,.btnsave,.bk,.no-print{display:none!important}}
 
 
