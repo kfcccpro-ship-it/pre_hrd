@@ -810,8 +810,7 @@ textarea.finput{resize:vertical;min-height:72px}
   <div class="print-overlay-inner" id="print-overlay-content"></div>
 </div>
 
-<div class="toast" id="toast"></div>
-<div class="sync-overlay" id="sync-overlay"><div class="sync-box"><div class="sync-emoji" id="sync-emoji">⏳</div><div class="sync-title" id="sync-title">정보처리 중입니다</div><div class="sync-body" id="sync-body">서버와 정보를 송수신하고 있습니다.</div><div class="sync-count" id="sync-count">3</div><div class="sync-sub" id="sync-sub">잠시만 기다려 주세요. 버튼을 여러 번 누르지 않아도 됩니다.</div></div></div>
+<div class="toast" id="toast"></div>\n<div class="sync-overlay" id="sync-overlay"><div class="sync-box"><div class="sync-emoji" id="sync-emoji">⏳</div><div class="sync-title" id="sync-title">반영 중입니다</div><div class="sync-body" id="sync-body">취소 처리 후 화면을 다시 조회합니다.</div><div class="sync-count" id="sync-count">3</div><div class="sync-sub" id="sync-sub">버튼을 여러 번 누르지 않아도 됩니다.</div></div></div>
 <div class="zoom-overlay" id="zoom-overlay"><img id="zoom-img" src="" alt="확대 보기"><div class="zoom-hint" id="zoom-hint">두 손가락 확대 · 한 손가락 이동 · 탭하여 닫기</div></div>
 
 <div class="pw-overlay" id="pw-overlay">
@@ -2993,7 +2992,7 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
   }
   function refreshCurrentScreen(){
     const sid=currentScreenId_();
-    beginManualProcessing_({title:'새로고침 중입니다', body:'최신 정보를 다시 조회하고 있습니다.\n3초 후 화면에 반영됩니다.', emoji:'🔄'});
+    toast('🔄 새로고침 중입니다');
     try{
       if(sid==='s-home'){ renderHome(); return; }
       if(sid==='s-week'){ initWeek(); return; }
@@ -3058,105 +3057,6 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
     },1000);
   }
   window.startReflectCountdown=startReflectCountdown;
-
-  // ==== global GAS communication guard: show 3-second processing countdown for slow server reads/writes ====
-  let __processingDepth=0;
-  let __processingTimer=null;
-  let __processingVisibleAt=0;
-  let __processingDelayTimer=null;
-  let __processingCurrentLabel='정보처리 중입니다';
-  function getFetchUrl_(input){
-    try{
-      if(typeof input==='string') return input;
-      if(input && typeof input.url==='string') return input.url;
-    }catch(e){}
-    return '';
-  }
-  function looksLikeGASFetch_(input){
-    const u=getFetchUrl_(input);
-    return !!(GAS_READY && u && typeof GAS_URL==='string' && u.indexOf(GAS_URL)===0);
-  }
-  function inferProcessingMessage_(input, init){
-    const u=getFetchUrl_(input);
-    let body='';
-    try{ body=(init&&init.body) ? String(init.body) : ''; }catch(e){}
-    const text=(u+' '+body).toLowerCase();
-    if(text.includes('getcourses')) return {title:'과정 정보를 불러오는 중입니다', body:'과정과 강의실 정보를 조회하고 있습니다.\n3초 정도 기다리면 화면에 반영됩니다.', emoji:'🔎'};
-    if(text.includes('listoe')) return {title:'외출·외박 정보를 조회 중입니다', body:'관리자 목록과 신청 내역을 가져오고 있습니다.\n조회가 끝나면 최신 정보로 다시 표시됩니다.', emoji:'📋'};
-    if(text.includes('listbus')||text.includes('checkbus')) return {title:'귀가버스 정보를 조회 중입니다', body:'신청 내역과 집계 정보를 불러오고 있습니다.\n잠시 후 최신 정보가 표시됩니다.', emoji:'🚌'};
-    if(text.includes('listlesson')||text.includes('checklesson')) return {title:'배드민턴 정보를 조회 중입니다', body:'신청 내역과 집계 정보를 불러오고 있습니다.\n잠시 후 최신 정보가 표시됩니다.', emoji:'🏸'};
-    if(text.includes('addbus')||text.includes('addlesson')||text.includes('addoe')) return {title:'신청 정보를 전송 중입니다', body:'입력하신 신청 정보를 서버에 저장하고 있습니다.\n완료될 때까지 버튼을 다시 누르지 않아도 됩니다.', emoji:'📨'};
-    if(text.includes('cancel')||text.includes('delete')) return {title:'취소 정보를 반영 중입니다', body:'취소 요청을 서버에 반영하고 있습니다.\n3초 후 최신 내역을 다시 확인합니다.', emoji:'✅'};
-    if(text.includes('save')) return {title:'저장 중입니다', body:'변경한 정보를 서버에 저장하고 있습니다.\n잠시만 기다려 주세요.', emoji:'💾'};
-    return {title:'정보처리 중입니다', body:'서버와 정보를 송수신하고 있습니다.\n3초 정도 기다리면 최신 정보가 반영됩니다.', emoji:'⏳'};
-  }
-  function setProcessingOverlay_(info,left){
-    const ov=document.getElementById('sync-overlay');
-    const cnt=document.getElementById('sync-count');
-    const title=document.getElementById('sync-title');
-    const body=document.getElementById('sync-body');
-    const emoji=document.getElementById('sync-emoji');
-    const sub=document.getElementById('sync-sub');
-    if(!ov||!cnt) return;
-    if(title) title.textContent=(info&&info.title)||'정보처리 중입니다';
-    if(body) body.textContent=(info&&info.body)||'서버와 정보를 송수신하고 있습니다.\n3초 정도 기다려 주세요.';
-    if(emoji) emoji.textContent=(info&&info.emoji)||'⏳';
-    if(sub) sub.textContent='잠시만 기다려 주세요. 버튼을 여러 번 누르지 않아도 됩니다.';
-    cnt.textContent=String(Math.max(left,1));
-    document.querySelectorAll('button').forEach(b=>{ if(!b.classList.contains('refresh-btn')) b.classList.add('is-busy'); });
-    ov.classList.add('show');
-  }
-  function beginProcessingGuard_(info){
-    __processingDepth++;
-    __processingCurrentLabel=(info&&info.title)||'정보처리 중입니다';
-    if(__processingDepth===1){
-      if(__processingDelayTimer) clearTimeout(__processingDelayTimer);
-      __processingDelayTimer=setTimeout(()=>{
-        if(__processingDepth<=0) return;
-        let left=3;
-        __processingVisibleAt=Date.now();
-        setProcessingOverlay_(info,left);
-        if(__processingTimer) clearInterval(__processingTimer);
-        __processingTimer=setInterval(()=>{
-          if(__processingDepth<=0){ clearInterval(__processingTimer); __processingTimer=null; return; }
-          left-=1;
-          const cnt=document.getElementById('sync-count');
-          if(cnt) cnt.textContent=left>0 ? String(left) : '…';
-        },1000);
-      },180);
-    }
-  }
-  function endProcessingGuard_(){
-    __processingDepth=Math.max(0,__processingDepth-1);
-    if(__processingDepth>0) return;
-    if(__processingDelayTimer){ clearTimeout(__processingDelayTimer); __processingDelayTimer=null; }
-    const hide=()=>{
-      if(__processingDepth>0) return;
-      if(__processingTimer){ clearInterval(__processingTimer); __processingTimer=null; }
-      const ov=document.getElementById('sync-overlay');
-      if(ov) ov.classList.remove('show');
-      document.querySelectorAll('button.is-busy').forEach(b=>b.classList.remove('is-busy'));
-    };
-    const elapsed=__processingVisibleAt ? (Date.now()-__processingVisibleAt) : 9999;
-    const wait=Math.max(0,3000-elapsed);
-    setTimeout(hide, wait);
-  }
-  function beginManualProcessing_(info){
-    beginProcessingGuard_(info||{title:'정보처리 중입니다',body:'정보를 처리하고 있습니다.\n3초 정도 기다려 주세요.',emoji:'⏳'});
-    setTimeout(()=>endProcessingGuard_(), 3100);
-  }
-  window.beginManualProcessing_=beginManualProcessing_;
-  if(!window.__GAS_PROCESSING_FETCH_PATCHED__){
-    window.__GAS_PROCESSING_FETCH_PATCHED__=true;
-    const __nativeFetch=window.fetch.bind(window);
-    window.fetch=function(input,init){
-      const shouldTrack=looksLikeGASFetch_(input);
-      const info=shouldTrack ? inferProcessingMessage_(input,init) : null;
-      if(shouldTrack) beginProcessingGuard_(info);
-      return __nativeFetch(input,init).finally(()=>{ if(shouldTrack) endProcessingGuard_(); });
-    };
-  }
-
 
   cancelSimpleApp = function(type,rowIdx,createdAt,name,phone,code,course){
     const cfg=SIMPLE_CFG[type]; if(!cfg) return false;
