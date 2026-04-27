@@ -1594,7 +1594,7 @@ function inferStartDateByCourse(course){ const vals=[...new Set(D.courses.filter
 function getRowStartDate(row){ return row && (row.startDate || inferStartDateByCourse(row.course) || ''); }
 function filterByWeek(rows, week){ if(!week) return Array.isArray(rows)?rows:[]; return (Array.isArray(rows)?rows:[]).filter(r=>getRowStartDate(r)===week); }
 function syncAdminWeekSelectors(){ const def=getDefaultWeekValue(); if(!OE_ADM_WEEK) OE_ADM_WEEK=def; ['oe-adm-date-sel','adm-oe-date-sel','bus-adm-date-sel','adm-bus-date-sel','lesson-adm-date-sel','adm-lesson-date-sel'].forEach(id=>{ const sel=document.getElementById(id); const key=id.includes('oe')?'oe':(id.includes('lesson')?'lesson':'bus'); const selected=(key==='oe'?OE_ADM_WEEK:SIMPLE_ADM_WEEK[key]||def); if(!SIMPLE_ADM_WEEK[key]&&key!=='oe') SIMPLE_ADM_WEEK[key]=def; populateWeekSelect(sel, selected); }); }
-function onAdminWeekChange(type, sel){ if(type==='oe'){ OE_ADM_WEEK=sel.value; syncAdminWeekSelectors(); OE_ADM_FILTER=OE_ADM_FILTER||'all'; const local=filterByWeek(filterOEData(lsGetOE('all'), OE_ADM_FILTER), OE_ADM_WEEK); oeAdmRender(local); admRenderOE(local); if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter='+OE_ADM_FILTER).then(r=>r.json()).then(res=>{ if(res.data){ const rows=filterByWeek(res.data, OE_ADM_WEEK); oeAdmRender(rows); admRenderOE(rows); } }).catch(()=>{}); } else { SIMPLE_ADM_WEEK[type]=sel.value; syncAdminWeekSelectors(); loadSimpleAdmin(type); } if(sel) sel.classList.toggle('ok', !!sel.value); }
+function onAdminWeekChange(type, sel){ if(type==='oe'){ OE_ADM_WEEK=sel.value; syncAdminWeekSelectors(); OE_ADM_FILTER=OE_ADM_FILTER||'all'; const localAll=filterByWeek(lsGetOE('all').filter(d=>!oeIsClientDeleted(d)), OE_ADM_WEEK); const local=filterOEData(localAll, OE_ADM_FILTER); oeAdmRender(local,localAll); admRenderOE(local,localAll); if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter=all').then(r=>r.json()).then(res=>{ if(res.data){ const remoteAll=filterByWeek(res.data.filter(d=>!oeIsClientDeleted(d)), OE_ADM_WEEK); const rows=filterOEData(remoteAll, OE_ADM_FILTER); oeAdmRender(rows,remoteAll); admRenderOE(rows,remoteAll); } }).catch(()=>{}); } else { SIMPLE_ADM_WEEK[type]=sel.value; syncAdminWeekSelectors(); loadSimpleAdmin(type); } if(sel) sel.classList.toggle('ok', !!sel.value); }
 
 function initWeek(){
   const sel = document.getElementById('date-sel'); const notice = document.getElementById('no-data-notice'); const clistArea = document.getElementById('clist-area'); sel.innerHTML = '<option value="">-- 과정이 시작되는 주차를 선택 --</option>';
@@ -2153,7 +2153,36 @@ function saveTombstoneToLS_(type,key){
 }
 const CLIENT_DELETE_TOMBSTONES=loadTombstonesFromLS_();
 function oeDeleteKey(token,rowIdx){ return String(token||'') ? 't:'+String(token||'') : 'r:'+String(rowIdx||''); }
-function simpleDeleteKey(rowIdx,createdAt,name,phone,code){ return [String(rowIdx||''),String(createdAt||''),String(name||''),String(phone||''),String(normalizeBusCode(code)||'')].join('|'); }
+function oeIsClientDeleted(row){ return CLIENT_DELETE_TOMBSTONES.oe.has(oeDeleteKey(row&&row.token,row&&row.rowIdx)); }
+function normalizePhoneDigits(v){ return String(v||'').replace(/\D/g,''); }
+function simpleLegacyDeleteKey(rowIdx,createdAt,name,phone,code){ return [String(rowIdx||''),String(createdAt||''),String(name||''),String(phone||''),String(normalizeBusCode(code)||'')].join('|'); }
+function simpleIdentityKey(rowIdx,createdAt,name,phone,code,course){
+  const created=String(createdAt||'');
+  const c=String(normalizeBusCode(code)||'');
+  const ph=normalizePhoneDigits(phone);
+  const nm=String(name||'').trim();
+  const cr=String(course||'').trim();
+  if(created) return ['c',created,c,ph,nm,cr].join('|');
+  if(c && ph && nm) return ['p',c,ph,nm,cr].join('|');
+  return ['r',String(rowIdx||''),c].join('|');
+}
+function simpleDeleteKey(rowIdx,createdAt,name,phone,code,course){ return simpleIdentityKey(rowIdx,createdAt,name,phone,code,course); }
+function simpleRowIdentityKeys(row){
+  const d=row||{};
+  const keys=[
+    simpleIdentityKey(d.rowIdx,d.createdAt,d.name,d.phone,d.code,d.course),
+    simpleLegacyDeleteKey(d.rowIdx,d.createdAt,d.name,d.phone,d.code)
+  ];
+  return Array.from(new Set(keys.filter(k=>k && k!=='r||' && k!=='||||')));
+}
+function simpleIsClientDeleted(type,row){
+  const set=CLIENT_DELETE_TOMBSTONES.simple[type]||new Set();
+  return simpleRowIdentityKeys(row).some(k=>set.has(k));
+}
+function addSimpleTombstone(type,row){
+  if(!CLIENT_DELETE_TOMBSTONES.simple[type]) CLIENT_DELETE_TOMBSTONES.simple[type]=new Set();
+  simpleRowIdentityKeys(row).forEach(k=>{ CLIENT_DELETE_TOMBSTONES.simple[type].add(k); saveTombstoneToLS_(type,k); });
+}
 const DEFAULT_APP_SETTINGS={oeAdminPw:'2026',busAdminPw:'2026',oeMailRecipients:['pcrew123@naver.com'],roomRoutePrep:{seminar1:{roomName:'1세미나실',active:false,plannedCarSteps:5,plannedBusSteps:5,note:'내일 사진/설명 추가 예정'},seminar2:{roomName:'2세미나실',active:false,plannedCarSteps:5,plannedBusSteps:5,note:'내일 사진/설명 추가 예정'}}};
 function getAppSettings(){let saved={};try{saved=JSON.parse(localStorage.getItem('app_settings')||'{}')||{};}catch(e){}return {...DEFAULT_APP_SETTINGS,...saved};}
 function saveAppSettings(patch){const next={...getAppSettings(),...(patch||{})};localStorage.setItem('app_settings',JSON.stringify(next));return next;}
@@ -2176,32 +2205,104 @@ function formatOEReason(d){
   return extra?raw+'['+extra+']':raw;
 }
 function getSimpleKey(type){return APP_STORAGE_KEYS[type]||`${type}_apps`;}
-function lsAddSimpleApp(type,d){const a=lsGet(getSimpleKey(type));a.unshift({...d,code:normalizeBusCode(d.code),status:d.status||'active',cancelledAt:d.cancelledAt||'',rowIdx:a.length});lsSave(getSimpleKey(type),a);}
+function lsAddSimpleApp(type,d){const a=lsGet(getSimpleKey(type));const row={...d,code:normalizeBusCode(d.code),status:d.status||'active',cancelledAt:d.cancelledAt||''}; if(row.rowIdx===undefined||row.rowIdx===null||row.rowIdx==='') row.rowIdx=a.length; a.unshift(row);lsSave(getSimpleKey(type),a);}
 function lsGetSimpleApp(type){return lsGet(getSimpleKey(type)).map(d=>({...d,code:normalizeBusCode(d.code),status:d.status||'active'}));}
-function lsCheckSimpleApp(type,code){const key=normalizeBusCode(code);return lsGetSimpleApp(type).filter(d=>normalizeBusCode(d.code)===key);}
-function lsCancelSimpleApp(type,rowIdx,at){const a=lsGet(getSimpleKey(type));const i=a.findIndex(d=>String(d.rowIdx)===String(rowIdx));if(i>=0){a[i].status='cancelled';a[i].cancelledAt=at||new Date().toISOString();lsSave(getSimpleKey(type),a);return true;}return false;}
-function lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code){const a=lsGet(getSimpleKey(type));const next=a.filter(d=>!(String(d.rowIdx||'')===String(rowIdx||'') && String(d.createdAt||'')===String(createdAt||'') && String(d.name||'')===String(name||'') && String(d.phone||'')===String(phone||'') && String(normalizeBusCode(d.code)||'')===String(normalizeBusCode(code)||'')));lsSave(getSimpleKey(type),next);return next.length!==a.length;}
+function simpleIdentityMatches(d,rowIdx,createdAt,name,phone,code,course){
+  const created=String(createdAt||''); const c=normalizeBusCode(code); const ph=normalizePhoneDigits(phone); const nm=String(name||'').trim(); const cr=String(course||'').trim();
+  if(created && String(d.createdAt||'')===created){
+    if(c && normalizeBusCode(d.code)!==c) return false;
+    if(ph && normalizePhoneDigits(d.phone)!==ph) return false;
+    if(nm && String(d.name||'').trim()!==nm) return false;
+    if(cr && String(d.course||'').trim()!==cr) return false;
+    return true;
+  }
+  if(c && ph && nm){ return normalizeBusCode(d.code)===c && normalizePhoneDigits(d.phone)===ph && String(d.name||'').trim()===nm && (!cr || String(d.course||'').trim()===cr); }
+  if(rowIdx!==undefined && rowIdx!==null && String(rowIdx)!==''){
+    if(c) return String(d.rowIdx||'')===String(rowIdx) && normalizeBusCode(d.code)===c;
+    return String(d.rowIdx||'')===String(rowIdx);
+  }
+  return false;
+}
+function lsCheckSimpleApp(type,code){const key=normalizeBusCode(code);return lsGetSimpleApp(type).filter(d=>normalizeBusCode(d.code)===key && !simpleIsClientDeleted(type,d));}
+function lsCancelSimpleApp(type,rowIdx,at,createdAt,name,phone,code,course){
+  const k=getSimpleKey(type), a=lsGet(k);
+  const i=a.findIndex(d=>simpleIdentityMatches(d,rowIdx,createdAt,name,phone,code,course));
+  if(i>=0){a[i].status='cancelled';a[i].cancelledAt=at||new Date().toISOString();lsSave(k,a);return true;}
+  if(createdAt||name||phone||code||course){
+    a.unshift({rowIdx,createdAt,name,phone,code:normalizeBusCode(code),course,status:'cancelled',cancelledAt:at||new Date().toISOString()});
+    lsSave(k,a);return true;
+  }
+  return false;
+}
+function lsUpdateSimpleAppRowIdx(type,createdAt,name,phone,code,course,rowIdx){
+  const k=getSimpleKey(type), a=lsGet(k);
+  const i=a.findIndex(d=>simpleIdentityMatches(d,'',createdAt,name,phone,code,course));
+  if(i>=0){a[i].rowIdx=rowIdx;lsSave(k,a);return true;}
+  return false;
+}
+function lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code,course){const a=lsGet(getSimpleKey(type));const next=a.filter(d=>!simpleIdentityMatches(d,rowIdx,createdAt,name,phone,code,course));lsSave(getSimpleKey(type),next);return next.length!==a.length;}
 function lsResetSimpleApp(type,startDate){const a=lsGet(getSimpleKey(type));const next=startDate?a.filter(d=>String(d.startDate||'')!==String(startDate||'')):[];lsSave(getSimpleKey(type),next);return a.length-next.length;}
 function lsAddBus(d){lsAddSimpleApp('bus',d);} function lsGetBus(){return lsGetSimpleApp('bus');} function lsCheckBus(code){return lsCheckSimpleApp('bus',code);}
 function lsAddLesson(d){lsAddSimpleApp('lesson',d);} function lsGetLesson(){return lsGetSimpleApp('lesson');} function lsCheckLesson(code){return lsCheckSimpleApp('lesson',code);}
-function simpleRowKey(d){return [String(d.name||''),String(d.phone||'').replace(/\D/g,''),String(normalizeBusCode(d.code)||''),String(d.createdAt||'').slice(0,19)].join('|');}
-function mergeSimpleRows(localRows, remoteRows){
+function simpleRowKey(d){return simpleIdentityKey(d&&d.rowIdx,d&&d.createdAt,d&&d.name,d&&d.phone,d&&d.code,d&&d.course);}
+function simpleRowsSame(a,b){
+  const ak=simpleRowIdentityKeys(a||{}), bk=simpleRowIdentityKeys(b||{});
+  return ak.some(k=>bk.includes(k));
+}
+function simpleIsFreshLocalOnly(row, ms){
+  // 서버 동기화가 끝난 행은 서버에 없으면 관리자 삭제/초기화로 본다.
+  // 단, 막 신청되어 add 응답을 기다리는 pending 행만 짧게 보존한다.
+  const sync=String((row&&row.syncState)||'');
+  if(sync && sync!=='pending') return false;
+  const t=Date.parse(String((row&&row.createdAt)||''));
+  if(!Number.isFinite(t)) return false;
+  return (Date.now()-t) <= (ms||120000);
+}
+function mergeSimpleRows(localRows, remoteRows, opts){
   const map=new Map();
-  // 1. 원격 데이터 먼저 세팅
-  (Array.isArray(remoteRows)?remoteRows:[]).forEach(r=>{
-    const row={...r,code:normalizeBusCode(r.code),status:r.status||'active'};
-    map.set(simpleRowKey(row),row);
-  });
-  // 2. 로컬 데이터로 덮어쓰기 — 로컬 취소/삭제 상태는 항상 우선
-  (Array.isArray(localRows)?localRows:[]).forEach(r=>{
-    const row={...r,code:normalizeBusCode(r.code),status:r.status||'active'};
+  const opt=opts||{};
+  const remoteList=(Array.isArray(remoteRows)?remoteRows:[])
+    .map(r=>({...r,code:normalizeBusCode(r.code),status:r.status||'active'}));
+  const localList=(Array.isArray(localRows)?localRows:[])
+    .map(r=>({...r,code:normalizeBusCode(r.code),status:r.status||'active'}));
+
+  // 1. 서버 데이터를 먼저 세팅한다. 서버 재조회 성공 시 active 원격 행이 기준이다.
+  remoteList.forEach(row=>{ map.set(simpleRowKey(row),row); });
+
+  // 2. 로컬 취소는 서버 active보다 우선한다. 단, 서버에 없는 오래된 active 로컬 캐시는
+  //    관리자 삭제/초기화로 간주하여 재등장시키지 않는다.
+  localList.forEach(row=>{
     const key=simpleRowKey(row);
-    const existing=map.get(key)||{};
-    // 로컬이 cancelled면 원격 active여도 cancelled 유지
-    const finalStatus=(row.status==='cancelled'||existing.status==='cancelled')?'cancelled':row.status;
-    map.set(key,{...existing,...row,status:finalStatus});
+    const remoteMatch=remoteList.find(r=>simpleRowsSame(row,r));
+    const existing=remoteMatch ? (map.get(simpleRowKey(remoteMatch))||remoteMatch) : (map.get(key)||{});
+    const isLocalCancelled=row.status==='cancelled';
+    const keepLocalOnly=!opt.remoteAuthoritative || isLocalCancelled || simpleIsFreshLocalOnly(row,opt.localGraceMs||120000);
+    if(!remoteMatch && !keepLocalOnly) return;
+    const finalStatus=(isLocalCancelled || existing.status==='cancelled') ? 'cancelled' : (existing.status||row.status||'active');
+    const targetKey=remoteMatch ? simpleRowKey(remoteMatch) : key;
+    map.set(targetKey,{...existing,...row,status:finalStatus});
   });
   return Array.from(map.values()).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+}
+function reconcileSimpleLocalWithRemote(type, localRows, remoteRows){
+  const remoteList=(Array.isArray(remoteRows)?remoteRows:[]).map(r=>({...r,code:normalizeBusCode(r.code),status:r.status||'active'}));
+  const localList=(Array.isArray(localRows)?localRows:[]).map(r=>({...r,code:normalizeBusCode(r.code),status:r.status||'active'}));
+
+  // 서버 조회가 성공했는데 서버에 없는 오래된 active 로컬 신청은
+  // 다른 기기의 관리자 삭제/초기화가 반영된 것으로 보고 로컬에서도 제거한다.
+  localList.forEach(row=>{
+    if(row.status==='cancelled' || simpleIsFreshLocalOnly(row,120000)) return;
+    const exists=remoteList.some(r=>simpleRowsSame(row,r));
+    if(!exists){
+      addSimpleTombstone(type,row);
+      lsDeleteSimpleApp(type,row.rowIdx,row.createdAt,row.name,row.phone,row.code,row.course);
+    }
+  });
+
+  const cleanLocal=lsGetSimpleApp(type).filter(row=>!simpleIsClientDeleted(type,row));
+  const cleanRemote=remoteList.filter(row=>!simpleIsClientDeleted(type,row));
+  return mergeSimpleRows(cleanLocal, cleanRemote, {remoteAuthoritative:true, localGraceMs:120000})
+    .filter(row=>!simpleIsClientDeleted(type,row));
 }
 
 // ════ 공통 상태 ════
@@ -2226,15 +2327,21 @@ let ADM_OE_FILT='all';
 function admOeFilt(f,btn){
   ADM_OE_FILT=f;
   document.querySelectorAll('#adm-oe-filt .rfilt-btn').forEach(b=>b.classList.toggle('on',b===btn));
-  admRenderOE(filterByWeek(filterOEData(lsGetOE('all'),f), OE_ADM_WEEK));
-  if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter='+f).then(r=>r.json()).then(res=>{if(res.data)admRenderOE(filterByWeek(res.data, OE_ADM_WEEK));}).catch(()=>{});
+  const localAll=filterByWeek(lsGetOE('all').filter(d=>!oeIsClientDeleted(d)), OE_ADM_WEEK);
+  admRenderOE(filterOEData(localAll,f), localAll);
+  if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter=all').then(r=>r.json()).then(res=>{
+    if(res.data){
+      const remoteAll=filterByWeek(res.data.filter(d=>!oeIsClientDeleted(d)), OE_ADM_WEEK);
+      admRenderOE(filterOEData(remoteAll,f), remoteAll);
+    }
+  }).catch(()=>{});
 }
 function admLoadOE(){ syncAdminWeekSelectors(); admOeFilt(ADM_OE_FILT||'all',document.querySelector('#adm-oe-filt .rfilt-btn.on')||document.querySelector('#adm-oe-filt .rfilt-btn')); }
-function admRenderOE(data){
-  OE_CACHE = Array.isArray(data) ? data : [];
+function admRenderOE(data,statsSource){
+  OE_CACHE = (Array.isArray(data) ? data : OE_CACHE).filter(d=>!oeIsClientDeleted(d));
   const el=document.getElementById('adm-oe-list');
   const st=document.getElementById('adm-oe-stats');
-  const all=filterByWeek(lsGetOE('all'), OE_ADM_WEEK);
+  const all=(Array.isArray(statsSource)?statsSource:OE_CACHE).filter(d=>!oeIsClientDeleted(d));
   const pendingCnt=filterOEData(all,'pending').length;
   const returnedCnt=filterOEData(all,'returned').length;
   if(st) st.innerHTML=`<div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-lbl">전체</div></div><div class="stat-card"><div class="stat-num" style="color:var(--warning)">${pendingCnt}</div><div class="stat-lbl">외출중</div></div><div class="stat-card"><div class="stat-num" style="color:var(--success)">${returnedCnt}</div><div class="stat-lbl">복귀완료</div></div>`;
@@ -2280,7 +2387,7 @@ function admReturnOE(token){
   const now=new Date().toISOString();
   lsReturnOE(item.rowIdx,now);
   if(GAS_READY){
-    fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'returnOE',rowIdx:item.rowIdx,returnedAt:now})})
+    fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'returnOE',token:item.token,rowIdx:item.rowIdx,returnedAt:now})})
       .then(r=>r.json()).then(res=>{ if(!res.ok) throw new Error(res.msg||'복귀 처리 실패'); toast('✅ 복귀 처리 완료'); admLoadOE(); })
       .catch(err=>toast('❌ '+err.message));
     return;
@@ -2294,28 +2401,32 @@ async function adminDeleteOE(token,rowIdx,name){
   CLIENT_DELETE_TOMBSTONES.oe.add(delKey);
   saveTombstoneToLS_('oe',delKey);
   lsDeleteOE(token,rowIdx);
-  // 로컬 캐시로 즉시 재렌더 (GAS 재조회 없음 → 빠름)
-  if(typeof window.admRenderOE === 'function') window.admRenderOE();
+  const remain=(OE_CACHE||[]).filter(d=>!oeIsClientDeleted(d));
+  admRenderOE(remain);
+  oeAdmRender(remain);
   toast('🗑️ 삭제되었습니다');
   if(GAS_READY){
     fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteOE',token,rowIdx})})
-      .catch(()=>{});
+      .then(r=>r.json())
+      .then(res=>{ if(!(res&&res.ok)) throw new Error((res&&res.msg)||'서버 삭제 실패'); admLoadOE(); loadOEAdmin(); })
+      .catch(err=>toast('⚠️ 서버 삭제 반영 확인 필요: '+err.message));
   }
 }
-async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code){
+async function adminDeleteSimple(type,rowIdx,createdAt,name,phone,code,course){
   const label=name||'선택한 신청';
-  if(!confirm(`${label} 신청 내역을 삭제하시겠습니까?`)) return;
-  const delKey = simpleDeleteKey(rowIdx,createdAt,name,phone,code);
-  if(!CLIENT_DELETE_TOMBSTONES.simple[type]) CLIENT_DELETE_TOMBSTONES.simple[type] = new Set();
-  CLIENT_DELETE_TOMBSTONES.simple[type].add(delKey);
-  saveTombstoneToLS_(type,delKey);
-  lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code);
-  loadSimpleAdmin(type, undefined, undefined, true); // ← GAS 재조회 없이 즉시 반영
-  toast('🗑️ 삭제되었습니다');
-  // 서버 삭제는 백그라운드에서 조용히 처리
+  if(!confirm(`${label} 신청 내역을 취소 처리하시겠습니까?`)) return;
+  const now=new Date().toISOString();
+  // 관리자 삭제는 사용자가 직접 취소한 것과 같은 의미로 status=cancelled 처리한다.
+  // 물리 삭제를 하면 신청자 기기의 localStorage active 캐시가 남을 수 있으므로 상태 변경이 더 안전하다.
+  lsCancelSimpleApp(type,rowIdx,now,createdAt,name,phone,code,course);
+  loadSimpleAdmin(type, undefined, undefined, true);
   if(GAS_READY){
-    fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type,rowIdx,createdAt,name,phone,code})})
-      .catch(()=>{}); // 실패해도 로컬 삭제는 유지
+    fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type,rowIdx,createdAt,name,phone,code,course,cancelledAt:now})})
+      .then(r=>r.json())
+      .then(res=>{ if(!(res&&res.ok)) throw new Error((res&&res.msg)||'서버 취소 처리 실패'); toast('✅ 취소 처리되었습니다'); loadSimpleAdmin(type); })
+      .catch(err=>{ toast('⚠️ 로컬 취소 처리됨. 서버 반영 확인 필요: '+err.message); loadSimpleAdmin(type); });
+  } else {
+    toast('✅ 취소 처리되었습니다');
   }
 }
 async function adminResetCategory(type){
@@ -2344,13 +2455,19 @@ function loadOEAdmin(){ syncAdminWeekSelectors(); const sel=document.getElementB
 function oeAdmFilt(f,btn){
   OE_ADM_FILTER=f;
   if(btn) document.querySelectorAll('#oe-adm-filt .rfilt-btn').forEach(b=>b.classList.toggle('on',b===btn));
-  oeAdmRender(filterByWeek(filterOEData(lsGetOE('all'),f), OE_ADM_WEEK));
-  if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter='+f).then(r=>r.json()).then(res=>{ if(res.data) oeAdmRender(filterByWeek(res.data, OE_ADM_WEEK)); }).catch(()=>{});
+  const localAll=filterByWeek(lsGetOE('all').filter(d=>!oeIsClientDeleted(d)), OE_ADM_WEEK);
+  oeAdmRender(filterOEData(localAll,f), localAll);
+  if(GAS_READY) fetch(GAS_URL+'?action=listOE&filter=all').then(r=>r.json()).then(res=>{
+    if(res.data){
+      const remoteAll=filterByWeek(res.data.filter(d=>!oeIsClientDeleted(d)), OE_ADM_WEEK);
+      oeAdmRender(filterOEData(remoteAll,f), remoteAll);
+    }
+  }).catch(()=>{});
 }
-function oeAdmRender(data){
-  OE_CACHE = Array.isArray(data) ? data : [];
+function oeAdmRender(data,statsSource){
+  OE_CACHE = (Array.isArray(data) ? data : OE_CACHE).filter(d=>!oeIsClientDeleted(d));
   const el=document.getElementById('oe-adm-list'), st=document.getElementById('oe-adm-stats');
-  const all=filterByWeek(lsGetOE('all'), OE_ADM_WEEK);
+  const all=(Array.isArray(statsSource)?statsSource:OE_CACHE).filter(d=>!oeIsClientDeleted(d));
   const pendingCnt=filterOEData(all,'pending').length;
   const returnedCnt=filterOEData(all,'returned').length;
   if(st) st.innerHTML=`<div class="stat-card"><div class="stat-num">${all.length}</div><div class="stat-lbl">전체</div></div><div class="stat-card"><div class="stat-num" style="color:var(--warning)">${pendingCnt}</div><div class="stat-lbl">외출중</div></div><div class="stat-card"><div class="stat-num" style="color:var(--success)">${returnedCnt}</div><div class="stat-lbl">복귀완료</div></div>`;
@@ -2461,7 +2578,7 @@ function doReturnItem(token){
   if(!confirm(`${item.name}님을 복귀 처리하시겠습니까?`)) return;
   const now=new Date().toISOString();
   lsReturnOE(item.rowIdx,now);
-  if(GAS_READY){ fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'returnOE',rowIdx:item.rowIdx,returnedAt:now})}).then(r=>r.json()).then(res=>{ if(!res.ok) throw new Error(res.msg||'복귀 처리 실패'); toast('✅ 복귀 처리 완료'); searchReturn(); }).catch(err=>toast('❌ '+err.message)); return; }
+  if(GAS_READY){ fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'returnOE',token:item.token,rowIdx:item.rowIdx,returnedAt:now})}).then(r=>r.json()).then(res=>{ if(!res.ok) throw new Error(res.msg||'복귀 처리 실패'); toast('✅ 복귀 처리 완료'); searchReturn(); }).catch(err=>toast('❌ '+err.message)); return; }
   toast('✅ 복귀 처리 완료'); searchReturn();
 }
 async function adminIssueOE(token){
@@ -2554,7 +2671,9 @@ function submitSimpleApp(type){
   const bank=bankPfx+'새마을금고'; const code=digits.slice(-4);
   const payload={course,startDate:(SIMPLE_SELECTED_DATE[type]||document.getElementById(`${type}-date-sel`)?.value||inferStartDateByCourse(course)||''),bank,name,phone,code,status:'active',createdAt:new Date().toISOString(),cancelledAt:'',busDest:type==='bus'?BUS_SELECTED_DEST:''};
   if(type==='bus') lsAddBus(payload); else if(type==='lesson') lsAddLesson(payload);
-  if(GAS_READY) fetch(GAS_URL,{method:'POST',body:JSON.stringify({...payload,action:cfg.addAction})}).catch(()=>{});
+  if(GAS_READY) fetch(GAS_URL,{method:'POST',body:JSON.stringify({...payload,action:cfg.addAction})})
+    .then(r=>r.json()).then(res=>{ if(res&&res.ok&&res.rowIdx!==undefined) lsUpdateSimpleAppRowIdx(type,payload.createdAt,payload.name,payload.phone,payload.code,payload.course,res.rowIdx); })
+    .catch(()=>{});
   const codeEl=document.getElementById(cfg.completeCode); if(codeEl) codeEl.textContent=code;
   document.getElementById(`${type}-apply-wrap`).style.display='none';
   document.getElementById(`${type}-complete-wrap`).style.display='block';
@@ -2573,7 +2692,7 @@ function renderSimpleCheckResult(type,data){
     ${d.busDest?`<div class="binfo-row"><span class="binfo-lbl">하차 정류장</span><span class="binfo-val" style="font-weight:900;color:#1D4ED8;font-size:15px">${esc(d.busDest)}</span></div>`:''}
     <div class="binfo-row"><span class="binfo-lbl">상태</span><span class="binfo-val">${d.status==='cancelled'?'취소됨':'신청완료'}</span></div>
     ${d.cancelledAt?`<div class="binfo-row"><span class="binfo-lbl">취소시각</span><span class="binfo-val">${esc(String(d.cancelledAt).slice(0,16).replace('T',' '))}</span></div>`:''}
-    ${d.status!=='cancelled'?`<button type="button" class="btnsave" style="margin-top:12px;background:var(--danger)" onclick="return cancelSimpleApp(${jsa(type)},${jsa(d.rowIdx||'')})">신청 취소</button>`:''}
+    ${d.status!=='cancelled'?`<button type="button" class="btnsave" style="margin-top:12px;background:var(--danger)" onclick="return cancelSimpleApp(${jsa(type)},${jsa(d.rowIdx||'')},${jsa(d.createdAt||'')},${jsa(d.name||'')},${jsa(d.phone||'')},${jsa(normalizeBusCode(d.code)||'')},${jsa(d.course||'')})">신청 취소</button>`:''}
   </div>`).join('');
 }
 function checkSimpleApp(type){
@@ -2582,24 +2701,19 @@ function checkSimpleApp(type){
   const localRows=lsCheckSimpleApp(type,code);
   renderSimpleCheckResult(type,localRows);
   if(GAS_READY) fetch(GAS_URL+`?action=${cfg.checkAction}&code=`+encodeURIComponent(code)).then(r=>r.json()).then(res=>{
-    const remoteRows=(res&&res.data)||[];
-    const merged=mergeSimpleRows(localRows,remoteRows);
+    const remoteRows=((res&&res.data)||[]).filter(row=>!simpleIsClientDeleted(type,row));
+    const merged=reconcileSimpleLocalWithRemote(type,localRows,remoteRows);
     renderSimpleCheckResult(type,merged);
   }).catch(()=>{});
 }
-function cancelSimpleApp(type,rowIdx,extraData){
+function cancelSimpleApp(type,rowIdx,createdAt,name,phone,code,course){
   const cfg=getSimpleCfg(type); if(!confirm('신청을 취소하시겠습니까?')) return false;
   const now=new Date().toISOString();
-  // rowIdx로 로컬 취소 시도, 안 되면 extraData(name,phone,code)로 시도
-  let ok=lsCancelSimpleApp(type,rowIdx,now);
-  if(!ok && extraData){
-    // GAS에서 받은 rowIdx가 로컬 rowIdx와 다를 수 있음 - name/phone으로 재시도
-    const a=JSON.parse(localStorage.getItem(getSimpleKey(type)||type+'_apps')||'[]');
-    const i=a.findIndex(d=>String(d.name||'')=== String(extraData.name||'') && String(d.phone||'').replace(/\D/g,'')=== String(extraData.phone||'').replace(/\D/g,''));
-    if(i>=0){ a[i].status='cancelled'; a[i].cancelledAt=now; localStorage.setItem(getSimpleKey(type)||type+'_apps',JSON.stringify(a)); ok=true; }
-  }
+  const ok=lsCancelSimpleApp(type,rowIdx,now,createdAt,name,phone,code,course);
+  if(!ok){toast('⚠️ 취소할 신청을 찾지 못했습니다');return false;}
   const refresh=()=>{ const codeInput=document.getElementById(cfg.codeInput); if(codeInput && normalizeBusCode(codeInput.value)) checkSimpleApp(type); loadSimpleAdmin(type); };
-  if(GAS_READY) fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:cfg.cancelAction,rowIdx,cancelledAt:now})})
+  const payload={action:cfg.cancelAction,rowIdx,cancelledAt:now,createdAt,name,phone,code,course};
+  if(GAS_READY) fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)})
     .then(r=>r.json())
     .then(res=>{ if(!res.ok) throw new Error(res.msg||'신청 취소 실패'); toast('✅ 신청을 취소했습니다'); refresh(); })
     .catch(err=>{ toast('⚠️ 로컬에서는 취소되었고 서버 반영은 확인이 필요합니다'); refresh(); });
@@ -2644,7 +2758,7 @@ function renderSimpleAdminData(type,data,statsId,listId){
     const destLine=DESTS.filter(d=>dc[d]>0).map(d=>`${icons[d]}${d} ${dc[d]}명`).join(' · ');
     return `<div class="binfo-row" style="flex-direction:column;align-items:flex-start;gap:3px"><span class="binfo-lbl" style="font-size:14px">${esc(course)} · ${ms.length}명</span>${destLine?`<span style="font-size:12px;color:var(--primary);font-weight:700">${destLine}</span>`:''}</div>`;
   }).join('')}</div>`;
-  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="var body=this.nextElementSibling;body.classList.toggle('on');this.querySelector('.bgroup-arr').style.transform=body.classList.contains('on')?'rotate(180deg)':'rotate(0deg)'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 · 탭하여 신청내역 보기</div></div><span class="bgroup-arr" style="transition:transform .2s">▼</span></div><div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div>${m.busDest?`<div class="bmem-info" style="color:#1D4ED8;font-weight:800">🚏 ${esc(m.busDest)}</div>`:''}<div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(${jsa(type)},${jsa(m.rowIdx||'')},${jsa(m.createdAt||'')},${jsa(m.name||'')},${jsa(m.phone||'')},${jsa(normalizeBusCode(m.code)||'')})">🗑️ 삭제</button></div></div>`).join('')}</div></div>`).join('');
+  const groups=courseEntries.map(([course,ms])=>`<div class="bgroup"><div class="bgroup-hd" onclick="var body=this.nextElementSibling;body.classList.toggle('on');this.querySelector('.bgroup-arr').style.transform=body.classList.contains('on')?'rotate(180deg)':'rotate(0deg)'"><div><div>${esc(course)}</div><div class="bgroup-sub">${ms.length}명 · 탭하여 신청내역 보기</div></div><span class="bgroup-arr" style="transition:transform .2s">▼</span></div><div class="bgroup-body">${ms.map(m=>`<div class="bmem"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">${esc(m.bank||'-')} · ${esc(m.name||'-')}</div><div class="bmem-info">연락처 ${esc(m.phone||'-')} · 확인번호 ${esc(normalizeBusCode(m.code))}</div>${m.busDest?`<div class="bmem-info" style="color:#1D4ED8;font-weight:800">🚏 ${esc(m.busDest)}</div>`:''}<div class="bmem-info">상태 ${m.status==='cancelled'?'취소됨':'신청완료'}${m.cancelledAt?` · ${esc(String(m.cancelledAt).slice(0,16).replace('T',' '))}`:''}</div></div><button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple(${jsa(type)},${jsa(m.rowIdx||'')},${jsa(m.createdAt||'')},${jsa(m.name||'')},${jsa(m.phone||'')},${jsa(normalizeBusCode(m.code)||'')},${jsa(m.course||'')})">🗑️ 취소</button></div></div>`).join('')}</div></div>`).join('');
   el.innerHTML=destSummaryHtml+summary+groups;
 }
 function loadSimpleAdmin(type,statsId,listId,skipRemote){
@@ -2653,14 +2767,14 @@ function loadSimpleAdmin(type,statsId,listId,skipRemote){
   const sel=document.getElementById(`${type}-adm-date-sel`); if(sel) populateWeekSelect(sel, SIMPLE_ADM_WEEK[type]||getDefaultWeekValue()); const sel2=document.getElementById(`adm-${type}-date-sel`); if(sel2) populateWeekSelect(sel2, SIMPLE_ADM_WEEK[type]||getDefaultWeekValue());
   if(!SIMPLE_ADM_WEEK[type]) SIMPLE_ADM_WEEK[type]=getDefaultWeekValue();
   const tombstones = CLIENT_DELETE_TOMBSTONES.simple[type] || new Set();
-  const local=lsGetSimpleApp(type).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
+  const local=lsGetSimpleApp(type).filter(row=>!simpleIsClientDeleted(type,row));
   renderSimpleAdminData(type,local,statsId||cfg.mainStats,listId||cfg.mainList);
   renderSimpleAdminData(type,local,cfg.standStats,cfg.standList);
   // skipRemote=true 이면 GAS 재조회 생략 (삭제 직후 즉시 반영용)
   if(skipRemote || !GAS_READY) return;
   fetch(GAS_URL+`?action=${cfg.listAction}`).then(r=>r.json()).then(res=>{
-    const rows=((res&&res.data)||[]).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
-    const merged=mergeSimpleRows(local,rows).filter(row=>!tombstones.has(simpleDeleteKey(row.rowIdx,row.createdAt,row.name,row.phone,row.code)));
+    const rows=((res&&res.data)||[]).filter(row=>!simpleIsClientDeleted(type,row));
+    const merged=reconcileSimpleLocalWithRemote(type,local,rows);
     // 항상 렌더링 (tombstone 필터링 후 빈 결과도 표시)
     renderSimpleAdminData(type,merged,statsId||cfg.mainStats,listId||cfg.mainList);
     renderSimpleAdminData(type,merged,cfg.standStats,cfg.standList);
