@@ -2184,7 +2184,7 @@ function lsDeleteSimpleApp(type,rowIdx,createdAt,name,phone,code){const a=lsGet(
 function lsResetSimpleApp(type,startDate){const a=lsGet(getSimpleKey(type));const next=startDate?a.filter(d=>String(d.startDate||'')!==String(startDate||'')):[];lsSave(getSimpleKey(type),next);return a.length-next.length;}
 function lsAddBus(d){lsAddSimpleApp('bus',d);} function lsGetBus(){return lsGetSimpleApp('bus');} function lsCheckBus(code){return lsCheckSimpleApp('bus',code);}
 function lsAddLesson(d){lsAddSimpleApp('lesson',d);} function lsGetLesson(){return lsGetSimpleApp('lesson');} function lsCheckLesson(code){return lsCheckSimpleApp('lesson',code);}
-function simpleRowKey(d){return [String(d.rowIdx||''),String(d.createdAt||''),String(normalizeBusCode(d.code)||''),String(d.name||''),String(d.phone||'')].join('|');}
+function simpleRowKey(d){return [String(d.name||''),String(d.phone||'').replace(/\D/g,''),String(normalizeBusCode(d.code)||''),String(d.createdAt||'').slice(0,19)].join('|');}
 function mergeSimpleRows(localRows, remoteRows){
   const map=new Map();
   // 1. 원격 데이터 먼저 세팅
@@ -2587,11 +2587,17 @@ function checkSimpleApp(type){
     renderSimpleCheckResult(type,merged);
   }).catch(()=>{});
 }
-function cancelSimpleApp(type,rowIdx){
+function cancelSimpleApp(type,rowIdx,extraData){
   const cfg=getSimpleCfg(type); if(!confirm('신청을 취소하시겠습니까?')) return false;
   const now=new Date().toISOString();
-  const ok=lsCancelSimpleApp(type,rowIdx,now);
-  if(!ok){toast('⚠️ 취소할 신청을 찾지 못했습니다');return false;}
+  // rowIdx로 로컬 취소 시도, 안 되면 extraData(name,phone,code)로 시도
+  let ok=lsCancelSimpleApp(type,rowIdx,now);
+  if(!ok && extraData){
+    // GAS에서 받은 rowIdx가 로컬 rowIdx와 다를 수 있음 - name/phone으로 재시도
+    const a=JSON.parse(localStorage.getItem(getSimpleKey(type)||type+'_apps')||'[]');
+    const i=a.findIndex(d=>String(d.name||'')=== String(extraData.name||'') && String(d.phone||'').replace(/\D/g,'')=== String(extraData.phone||'').replace(/\D/g,''));
+    if(i>=0){ a[i].status='cancelled'; a[i].cancelledAt=now; localStorage.setItem(getSimpleKey(type)||type+'_apps',JSON.stringify(a)); ok=true; }
+  }
   const refresh=()=>{ const codeInput=document.getElementById(cfg.codeInput); if(codeInput && normalizeBusCode(codeInput.value)) checkSimpleApp(type); loadSimpleAdmin(type); };
   if(GAS_READY) fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:cfg.cancelAction,rowIdx,cancelledAt:now})})
     .then(r=>r.json())
