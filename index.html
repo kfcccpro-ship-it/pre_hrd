@@ -3362,5 +3362,109 @@ const CAMPUS_PHOTO = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUND
   </div>
 </div>
 
+
+<style id="mg-202604-mobile-cancel-patch">
+/* 2026-04 mobile compatibility + cancelled-state clarity */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overflow-x:hidden;word-break:keep-all;overflow-wrap:anywhere}
+.screen,.cnt,.card,.bgroup,.bmem,.req-item,.binfo-box,.dest-total-card{max-width:100%;overflow-wrap:anywhere}
+.finput,.bank-inp,.csel,button{max-width:100%;min-height:44px;font-size:16px}
+.req-info,.binfo-row,.bgroup-hd,.bmem>div{min-width:0}
+.req-name,.bmem-name,.bmem-info,.bgroup-sub{overflow-wrap:anywhere;word-break:keep-all}
+.cancelled-row,.req-item.cancelled-row,.bmem.cancelled-row{background:#f3f4f6!important;border-color:#d1d5db!important;color:#6b7280!important;box-shadow:none!important;filter:grayscale(.18)}
+.cancelled-row .bmem-name,.cancelled-row .req-name{color:#6b7280!important;text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:#9ca3af}
+.cancel-badge{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:999px;background:#e5e7eb;color:#4b5563;font-size:12px;font-weight:900;white-space:nowrap}
+.live-badge{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:999px;background:#e8f3ff;color:#1d4ed8;font-size:12px;font-weight:900;white-space:nowrap}
+.admin-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0 14px}
+.admin-dashboard-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:13px;box-shadow:0 8px 20px rgba(15,23,42,.05)}
+.admin-dashboard-card .t{font-size:12px;color:#6b7280;font-weight:900}.admin-dashboard-card .n{font-size:24px;font-weight:950;color:#111827;margin-top:3px}.admin-dashboard-card .s{font-size:12px;color:#4b5563;margin-top:4px;line-height:1.45}
+@media(max-width:480px){
+  .cnt{padding-left:16px!important;padding-right:16px!important}.hdr h1{font-size:18px!important;line-height:1.25!important;min-width:0}.hdr{gap:8px!important}.bk,.refresh-btn{flex:0 0 auto;white-space:nowrap}
+  .home-extra-grid,.admin-dashboard-grid{grid-template-columns:1fr!important}.stat-row{grid-template-columns:1fr!important}.stat-card{min-width:0!important}.bgroup-hd{align-items:flex-start!important}.bmem>div{flex-direction:column!important}.bmem button{width:100%;margin-top:8px}.req-info{grid-template-columns:1fr!important}.req-head{align-items:flex-start!important;gap:8px}.sync-box{width:calc(100vw - 32px)!important}
+}
+</style>
+<script id="mg-202604-cancel-dashboard-patch">
+(function(){
+  function x(v){return String(v==null?'':v).replace(/[&<>'"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c];});}
+  function normCode(v){return String(v||'').replace(/\D/g,'').slice(-4);}
+  function isCancelled(row){return String(row&&row.status||'').toLowerCase()==='cancelled';}
+  function statusText(row){return isCancelled(row)?'취소됨':'신청완료';}
+  function dt(v){return v?x(String(v).slice(0,16).replace('T',' ')):'-';}
+  window.getOEState=function(item){ var s=String(item&&item.status||''); if(s==='cancelled') return 'cancelled'; if(s==='returned') return 'returned'; return 'pending'; };
+  window.filterOEData=function(list,filter){ var arr=Array.isArray(list)?list:[]; if(filter==='all') return arr; return arr.filter(function(item){return window.getOEState(item)===filter;}); };
+  window.lsDeleteOE=function(token,rowIdx){
+    var a=lsGet('oe_apps'), now=new Date().toISOString(), changed=false;
+    a=a.map(function(d){ if(String(d.token||'')===String(token||'') || (!token && String(d.rowIdx||'')===String(rowIdx||''))){ changed=true; return Object.assign({},d,{status:'cancelled',cancelledAt:now}); } return d; });
+    lsSave('oe_apps',a); return changed;
+  };
+  window.lsResetOE=function(startDate){
+    var a=lsGet('oe_apps'), now=new Date().toISOString(), cnt=0;
+    a=a.map(function(d){ if(!startDate || String(d.startDate||'')===String(startDate||'')){ cnt++; return Object.assign({},d,{status:'cancelled',cancelledAt:now}); } return d; });
+    lsSave('oe_apps',a); return cnt;
+  };
+  window.admRenderOE=function(data,statsSource){
+    OE_CACHE=(Array.isArray(data)?data:OE_CACHE);
+    var el=document.getElementById('adm-oe-list'), st=document.getElementById('adm-oe-stats'); if(!el) return;
+    var all=(Array.isArray(statsSource)?statsSource:OE_CACHE);
+    var pending=all.filter(function(d){return getOEState(d)==='pending';}).length, returned=all.filter(function(d){return getOEState(d)==='returned';}).length, cancelled=all.filter(function(d){return getOEState(d)==='cancelled';}).length, active=pending+returned;
+    if(st) st.innerHTML='<div class="stat-card"><div class="stat-num">'+active+'</div><div class="stat-lbl">실제 신청</div></div><div class="stat-card"><div class="stat-num" style="color:var(--warning)">'+pending+'</div><div class="stat-lbl">외출중</div></div><div class="stat-card"><div class="stat-num" style="color:var(--success)">'+returned+'</div><div class="stat-lbl">복귀완료</div></div><div class="stat-card"><div class="stat-num" style="color:#6b7280">'+cancelled+'</div><div class="stat-lbl">취소</div></div>';
+    if(!OE_CACHE.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
+    el.innerHTML=OE_CACHE.map(function(item){return admOECard(item);}).join('');
+  };
+  window.admOECard=function(item){
+    var state=getOEState(item), cancelled=state==='cancelled';
+    var badge=cancelled?'<span class="cancel-badge">취소건</span>':(state==='returned'?'<span class="rbadge done">복귀완료</span>':'<span class="rbadge ing">외출중</span>');
+    var issueSent=!!item.mailSentAt;
+    var issueBtn=cancelled?'<button style="width:100%;padding:14px;background:#e5e7eb;color:#6b7280;border:1px solid #d1d5db;border-radius:12px;font-size:15px;font-weight:900;cursor:default;font-family:inherit" disabled>취소 완료 · 추가 조치 없음</button>':'<button style="width:100%;padding:14px;background:'+(issueSent?'#f0f0f0':'var(--primary)')+';color:'+(issueSent?'#aaa':'#fff')+';border:'+(issueSent?'1.5px solid #e0e0e0':'none')+';border-radius:12px;font-size:15px;font-weight:900;cursor:'+(issueSent?'default':'pointer')+';font-family:inherit;box-shadow:'+(issueSent?'none':'0 4px 12px rgba(49,130,246,.25)')+'" '+(issueSent?'disabled':'onclick="adminIssueOE('+jsa(item.token||'')+')"')+'>'+(issueSent?'📧 발송완료':'📧 메일발송 · 인쇄출력')+'</button>';
+    var returnBtn=(!cancelled&&state!=='returned')?'<button style="flex:1;padding:11px 6px;background:var(--success);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit" onclick="admReturnOE('+jsa(item.token||'')+')">✅ 복귀 처리</button>':'';
+    var deleteBtn=!cancelled?'<button style="flex:1;padding:11px 6px;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteOE('+jsa(item.token||'')+','+jsa(item.rowIdx||'')+','+jsa(item.name||'')+')">🗑️ 취소 처리</button>':'<span class="cancel-badge">취소 완료 · 취소 버튼 숨김</span>';
+    var sub='<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">'+returnBtn+deleteBtn+'</div>';
+    return '<div class="req-item '+(cancelled?'cancelled-row':'')+'"><div class="req-head"><span class="req-name">'+x(item.name||'-')+' <span style="font-size:12px;color:var(--text-3)">'+x(item.typeLabel||'')+'</span></span>'+badge+'</div><div style="margin-bottom:8px">'+(item.mailSentAt?'<span class="rbadge" style="background:var(--primary-weak);color:var(--primary)">메일발송 '+dt(item.mailSentAt)+'</span>':'<span class="rbadge" style="background:#f5f7fa;color:var(--text-3)">메일 미발송</span>')+(cancelled&&item.cancelledAt?' <span class="cancel-badge">취소시각 '+dt(item.cancelledAt)+'</span>':'')+'</div><div class="req-info"><div><b>소속</b> '+x(item.bankFull||item.sosok||'-')+'</div><div><b>직위</b> '+x(item.position||item.jikwi||'-')+'</div><div><b>과정</b> '+x(item.course||'-')+'</div><div><b>연락처</b> '+x(item.phone||'-')+'</div><div><b>이동수단</b> '+x(item.transport||'-')+'</div><div><b>외출시간</b> '+x(item.startdt||'-')+'</div><div><b>복귀예정</b> '+x(item.retTime||'미정')+'</div>'+(item.returnedAt?'<div><b>복귀시간</b> '+dt(item.returnedAt)+'</div>':'')+'</div><div style="margin-top:12px">'+issueBtn+sub+'</div></div>';
+  };
+  window.renderSimpleCheckResult=function(type,data){
+    var cfg=getSimpleCfg(type), el=document.getElementById(cfg.result); if(!el) return;
+    var rows=(Array.isArray(data)?data:[]).map(function(d){return Object.assign({},d,{code:normCode(d.code),status:d.status||'active'});});
+    if(!rows.length){el.innerHTML='<div class="binfo-box">신청 내역이 없습니다.</div>';return;}
+    el.innerHTML=rows.map(function(d){var c=isCancelled(d);return '<div class="binfo-box '+(c?'cancelled-row':'')+'"><div class="binfo-row"><span class="binfo-lbl">과정</span><span class="binfo-val">'+x(d.course||'-')+'</span></div><div class="binfo-row"><span class="binfo-lbl">성명</span><span class="binfo-val">'+x(d.name||'-')+'</span></div>'+(d.busDest?'<div class="binfo-row"><span class="binfo-lbl">하차</span><span class="binfo-val">'+x(d.busDest)+'</span></div>':'')+'<div class="binfo-row"><span class="binfo-lbl">상태</span><span class="binfo-val">'+(c?'<span class="cancel-badge">취소됨</span>':'<span class="live-badge">신청완료</span>')+'</span></div>'+(d.cancelledAt?'<div class="binfo-row"><span class="binfo-lbl">취소시각</span><span class="binfo-val">'+dt(d.cancelledAt)+'</span></div>':'')+(c?'<div class="cancel-badge" style="margin-top:12px">취소 완료 · 취소 버튼 없음</div>':'<button type="button" class="btnsave" style="margin-top:12px;background:var(--danger)" onclick="return cancelSimpleApp('+jsa(type)+','+jsa(d.rowIdx||'')+','+jsa(d.createdAt||'')+','+jsa(d.name||'')+','+jsa(d.phone||'')+','+jsa(normCode(d.code)||'')+','+jsa(d.course||'')+')">신청 취소</button>')+'</div>';}).join('');
+  };
+  window.renderSimpleAdminData=function(type,data,statsId,listId){
+    var cfg=getSimpleCfg(type), st=document.getElementById(statsId||cfg.mainStats), el=document.getElementById(listId||cfg.mainList); if(!st||!el) return;
+    var week=SIMPLE_ADM_WEEK[type]||'';
+    var rows=filterByWeek((Array.isArray(data)?data:[]).map(function(d){return Object.assign({},d,{code:normCode(d.code),status:d.status||'active'});}),week);
+    var active=rows.filter(function(d){return !isCancelled(d);}), cancelled=rows.filter(isCancelled);
+    st.innerHTML='<div class="stat-card"><div class="stat-num">'+active.length+'</div><div class="stat-lbl">실제 신청</div></div><div class="stat-card"><div class="stat-num">'+rows.length+'</div><div class="stat-lbl">전체 기록</div></div><div class="stat-card"><div class="stat-num" style="color:#6b7280">'+cancelled.length+'</div><div class="stat-lbl">취소</div></div>';
+    if(!rows.length){el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-3)">신청 내역이 없습니다</div>';return;}
+    var grp={}; rows.forEach(function(d){var key=d.course||'과정 미지정'; (grp[key]=grp[key]||[]).push(d);});
+    var entries=Object.entries(grp).sort(function(a,b){return b[1].length-a[1].length||String(a[0]).localeCompare(String(b[0]));});
+    var dest=''; if(type==='bus'){var ds=['천안버스터미널','천안역','천안아산역'], icon={'천안버스터미널':'🚌','천안역':'🚄','천안아산역':'🚅'}, cnt={}; ds.forEach(function(d){cnt[d]=0;}); active.forEach(function(r){if(cnt[r.busDest]!==undefined)cnt[r.busDest]++;}); dest='<div class="dest-total-card"><div style="font-size:15px;font-weight:900;color:#1E3A8A;margin-bottom:12px">🚌 하차 정류장별 인원 (실제 신청 기준)</div>'+ds.map(function(d){return '<div class="dest-row"><span class="dest-row-label">'+icon[d]+' '+d+'</span><span class="dest-row-cnt">'+cnt[d]+'명</span></div>';}).join('')+'</div>';}
+    var summary='<div class="binfo-box"><div style="font-size:15px;font-weight:900;color:var(--text);margin-bottom:10px">과정별 소계 (실제 신청 기준)</div>'+entries.map(function(e){var course=e[0], ms=e[1], ac=ms.filter(function(m){return !isCancelled(m);}).length, cc=ms.length-ac; return '<div class="binfo-row"><span class="binfo-lbl">'+x(course)+'</span><span class="binfo-val">신청 '+ac+'명 · 취소 '+cc+'명</span></div>';}).join('')+'</div>';
+    var groups=entries.map(function(e){var course=e[0], ms=e[1], ac=ms.filter(function(m){return !isCancelled(m);}).length; return '<div class="bgroup"><div class="bgroup-hd" onclick="var body=this.nextElementSibling;body.classList.toggle(\'on\');this.querySelector(\'.bgroup-arr\').style.transform=body.classList.contains(\'on\')?\'rotate(180deg)\':\'rotate(0deg)\'"><div><div>'+x(course)+'</div><div class="bgroup-sub">실제 신청 '+ac+'명 · 취소 '+(ms.length-ac)+'명</div></div><span class="bgroup-arr" style="transition:transform .2s">▼</span></div><div class="bgroup-body">'+ms.map(function(m){var c=isCancelled(m); return '<div class="bmem '+(c?'cancelled-row':'')+'"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;width:100%"><div style="flex:1"><div class="bmem-name">'+x(m.bank||'-')+' · '+x(m.name||'-')+'</div><div class="bmem-info">연락처 '+x(m.phone||'-')+' · 확인번호 '+x(normCode(m.code))+'</div>'+(m.busDest?'<div class="bmem-info" style="color:#1D4ED8;font-weight:800">🚏 '+x(m.busDest)+'</div>':'')+'<div class="bmem-info">상태 '+(c?'<span class="cancel-badge">취소됨</span>':'<span class="live-badge">신청완료</span>')+(m.cancelledAt?' · '+dt(m.cancelledAt):'')+'</div></div>'+(c?'<span class="cancel-badge">취소 버튼 없음</span>':'<button style="flex:0 0 auto;background:#fff1f2;color:#be123c;border:1px solid #fecdd3;border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="adminDeleteSimple('+jsa(type)+','+jsa(m.rowIdx||'')+','+jsa(m.createdAt||'')+','+jsa(m.name||'')+','+jsa(m.phone||'')+','+jsa(normCode(m.code)||'')+','+jsa(m.course||'')+')">🗑️ 취소</button>')+'</div></div>';}).join('')+'</div></div>';}).join('');
+    el.innerHTML=dest+summary+groups;
+  };
+  window.adminDeleteOE=async function(token,rowIdx,name){
+    var label=name||'선택한 신청'; if(!confirm(label+' 신청 내역을 취소 처리하시겠습니까?')) return;
+    var now=new Date().toISOString(); lsDeleteOE(token,rowIdx); admRenderOE(OE_CACHE); if(window.oeAdmRender) oeAdmRender(OE_CACHE);
+    if(GAS_READY){fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteOE',token:token,rowIdx:rowIdx,cancelledAt:now})}).then(function(r){return r.json();}).then(function(res){if(!(res&&res.ok))throw new Error((res&&res.msg)||'서버 취소 처리 실패');}).catch(function(err){toast('⚠️ 서버 반영 확인 필요: '+err.message);});}
+    startReflectCountdown({title:'취소 반영 중입니다',body:'관리자 취소가 접수되었습니다.\n3초 후 목록을 다시 조회합니다.',emoji:'🗑️',seconds:3,after:function(){admLoadOE(); if(window.loadOEAdmin) loadOEAdmin(); toast('✅ 취소 내역을 다시 조회했습니다');}});
+  };
+  window.adminDeleteSimple=async function(type,rowIdx,createdAt,name,phone,code,course){
+    var label=name||'선택한 신청'; if(!confirm(label+' 신청 내역을 취소 처리하시겠습니까?')) return;
+    var now=new Date().toISOString(); lsCancelSimpleApp(type,rowIdx,now,createdAt,name,phone,code,course); loadSimpleAdmin(type,undefined,undefined,true);
+    if(GAS_READY){fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deleteSimple',type:type,rowIdx:rowIdx,createdAt:createdAt,name:name,phone:phone,code:code,course:course,cancelledAt:now})}).then(function(r){return r.json();}).then(function(res){if(!(res&&res.ok))throw new Error((res&&res.msg)||'서버 취소 처리 실패');}).catch(function(err){toast('⚠️ 서버 반영 확인 필요: '+err.message);});}
+    startReflectCountdown({title:'관리자 취소 반영 중입니다',body:'관리자 취소가 접수되었습니다.\n3초 후 목록을 다시 조회합니다.',emoji:'🗑️',seconds:3,after:function(){loadSimpleAdmin(type);toast('✅ 관리자 취소 내역을 다시 조회했습니다');}});
+  };
+  window.loadAdminDashboardStats=function(){
+    if(!GAS_READY) return;
+    fetch(GAS_URL+'?action=getStats').then(function(r){return r.json();}).then(function(res){
+      if(!(res&&res.ok&&res.data)) return;
+      var host=document.querySelector('#s-admin .cnt'); if(!host||document.getElementById('admin-dashboard')) return;
+      var d=res.data, html='<div id="admin-dashboard"><div style="font-size:16px;font-weight:950;margin:8px 0 4px">📊 신청 통계 대시보드</div><div class="admin-dashboard-grid">'+['oe','bus','lesson'].map(function(k){var name={oe:'외출·외박',bus:'귀가버스',lesson:'배드민턴'}[k], v=d[k]||{}; return '<div class="admin-dashboard-card"><div class="t">'+name+'</div><div class="n">'+(v.active||0)+'</div><div class="s">실제 신청 · 전체 '+(v.total||0)+' / 취소 '+(v.cancelled||0)+'</div></div>';}).join('')+'</div></div>';
+      host.insertAdjacentHTML('afterbegin',html);
+    }).catch(function(){});
+  };
+  var oldRenderAdmin=window.renderAdmin; window.renderAdmin=function(){ if(oldRenderAdmin) oldRenderAdmin.apply(this,arguments); setTimeout(loadAdminDashboardStats,0); };
+})();
+</script>
 </body>
 </html>
