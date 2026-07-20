@@ -6,7 +6,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MG인재개발원 강의실 안내</title>
-<!-- 2026-07-20: 2전산실 전용 자차/대중교통 8단계 경로 반영 -->
+<!-- 2026-07-20: 세미나관/연수관 분기 고정 + 제2전산강의실 전용 8단계 경로 반영 -->
 <style>
 
 :root{
@@ -1041,9 +1041,9 @@ textarea.finput{resize:vertical;min-height:72px}
 
     <div class="asec">
       <h3>② 이동경로 사진 업로드</h3>
-      <p>자차/버스 경로 사진을 각각 최대 10장 업로드하세요.<br>모든 과정에 공통으로 사용됩니다.</p>
+      <p>자차 경로 사진은 최대 7장, 대중교통 경로 사진은 최대 10장 업로드하세요.<br>모든 연수관 강의실에 공통으로 사용됩니다.</p>
       <div style="margin-bottom:16px">
-        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px">자차 경로 사진 (최대 10장)</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:8px">자차 경로 사진 (최대 7장)</div>
         <div class="photo-grid" id="car-photo-grid"></div>
         <input type="file" id="car-photo-inp" accept="image/*" multiple style="display:none" onchange="handlePhotos('car',this)">
         <button onclick="document.getElementById('car-photo-inp').click()" style="width:100%;background:var(--primary-weak);color:var(--primary);border:1px solid #cfe0ff;border-radius:12px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">자차 사진 추가</button>
@@ -1205,19 +1205,37 @@ const COMPUTER2_TAIL_DESC = [
   {emoji:'💻', title:'2전산실 도착', desc:'복도를 따라 직진하면 오른쪽에\n107호 2전산강의실이 있습니다.', bg1:'#03B26C', bg2:'#02995B', fit:'contain'}
 ];
 
+// 강의실 경로 판별 규칙
+// 1) 연수관의 제2전산강의실만 전용 후반 경로를 사용합니다.
+// 2) 세미나관의 1·2세미나실만 세미나관 전용 경로를 사용합니다.
+// 3) 연수관의 3·4세미나실과 그 밖의 모든 강의실은 기존 연수관 공통 경로를 그대로 사용합니다.
+function normalizeRoomName(roomId){
+  return String(roomId||'')
+    .replace(/\s+/g,'')
+    .replace(/[·ㆍ]/g,'')
+    .trim();
+}
 function isComputerRoom2(roomId){
-  const normalized = String(roomId||'').replace(/\s+/g,'');
-  return normalized.includes('2전산');
+  const room = normalizeRoomName(roomId);
+  // 예: 2전산실, 제2전산실, 2전산강의실, 연수관107호2전산강의실
+  // 12전산실처럼 다른 번호가 잘못 포함되는 것은 제외합니다.
+  return /(^|[^0-9])(?:제)?2전산(?:강의)?실([^0-9]|$)/.test(room);
 }
 
-// 세미나실 사진 캐시 (자차 4장, 대중교통 5장)
+// 세미나실 사진 캐시 (세미나관 1·2세미나실 전용: 자차 4장, 대중교통 5장)
 let SEMINAR_PHOTO_CACHE = {car: Array(4).fill(null), bus: Array(5).fill(null)};
 
-// 강의실 경로 분기 판별
-// '세미나관' 키워드 → 세미나실 전용 경로
-// '연수관' 키워드 → 기존 전통 경로
 function isSeminarRoom(roomId){
-  return String(roomId||'').includes('세미나관');
+  const room = normalizeRoomName(roomId);
+  if(room.includes('세미나관')) return true;
+  // 건물명이 생략된 배정명도 1·2세미나실만 세미나관으로 판별합니다.
+  // 3·4세미나실은 연수관 공통 경로로 남겨 둡니다.
+  return /(^|[^0-9])(?:제)?[12]세미나(?:강의)?실([^0-9]|$)/.test(room);
+}
+function getRoomRouteType(roomId){
+  if(isComputerRoom2(roomId)) return 'computer2';
+  if(isSeminarRoom(roomId)) return 'seminar';
+  return 'training';
 }
 
 // 세미나실 전용 단계 반환
@@ -1230,6 +1248,10 @@ function getSeminarPhotoFileId_(slot){ return (slot && typeof slot==='object') ?
 // ═══════════════════════════════
 let D  = {courses:[]};
 const STEP_MAX = 10;
+const STEP_MAX_BY_TYPE = {car:7, bus:10};
+const PHOTO_SLOT_MAX = {car:7, bus:10};
+function getStepMax(type){ return STEP_MAX_BY_TYPE[type] || STEP_MAX; }
+function getPhotoSlotMax(type){ return PHOTO_SLOT_MAX[type] || 10; }
 let STEP_CFG = {
   car: { steps: DEFAULT_CAR_DESC.map(s=>({...s})), font: 14 },
   bus: { steps: DEFAULT_BUS_DESC.map(s=>({...s})), font: 14 }
@@ -1247,7 +1269,7 @@ function defaultStepObj(type, idx){
 function normalizeSteps(type, steps){
   const arr = Array.isArray(steps) ? steps : [];
   const defLen = ((type==='car') ? DEFAULT_CAR_DESC.length : DEFAULT_BUS_DESC.length) || 1;
-  let len = Math.min(STEP_MAX, Math.max(1, arr.length || defLen));
+  let len = Math.min(getStepMax(type), Math.max(1, arr.length || defLen));
   const out = [];
   for(let i=0;i<len;i++){
     const base = defaultStepObj(type, i);
@@ -1269,7 +1291,7 @@ async function loadStepCfg(){
   STEP_CFG = { car: { steps: DEFAULT_CAR_DESC.map(s=>({...s})), font: 14 }, bus: { steps: DEFAULT_BUS_DESC.map(s=>({...s})), font: 14 } };
   // localStorage 캐시 먼저 확인 (1시간 TTL)
   try{
-    const raw = localStorage.getItem('mg_stepcfg_cache');
+    const raw = localStorage.getItem('mg_stepcfg_cache_v2');
     if(raw){
       const {data, ts} = JSON.parse(raw);
       if(Date.now() - ts < 60*60*1000 && data){
@@ -1285,13 +1307,18 @@ async function loadStepCfg(){
     const json = await res.json();
     if(json.ok && json.data){
       const obj = json.data;
+      const oldCarStepCount = obj.car && Array.isArray(obj.car.steps) ? obj.car.steps.length : 0;
       if(obj.car){ STEP_CFG.car.font = normalizeFont(obj.car.font); STEP_CFG.car.steps = normalizeSteps('car', obj.car.steps); }
       if(obj.bus){ STEP_CFG.bus.font = normalizeFont(obj.bus.font); STEP_CFG.bus.steps = normalizeSteps('bus', obj.bus.steps); }
-      try{ localStorage.setItem('mg_stepcfg_cache', JSON.stringify({data:json.data, ts:Date.now()})); }catch(e){}
+      try{ localStorage.setItem('mg_stepcfg_cache_v2', JSON.stringify({data:{car:STEP_CFG.car,bus:STEP_CFG.bus}, ts:Date.now()})); }catch(e){}
+      if(oldCarStepCount > getStepMax('car')) await saveStepCfg();
     }
   }catch(e){}
 }
 async function saveStepCfg(){
+  STEP_CFG.car.steps = normalizeSteps('car', STEP_CFG.car.steps);
+  STEP_CFG.bus.steps = normalizeSteps('bus', STEP_CFG.bus.steps);
+  try{ localStorage.setItem('mg_stepcfg_cache_v2', JSON.stringify({data:STEP_CFG, ts:Date.now()})); }catch(e){}
   if(!GAS_READY) return;
   try{
     await fetch(GAS_URL, {
@@ -1306,7 +1333,7 @@ function getStepFont(type){ const cfg = STEP_CFG && STEP_CFG[type]; return cfg ?
 function applyGuideFont(type){ const base = getStepFont(type); document.documentElement.style.setProperty('--g-desc', base + 'px'); document.documentElement.style.setProperty('--g-title', Math.round(base * 1.2) + 'px'); }
 
 let COURSE_SEL = new Set();
-let PHOTO_CACHE = {car:Array(10).fill(null), bus:Array(10).fill(null)};
+let PHOTO_CACHE = {car:Array(7).fill(null), bus:Array(10).fill(null)};
 
 // ★ Firebase 제거 → 과정 목록은 Google Sheets '과정목록' 탭에 저장
 // (178개 + 강의실 = 약 17KB → PropertiesService 9KB 초과 → Sheets 사용)
@@ -1528,7 +1555,7 @@ function syncFontUI(type){ const r = document.getElementById(type+'-font'); cons
 function renderStepEditors(){ syncFontUI('car'); syncFontUI('bus'); renderStepEditor('car'); renderStepEditor('bus'); }
 function renderStepEditor(type){
   const wrap = document.getElementById(type+'-step-editor'); if(!wrap) return; wrap.innerHTML = '';
-  const steps = getStepDesc(type).slice(0, STEP_MAX); const total = steps.length;
+  const steps = getStepDesc(type).slice(0, getStepMax(type)); const total = steps.length;
   steps.forEach((s, idx)=>{
     const card = document.createElement('div'); card.className = 'stitem'; card.dataset.idx = String(idx);
     const top = document.createElement('div'); top.className = 'sttop';
@@ -1560,7 +1587,7 @@ async function resetSteps(type){
   if(!confirm('기본값으로 되돌릴까요?')) return; if(!STEP_CFG[type]) STEP_CFG[type] = {steps:[], font:14};
   STEP_CFG[type].steps = ((type==='car') ? DEFAULT_CAR_DESC : DEFAULT_BUS_DESC).map(s=>({...s})); await saveStepCfg(); renderStepEditor(type); toast('↩︎ 복원했습니다');
 }
-async function addStep(type){ const steps = readStepsFromEditor(type); if(steps.length >= STEP_MAX){ toast('최대 10단계까지 가능합니다'); return; } steps.push(defaultStepObj(type, steps.length)); if(!STEP_CFG[type]) STEP_CFG[type] = {steps:[], font:14}; STEP_CFG[type].steps = normalizeSteps(type, steps); await saveStepCfg(); renderStepEditor(type); toast('➕ 추가되었습니다'); }
+async function addStep(type){ const steps = readStepsFromEditor(type); const max=getStepMax(type); if(steps.length >= max){ toast('최대 '+max+'단계까지 가능합니다'); return; } steps.push(defaultStepObj(type, steps.length)); if(!STEP_CFG[type]) STEP_CFG[type] = {steps:[], font:14}; STEP_CFG[type].steps = normalizeSteps(type, steps); await saveStepCfg(); renderStepEditor(type); toast('➕ 추가되었습니다'); }
 async function removeStep(type){ const steps = readStepsFromEditor(type); if(steps.length <= 1){ toast('최소 1단계는 남겨야 합니다'); return; } steps.pop(); if(!STEP_CFG[type]) STEP_CFG[type] = {steps:[], font:14}; STEP_CFG[type].steps = normalizeSteps(type, steps); await saveStepCfg(); renderStepEditor(type); toast('➖ 제거했습니다'); }
 async function onFontSlider(type, val){ const f = normalizeFont(val); if(!STEP_CFG[type]) STEP_CFG[type] = {steps:[], font:14}; STEP_CFG[type].font = f; const v = document.getElementById(type+'-font-val'); if(v) v.textContent = f + 'px'; await saveStepCfg(); if(curScreen==='guide' && ST.transport===type){ applyGuideFont(type); renderGuide(); } }
 
@@ -1654,7 +1681,7 @@ function preloadGuidePhotos(){
   ['car','bus'].forEach(type=>{
     const cache = PHOTO_CACHE[type];
     if(!cache) return;
-    cache.forEach(slot=>{
+    cache.slice(0,getPhotoSlotMax(type)).forEach(slot=>{
       const url = getPhotoUrl_(slot); // ★ {url,fileId} 또는 string URL 모두 지원
       if(url){ const img=new Image(); img.src=url; }
     });
@@ -1673,8 +1700,10 @@ function pickTransport(type){
   ST.transport = type;
   applyGuideFont(type);
 
-  // 2전산실 전용 경로: 공통 1~5단계 + 신규 전용 사진 3장 = 총 8단계
-  if(isComputerRoom2(ST.roomId)){
+  const routeType = getRoomRouteType(ST.roomId);
+
+  // 연수관 제2전산강의실 전용 경로: 연수관 공통 1~5단계 + 신규 전용 사진 3장 = 총 8단계
+  if(routeType==='computer2'){
     const commonDesc = getStepDesc(type);
     const commonCache = PHOTO_CACHE[type] || [];
     ST.steps = [];
@@ -1694,12 +1723,13 @@ function pickTransport(type){
     return;
   }
 
-  // 세미나실이면 전용 경로, 아니면 기존 경로
-  const isSeminar = isSeminarRoom(ST.roomId);
+  // 세미나관 1·2세미나실이면 전용 경로, 그 밖에는 기존 연수관 공통 경로
+  const isSeminar = routeType==='seminar';
   const desc  = isSeminar ? getSeminarStepDesc(type) : getStepDesc(type);
   const cache = isSeminar ? SEMINAR_PHOTO_CACHE[type] : PHOTO_CACHE[type];
 
-  const count = Math.max((cache||[]).filter(Boolean).length, desc.length, 1);
+  const rawCount = Math.max((cache||[]).filter(Boolean).length, desc.length, 1);
+  const count = isSeminar ? rawCount : Math.min(getPhotoSlotMax(type), rawCount);
   ST.steps = [];
   for(let i=0;i<count;i++){
     const d = desc[i] || {emoji:'📸',title:`${i+1}단계`,desc:'다음 안내를 따라 이동하세요.',bg1:'#3182F6',bg2:'#1B64DA'};
@@ -1766,6 +1796,23 @@ function compressToBlob(file, maxW=1200, quality=0.82){
 function getPhotoUrl_(slot){ return slot ? (typeof slot==='string' ? slot : (slot.url||null)) : null; }
 function getPhotoFileId_(slot){ return (slot && typeof slot==='object') ? (slot.fileId||null) : null; }
 
+async function deleteStoredPhotoSlot_(slot){
+  const fileId = getPhotoFileId_(slot);
+  if(fileId && GAS_READY){
+    try{ await fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'deletePhoto',fileId})}); }catch(e){}
+  }
+}
+async function enforcePhotoCacheLimits_(persist){
+  const removedCar = Array.isArray(PHOTO_CACHE.car) ? PHOTO_CACHE.car.slice(getPhotoSlotMax('car')).filter(Boolean) : [];
+  PHOTO_CACHE.car = (Array.isArray(PHOTO_CACHE.car) ? PHOTO_CACHE.car.slice(0,getPhotoSlotMax('car')) : []);
+  while(PHOTO_CACHE.car.length<getPhotoSlotMax('car')) PHOTO_CACHE.car.push(null);
+  PHOTO_CACHE.bus = (Array.isArray(PHOTO_CACHE.bus) ? PHOTO_CACHE.bus.slice(0,getPhotoSlotMax('bus')) : []);
+  while(PHOTO_CACHE.bus.length<getPhotoSlotMax('bus')) PHOTO_CACHE.bus.push(null);
+  if(removedCar.length){
+    await Promise.allSettled(removedCar.map(deleteStoredPhotoSlot_));
+    if(persist) await savePhotoCache();
+  }
+}
 async function loadPhotos(){
   if(!GAS_READY) return;
   try{
@@ -1774,6 +1821,7 @@ async function loadPhotos(){
     if(json.ok && json.data){
       if(Array.isArray(json.data.car)) PHOTO_CACHE.car = json.data.car;
       if(Array.isArray(json.data.bus)) PHOTO_CACHE.bus = json.data.bus;
+      await enforcePhotoCacheLimits_(true);
     }
   }catch(e){}
 }
@@ -1811,9 +1859,9 @@ async function saveSeminarPhotoCache(){
 
 async function handlePhotos(type, inp){
   const files = Array.from(inp.files||[]); if(!files.length) return;
-  const cache = PHOTO_CACHE[type]; const emptySlots=[];
-  for(let i=0;i<10;i++){ if(!getPhotoUrl_(cache[i])) emptySlots.push(i); }
-  if(!emptySlots.length){ toast('⚠️ 최대 10장까지만 가능합니다'); inp.value=''; return; }
+  const cache = PHOTO_CACHE[type]; const emptySlots=[]; const maxSlots=getPhotoSlotMax(type);
+  for(let i=0;i<maxSlots;i++){ if(!getPhotoUrl_(cache[i])) emptySlots.push(i); }
+  if(!emptySlots.length){ toast('⚠️ 최대 '+maxSlots+'장까지만 가능합니다'); inp.value=''; return; }
   if(!GAS_READY){ toast('⚠️ GAS URL이 설정되지 않아 업로드할 수 없습니다'); inp.value=''; return; }
   const toAdd = files.slice(0,emptySlots.length);
   toast('사진을 업로드하는 중입니다.'); let saved=0;
@@ -1937,7 +1985,7 @@ function deletePhoto(type, idx){
 }
 function renderPhotoGrid(type){
   const cache = PHOTO_CACHE[type]; const grid = document.getElementById(type+'-photo-grid'); if(!grid) return; let html='';
-  for(let i=0;i<10;i++){
+  for(let i=0;i<getPhotoSlotMax(type);i++){
     const url = getPhotoUrl_(cache[i]); // ★ {url,fileId} 또는 string URL 모두 지원
     if(url){ html+=`<div class="photo-slot" id="ps-${type}-${i}"><img src="${url}" alt="사진${i+1}" style="width:100%;height:100%;object-fit:cover;display:block"><button class="del-photo" onclick="deletePhoto('${type}',${i})">✕</button></div>`; }
     else    { html+=`<div class="photo-slot" id="ps-${type}-${i}"><div class="slot-num"><span>📷</span>${i+1}번</div></div>`; }
@@ -1980,7 +2028,7 @@ async function resetData(){
   if(!confirm('모든 데이터를 초기화할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
   toast('초기화 중입니다.');
   // ★ Firebase Storage 코드 제거됨 — Drive 사진은 Drive 폴더에서 직접 삭제
-  PHOTO_CACHE = {car:Array(10).fill(null), bus:Array(10).fill(null)}; COURSE_SEL.clear(); D = {courses: []};
+  PHOTO_CACHE = {car:Array(7).fill(null), bus:Array(10).fill(null)}; COURSE_SEL.clear(); D = {courses: []};
   STEP_CFG = { car: { steps: DEFAULT_CAR_DESC.map(s=>({...s})), font: 14 }, bus: { steps: DEFAULT_BUS_DESC.map(s=>({...s})), font: 14 } };
   await savePhotoCache(); await saveStepCfg(); await save(); renderAdmin(); renderHome(); toast('초기화가 완료되었습니다.');
 }
