@@ -56,6 +56,7 @@ body{
 button,input,select,textarea{font:inherit}
 a{text-decoration:none;color:inherit}
 .screen{display:none;min-height:100vh;flex-direction:column;background:var(--bg);position:relative;isolation:isolate;overflow:hidden}
+@supports (height: 100dvh){.screen,.hw,.ts-wrap{min-height:100dvh}}
 .screen.active{display:flex}
 .screen::before{content:'';position:absolute;top:52px;right:-110px;width:270px;height:270px;background-image:var(--logo-url);background-size:contain;background-repeat:no-repeat;opacity:.06;pointer-events:none;transform:rotate(10deg);z-index:0}
 .screen::after{content:'';position:absolute;bottom:72px;left:-92px;width:220px;height:220px;background-image:var(--logo-url);background-size:contain;background-repeat:no-repeat;opacity:.03;pointer-events:none;transform:rotate(-14deg);z-index:0}
@@ -1335,6 +1336,12 @@ function applyGuideFont(type){ const base = getStepFont(type); document.document
 let COURSE_SEL = new Set();
 let PHOTO_CACHE = {car:Array(7).fill(null), bus:Array(10).fill(null)};
 
+// iOS/Safari 호환: 경로 사진 데이터 준비 상태를 명시적으로 관리합니다.
+// 필수 경로 데이터 로딩을 requestIdleCallback에 의존하지 않습니다.
+let GUIDE_DATA_READY = false;
+let GUIDE_DATA_PROMISE = null;
+let OPEN_TRANSPORT_PENDING = false;
+
 // ★ Firebase 제거 → 과정 목록은 Google Sheets '과정목록' 탭에 저장
 // (178개 + 강의실 = 약 17KB → PropertiesService 9KB 초과 → Sheets 사용)
 const COURSES_CACHE_KEY = 'mg_courses_cache';
@@ -1678,25 +1685,49 @@ function openPopup(listIdx){
 }
 function closePopup(e,fromBack){ if(e && e.target !== document.getElementById('popup-overlay')) return; document.getElementById('popup-overlay').classList.remove('show'); document.body.style.overflow=''; if(!fromBack) history.back(); }
 function preloadGuidePhotos(){
+  const routeType = getRoomRouteType(ST.roomId);
   ['car','bus'].forEach(type=>{
-    const cache = PHOTO_CACHE[type];
-    if(!cache) return;
-    cache.slice(0,getPhotoSlotMax(type)).forEach(slot=>{
-      const url = getPhotoUrl_(slot); // ★ {url,fileId} 또는 string URL 모두 지원
-      if(url){ const img=new Image(); img.src=url; }
-    });
+    const cache = routeType==='seminar' ? SEMINAR_PHOTO_CACHE[type] : PHOTO_CACHE[type];
+    if(cache){
+      const max = routeType==='seminar' ? cache.length : getPhotoSlotMax(type);
+      cache.slice(0,max).forEach(slot=>{
+        const url = routeType==='seminar' ? getSeminarPhotoUrl_(slot) : getPhotoUrl_(slot);
+        if(url){ const img=new Image(); img.decoding='async'; img.src=url; }
+      });
+    }
+    if(routeType==='computer2'){
+      COMPUTER2_ROUTE_PHOTOS.forEach(url=>{ const img=new Image(); img.decoding='async'; img.src=url; });
+    }
   });
 }
-function openTransportScreen(){
-  document.getElementById('popup-overlay').classList.remove('show'); document.body.style.overflow='';
-  history.back();
-  const roomInfo = document.getElementById('ts-room-info');
-  roomInfo.textContent = ST.roomId ? '목적지 ' + ST.roomId : '';
-  preloadGuidePhotos();
-  setTimeout(()=>goTo('transport'),50);
+async function openTransportScreen(){
+  if(OPEN_TRANSPORT_PENDING) return;
+  OPEN_TRANSPORT_PENDING = true;
+  try{
+    if(!GUIDE_DATA_READY) toast('경로 사진을 불러오는 중입니다…', 3500);
+    const ok = await ensureGuideDataReady(false);
+    if(!ok) toast('일부 경로 사진을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.', 4200);
+
+    document.getElementById('popup-overlay').classList.remove('show');
+    document.body.style.overflow='';
+    const roomInfo = document.getElementById('ts-room-info');
+    roomInfo.textContent = ST.roomId ? '목적지 ' + ST.roomId : '';
+    preloadGuidePhotos();
+
+    // iOS Safari에서 history.back() 완료 전에 다음 화면으로 이동하는 경쟁상태를 제거합니다.
+    // 현재 팝업 history 항목을 transport 화면으로 교체하면 뒤로가기도 안정적으로 유지됩니다.
+    history.replaceState({screen:'transport'},'');
+    goTo('transport', true);
+  }finally{
+    OPEN_TRANSPORT_PENDING = false;
+  }
 }
-function pickTransport(type){
+async function pickTransport(type){
   if(!ST.course){ toast('과정을 먼저 선택해 주세요'); return; }
+  if(!GUIDE_DATA_READY){
+    toast('경로 정보를 확인하고 있습니다…', 3000);
+    await ensureGuideDataReady(false);
+  }
   ST.transport = type;
   applyGuideFont(type);
 
@@ -1813,18 +1844,35 @@ async function enforcePhotoCacheLimits_(persist){
     if(persist) await savePhotoCache();
   }
 }
-async function loadPhotos(){
-  if(!GAS_READY) return;
+async function fetchWithTimeout_(url, options, timeoutMs){
+  const ms = timeoutMs || 8000;
+  if(typeof AbortController==='undefined') return fetch(url, options||{});
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), ms);
   try{
-    const res  = await fetch(GAS_URL+'?action=getAppData&key=app_photos');
+    return await fetch(url, Object.assign({}, options||{}, {signal:ctrl.signal, cache:'no-store'}));
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+async function loadPhotos(){
+  if(!GAS_READY) return true;
+  try{
+    const res  = await fetchWithTimeout_(GAS_URL+'?action=getAppData&key=app_photos', {}, 8000);
     const json = await res.json();
     if(json.ok && json.data){
       if(Array.isArray(json.data.car)) PHOTO_CACHE.car = json.data.car;
       if(Array.isArray(json.data.bus)) PHOTO_CACHE.bus = json.data.bus;
       await enforcePhotoCacheLimits_(true);
     }
-  }catch(e){}
+    return true;
+  }catch(e){
+    console.warn('경로 사진 로드 실패', e);
+    return false;
+  }
 }
+
 async function savePhotoCache(){
   if(!GAS_READY) return;
   try{
@@ -1835,18 +1883,47 @@ async function savePhotoCache(){
   }catch(e){}
 }
 
-// ★ 세미나실 전용 사진 로드/저장
+// ★ 세미나관 1·2세미나실 전용 사진 로드/저장
 async function loadSeminarPhotos(){
-  if(!GAS_READY) return;
+  if(!GAS_READY) return true;
   try{
-    const res  = await fetch(GAS_URL+'?action=getAppData&key=app_seminar_photos');
+    const res  = await fetchWithTimeout_(GAS_URL+'?action=getAppData&key=app_seminar_photos', {}, 8000);
     const json = await res.json();
     if(json.ok && json.data){
       if(Array.isArray(json.data.car)) SEMINAR_PHOTO_CACHE.car = json.data.car;
       if(Array.isArray(json.data.bus)) SEMINAR_PHOTO_CACHE.bus = json.data.bus;
     }
-  }catch(e){}
+    return true;
+  }catch(e){
+    console.warn('세미나관 사진 로드 실패', e);
+    return false;
+  }
 }
+
+function ensureGuideDataReady(force){
+  if(force){
+    GUIDE_DATA_READY = false;
+    GUIDE_DATA_PROMISE = null;
+  }
+  if(GUIDE_DATA_READY) return Promise.resolve(true);
+  if(GUIDE_DATA_PROMISE) return GUIDE_DATA_PROMISE;
+
+  GUIDE_DATA_PROMISE = Promise.all([loadPhotos(), loadSeminarPhotos()])
+    .then(results=>{
+      GUIDE_DATA_READY = true;
+      return results.every(Boolean);
+    })
+    .catch(err=>{
+      console.warn('경로 데이터 준비 실패', err);
+      GUIDE_DATA_READY = true; // 화면 자체는 기본 안내 이미지로 계속 사용할 수 있게 합니다.
+      return false;
+    })
+    .finally(()=>{
+      GUIDE_DATA_PROMISE = null;
+    });
+  return GUIDE_DATA_PROMISE;
+}
+
 async function saveSeminarPhotoCache(){
   if(!GAS_READY) return;
   try{
@@ -2209,7 +2286,9 @@ document.addEventListener('DOMContentLoaded', () => {
   syncAdminWeekSelectors();
   startBootCountdown();
   goTo('home');
-  Promise.allSettled([load(), loadStepCfg()]).then(()=>{  // ← loadPhotos() 제거 (lazy load로 전환)
+  // iOS/Safari 호환: 과정/설정/경로사진 메타데이터를 함께 준비합니다.
+  // requestIdleCallback은 필수 데이터 로딩에 사용하지 않습니다.
+  Promise.allSettled([load(), loadStepCfg(), ensureGuideDataReady(false)]).then(()=>{
     appReady = true;
     renderHome();
     if(bootCountdownDone && splashAnimDone){
@@ -2217,9 +2296,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if(bootLaunchQueued){ bootLaunchQueued = false; goTo('week'); }
     }
     if(curScreen==='week') initWeek();
-  }).finally(()=>{
-    // 사진은 idle 시간에 백그라운드로 로딩 (홈 화면에서는 불필요)
-    requestIdleCallback ? requestIdleCallback(()=>{ loadPhotos(); loadSeminarPhotos(); }) : setTimeout(()=>{ loadPhotos(); loadSeminarPhotos(); }, 3000);
   });
 });
 
